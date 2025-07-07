@@ -113,7 +113,7 @@ export default function PrivacyPage() {
               <section className="space-y-4">
                 <h2 className="text-2xl font-semibold text-primary">Policy Updates (No Surprises)</h2>
                 <p className="leading-relaxed">
-                  This policy is current as of <strong>December 2024</strong>. If I make any changes, I'll update it here, 
+                  This policy is current as of <strong>July 2025</strong>. If I make any changes, I'll update it here, 
                   so you're always in the loop. Feel free to check back occasionally, but don't worry—I'm not making any 
                   big changes without being transparent about it.
                 </p>

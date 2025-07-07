@@ -1,11 +1,9 @@
 import { Button } from "@/components/ui/button"
 import { Github, Linkedin, Mail, Instagram, FileText, ChevronDown } from "lucide-react"
 import Link from "next/link"
-import ContactForm from "./components/contact-form"
-import ProjectCard from "./components/project-card"
-import TechStack from "./components/tech-stack"
 import { Card } from "@/components/ui/card"
 import Image from "next/image"
+import TechStack from "../components/tech-stack"
 
 export default function AboutPage() {
   return (
@@ -17,36 +15,41 @@ export default function AboutPage() {
               <span className="font-bold">MelvinDY</span>
             </Link>
             <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-              <Link href="/about" className="transition-colors hover:text-foreground/80">
+              <Link href="#hero" className="transition-colors hover:text-foreground/80">
                 About
               </Link>
-              <Link href="#projects" className="transition-colors hover:text-foreground/80">
-                Projects
+              <Link href="#story" className="transition-colors hover:text-foreground/80">
+                My Story
+              </Link>
+              <Link href="#tech" className="transition-colors hover:text-foreground/80">
+                Tech Stack
               </Link>
               <Link href="#contact" className="transition-colors hover:text-foreground/80">
                 Contact
               </Link>
             </nav>
           </div>
-          <Button variant="outline">
-            Resume
-          </Button>
+          <Link href="/">
+            <Button variant="outline" size="sm">
+              ← Back to Home
+            </Button>
+          </Link>
         </div>
       </header>
 
       <main className="w-full">
         {/* Hero Section - Full Screen */}
-        <section id="hero" className="min-h-screen flex items-center justify-center py-12 md:py-24 lg:py-32">
+        <section id="hero" className="min-h-screen flex items-center justify-center py-12 md:py-24 lg:py-32 relative">
           <div className="container mx-auto px-4 md:px-6">
             <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
               {/* Left Content */}
               <div className="space-y-6 text-center lg:text-left">
                 <div className="space-y-4">
                   <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-                    hi john here, 👋
+                    hi Melvin here, 👋
                   </h1>
                   <p className="text-xl md:text-2xl text-muted-foreground">
-                    Web dev enthusiast from Melbourne 🇦🇺
+                    Web dev enthusiast from Sydney 🇦🇺
                   </p>
                 </div>
 
@@ -71,7 +74,7 @@ export default function AboutPage() {
                       <span className="sr-only">LinkedIn</span>
                     </Button>
                   </Link>
-                  <Link href="mailto:hello@example.com">
+                  <Link href="mailto:melvindarialyogiana@gmail.com">
                     <Button variant="outline" size="icon">
                       <Mail className="h-4 w-4" />
                       <span className="sr-only">Email</span>
@@ -92,11 +95,25 @@ export default function AboutPage() {
                   <div className="aspect-[4/5] w-80 relative rounded-2xl overflow-hidden">
                     <Image
                       src="/placeholder.svg?height=600&width=480"
-                      alt="John - Full Stack Developer"
+                      alt="Melvin - Full Stack Developer"
                       fill
                       className="object-cover"
                       priority
                     />
+                  </div>
+                  {/* Tech stack icons overlay */}
+                  <div className="absolute -bottom-4 -right-4 bg-background border rounded-lg p-4 shadow-lg">
+                    <div className="flex gap-2">
+                      <div className="w-8 h-8 rounded bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 text-xs font-bold">
+                        JS
+                      </div>
+                      <div className="w-8 h-8 rounded bg-green-100 dark:bg-green-900 flex items-center justify-center text-green-600 text-xs font-bold">
+                        TS
+                      </div>
+                      <div className="w-8 h-8 rounded bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-purple-600 text-xs font-bold">
+                        ⚛️
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -127,7 +144,7 @@ export default function AboutPage() {
                     </p>
                     
                     <p>
-                      When I'm not coding, you'll probably find me exploring Melbourne's 
+                      When I'm not coding, you'll probably find me exploring Sydney's 
                       coffee scene or planning my next adventure. I believe the best 
                       developers are curious about everything, not just code.
                     </p>
@@ -163,36 +180,8 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section id="projects" className="py-12 md:py-24 lg:py-32">
-          <div className="container mx-auto px-4 md:px-6">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-12 text-center">Projects</h2>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
-              <ProjectCard
-                title="E-commerce Platform"
-                description="A full-stack e-commerce platform built with Next.js, Prisma, and Stripe integration."
-                image="/placeholder.svg?height=400&width=600"
-                link="https://github.com"
-                tags={["Next.js", "Prisma", "Stripe"]}
-              />
-              <ProjectCard
-                title="Task Management App"
-                description="A real-time task management application with team collaboration features."
-                image="/placeholder.svg?height=400&width=600"
-                link="https://github.com"
-                tags={["React", "Node.js", "Socket.io"]}
-              />
-              <ProjectCard
-                title="AI Chat Interface"
-                description="An AI-powered chat interface with natural language processing capabilities."
-                image="/placeholder.svg?height=400&width=600"
-                link="https://github.com"
-                tags={["OpenAI", "Next.js", "TailwindCSS"]}
-              />
-            </div>
-          </div>
-        </section>
-
-        <section className="py-12 md:py-24 lg:py-32">
+        {/* Tech Stack Section */}
+        <section id="tech" className="py-12 md:py-24 lg:py-32">
           <div className="container mx-auto px-4 md:px-6">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-12 text-center">
               Tech Stack
@@ -203,31 +192,71 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section id="contact" className="py-12 md:py-24 lg:py-32">
+        {/* Contact Section */}
+        <section id="contact" className="py-12 md:py-24 lg:py-32 bg-muted/20">
           <div className="container mx-auto px-4 md:px-6">
             <div className="mx-auto max-w-2xl">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-12 text-center">
-                Get in Touch
-              </h2>
-              <ContactForm />
+              <Card className="p-8 md:p-12">
+                <div className="space-y-8 text-center">
+                  <div className="space-y-4">
+                    <h2 className="text-3xl md:text-4xl font-bold">Let's Build Something Together</h2>
+                    <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                      I'm always excited about new projects and opportunities to learn. 
+                      Whether you have a project in mind or just want to chat about tech, let's connect!
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Button asChild size="lg">
+                      <Link href="mailto:melvindarialyogiana@gmail.com">
+                        <Mail className="h-4 w-4 mr-2" />
+                        Send me an email
+                      </Link>
+                    </Button>
+                    
+                    <Button variant="outline" size="lg" asChild>
+                      <Link href="/resume.pdf" target="_blank">
+                        <FileText className="h-4 w-4 mr-2" />
+                        View Resume
+                      </Link>
+                    </Button>
+                    
+                    <Button variant="outline" size="lg" asChild>
+                      <Link href="/">
+                        View My Work
+                      </Link>
+                    </Button>
+                  </div>
+
+                  {/* Social Links */}
+                  <div className="flex justify-center gap-4 pt-4">
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link href="https://github.com" target="_blank">
+                        <Github className="h-4 w-4 mr-2" />
+                        GitHub
+                      </Link>
+                    </Button>
+                    
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link href="https://linkedin.com" target="_blank">
+                        <Linkedin className="h-4 w-4 mr-2" />
+                        LinkedIn
+                      </Link>
+                    </Button>
+                    
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link href="https://instagram.com/your-pet-instagram" target="_blank">
+                        <Instagram className="h-4 w-4 mr-2" />
+                        Pet Support
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </Card>
             </div>
           </div>
         </section>
       </main>
-
-      <footer className="border-t">
-        <div className="container mx-auto flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6">
-          <p className="text-xs text-gray-500 dark:text-gray-400">© 2025 MelvinDY All rights reserved.</p>
-          <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-            <Link className="text-xs hover:underline underline-offset-4" href="/privacy">
-              Privacy Policy
-            </Link>
-            <Link className="text-xs hover:underline underline-offset-4" href="mailto:melvindarialyogiana@gmail.com">
-              Contact
-            </Link>
-          </nav>
-        </div>
-      </footer>
     </div>
   )
 }
