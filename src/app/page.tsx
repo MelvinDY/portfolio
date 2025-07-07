@@ -9,12 +9,12 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center">
-          <div className="mr-4 hidden md:flex">
+        <div className="container mx-auto flex h-14 items-center justify-between px-4 md:px-6">
+          <div className="flex items-center">
             <Link className="mr-6 flex items-center space-x-2" href="/">
-              <span className="hidden font-bold sm:inline-block">John.dev</span>
+              <span className="font-bold">Melv</span>
             </Link>
-            <nav className="flex items-center space-x-6 text-sm font-medium">
+            <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
               <Link href="#about" className="transition-colors hover:text-foreground/80">
                 About
               </Link>
@@ -26,15 +26,15 @@ export default function Page() {
               </Link>
             </nav>
           </div>
-          <Button variant="outline" className="ml-auto">
+          <Button variant="outline">
             Resume
           </Button>
         </div>
       </header>
 
-      <main className="container px-4 md:px-6">
+      <main className="w-full">
         <section id="about" className="py-12 md:py-24 lg:py-32">
-          <div className="container px-4 md:px-6">
+          <div className="container mx-auto px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
@@ -45,7 +45,7 @@ export default function Page() {
                   complex problems.
                 </p>
               </div>
-              <div className="space-x-4">
+              <div className="flex space-x-4">
                 <Link href="https://github.com" target="_blank">
                   <Button variant="outline" size="icon">
                     <Github className="h-4 w-4" />
@@ -76,9 +76,9 @@ export default function Page() {
         </section>
 
         <section id="projects" className="py-12 md:py-24 lg:py-32">
-          <div className="container px-4 md:px-6">
+          <div className="container mx-auto px-4 md:px-6">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-12 text-center">Projects</h2>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
               <ProjectCard
                 title="E-commerce Platform"
                 description="A full-stack e-commerce platform built with Next.js, Prisma, and Stripe integration."
@@ -105,16 +105,18 @@ export default function Page() {
         </section>
 
         <section className="py-12 md:py-24 lg:py-32">
-          <div className="container px-4 md:px-6">
+          <div className="container mx-auto px-4 md:px-6">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-12 text-center">
               Tech Stack
             </h2>
-            <TechStack />
+            <div className="max-w-4xl mx-auto">
+              <TechStack />
+            </div>
           </div>
         </section>
 
         <section id="contact" className="py-12 md:py-24 lg:py-32">
-          <div className="container px-4 md:px-6">
+          <div className="container mx-auto px-4 md:px-6">
             <div className="mx-auto max-w-2xl">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-12 text-center">
                 Get in Touch
@@ -126,7 +128,7 @@ export default function Page() {
       </main>
 
       <footer className="border-t">
-        <div className="container flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6">
+        <div className="container mx-auto flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6">
           <p className="text-xs text-gray-500 dark:text-gray-400">© 2024 John.dev. All rights reserved.</p>
           <nav className="sm:ml-auto flex gap-4 sm:gap-6">
             <Link className="text-xs hover:underline underline-offset-4" href="#">
