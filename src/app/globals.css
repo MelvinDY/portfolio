@@ -3,7 +3,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Ensure smooth scrolling works properly */
+* {
+  scroll-behavior: smooth;
+}
+
 html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 4rem; /* Account for sticky header */
+}
+
+body {
   scroll-behavior: smooth;
 }
 
@@ -48,6 +58,11 @@ html {
   90% {
     transform: translate3d(0,-4px,0);
   }
+}
+
+/* Add smooth scroll class for JavaScript fallback */
+.smooth-scroll {
+  scroll-behavior: smooth;
 }
 
 @theme inline {

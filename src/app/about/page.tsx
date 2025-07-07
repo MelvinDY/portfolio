@@ -4,38 +4,12 @@ import Link from "next/link"
 import { Card } from "@/components/ui/card"
 import Image from "next/image"
 import TechStack from "../components/tech-stack"
+import SiteHeader from "../components/site-header"
 
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto flex h-14 items-center justify-between px-4 md:px-6">
-          <div className="flex items-center">
-            <Link className="mr-6 flex items-center space-x-2" href="/">
-              <span className="font-bold">MelvinDY</span>
-            </Link>
-            <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-              <Link href="#hero" className="transition-colors hover:text-foreground/80">
-                About
-              </Link>
-              <Link href="#story" className="transition-colors hover:text-foreground/80">
-                My Story
-              </Link>
-              <Link href="#tech" className="transition-colors hover:text-foreground/80">
-                Tech Stack
-              </Link>
-              <Link href="#contact" className="transition-colors hover:text-foreground/80">
-                Contact
-              </Link>
-            </nav>
-          </div>
-          <Link href="/">
-            <Button variant="outline" size="sm">
-              ← Back to Home
-            </Button>
-          </Link>
-        </div>
-      </header>
+      <SiteHeader variant="about" />
 
       <main className="w-full">
         {/* Hero Section - Full Screen */}

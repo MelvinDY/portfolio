@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Github, Linkedin, Mail, Instagram } from "lucide-react"
 import Link from "next/link"
+import SiteHeader from "./components/site-header"
 import ContactForm from "./components/contact-form"
 import ProjectCard from "./components/project-card"
 import TechStack from "./components/tech-stack"
@@ -8,30 +9,7 @@ import TechStack from "./components/tech-stack"
 export default function Page() {
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto flex h-14 items-center justify-between px-4 md:px-6">
-          <div className="flex items-center">
-            <Link className="mr-6 flex items-center space-x-2" href="/">
-              <span className="font-bold">MelvinDY</span>
-            </Link>
-            <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-              <Link href="/about" className="transition-colors hover:text-foreground/80">
-                About
-              </Link>
-              <Link href="#projects" className="transition-colors hover:text-foreground/80">
-                Projects
-              </Link>
-              <Link href="#contact" className="transition-colors hover:text-foreground/80">
-                Contact
-              </Link>
-            </nav>
-          </div>
-          <Button variant="outline">
-            Resume
-          </Button>
-        </div>
-      </header>
-
+      <SiteHeader variant="home" />
       <main className="w-full">
         <section id="about" className="py-12 md:py-24 lg:py-32">
           <div className="container mx-auto px-4 md:px-6">
