@@ -101,20 +101,6 @@ export default function AboutPage() {
                       priority
                     />
                   </div>
-                  {/* Tech stack icons overlay */}
-                  <div className="absolute -bottom-4 -right-4 bg-background border rounded-lg p-4 shadow-lg">
-                    <div className="flex gap-2">
-                      <div className="w-8 h-8 rounded bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 text-xs font-bold">
-                        JS
-                      </div>
-                      <div className="w-8 h-8 rounded bg-green-100 dark:bg-green-900 flex items-center justify-center text-green-600 text-xs font-bold">
-                        TS
-                      </div>
-                      <div className="w-8 h-8 rounded bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-purple-600 text-xs font-bold">
-                        ⚛️
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
