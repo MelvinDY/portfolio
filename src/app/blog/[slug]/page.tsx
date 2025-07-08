@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ArrowLeft, Calendar, Clock } from "lucide-react"
@@ -7,13 +8,18 @@ import SiteHeader from "../../components/site-header"
 import { getPostById, getRelatedPosts } from "../../lib/blog"
 import BlogCard from "@/app/components/blog-card"
 
-interface BlogPostPageProps {
-  params: Promise<{
-    slug: string
-  }>
-}
+// Remove the custom interface and use Next.js types directly
+// interface BlogPostPageProps {
+//   params: Promise<{
+//     slug: string
+//   }>
+// }
 
-export default async function BlogPostPage({ params }: BlogPostPageProps) {
+export default async function BlogPostPage({ 
+  params 
+}: {
+  params: Promise<{ slug: string }>
+}) {
   const { slug } = await params
   const post = getPostById(slug)
 
@@ -156,7 +162,11 @@ export async function generateStaticParams() {
 }
 
 // Generate metadata for each post
-export async function generateMetadata({ params }: BlogPostPageProps) {
+export async function generateMetadata({ 
+  params 
+}: {
+  params: Promise<{ slug: string }>
+}) {
   const { slug } = await params
   const post = getPostById(slug)
 
