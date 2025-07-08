@@ -1,13 +1,33 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { useTheme } from "next-themes"
 import Link from "next/link"
+import { useEffect, useState } from "react"
 
 interface SiteHeaderProps {
   variant?: "home" | "about" | "blog"
 }
 
 export default function SiteHeader({ variant = "home" }: SiteHeaderProps) {
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  // Avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light")
+  }
+
+  // Get the appropriate emoji for current theme
+  const getThemeEmoji = () => {
+    if (!mounted) return "🌙" // Default to moon during SSR
+    return theme === "light" ? "🌙" : "☀️"
+  }
+
   // Navigation items for different pages
   const homeNavItems = [
     { href: "/about", label: "About", emoji: "👨‍💻", title: "About Me" },
@@ -79,24 +99,36 @@ export default function SiteHeader({ variant = "home" }: SiteHeaderProps) {
           </nav>
         </div>
         
-        {/* Right side action button */}
-        {variant === "home" ? (
-          <Button variant="outline">
-            Resume
-          </Button>
-        ) : variant === "blog" ? (
-          <Link href="/">
-            <Button variant="outline" size="sm">
-              ← Back to Home
+        {/* Right side - Theme toggle and action button */}
+        <div className="flex items-center space-x-2">
+          {/* Theme Toggle Button - Hidden on very small screens */}
+          <button
+            onClick={toggleTheme}
+            className="hidden sm:flex p-2 hover:bg-accent rounded-md transition-colors text-lg"
+            title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+          >
+            {getThemeEmoji()}
+          </button>
+
+          {/* Main action button */}
+          {variant === "home" ? (
+            <Button variant="outline">
+              Resume
             </Button>
-          </Link>
-        ) : (
-          <Link href="/">
-            <Button variant="outline" size="sm">
-              ← Back to Home
-            </Button>
-          </Link>
-        )}
+          ) : variant === "blog" ? (
+            <Link href="/">
+              <Button variant="outline" size="sm">
+                ← Back to Home
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/">
+              <Button variant="outline" size="sm">
+                ← Back to Home
+              </Button>
+            </Link>
+          )}
+        </div>
       </div>
     </header>
   )
