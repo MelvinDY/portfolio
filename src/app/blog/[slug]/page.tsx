@@ -1,25 +1,20 @@
-
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ArrowLeft, Calendar, Clock } from "lucide-react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import React, { JSX } from "react"
 import SiteHeader from "../../components/site-header"
-import { getPostById, getRelatedPosts } from "../../lib/blog"
+import { getPostById, getRelatedPosts, getAllPosts } from "../../lib/blog"
 import BlogCard from "@/app/components/blog-card"
 
-// Remove the custom interface and use Next.js types directly
-// interface BlogPostPageProps {
-//   params: Promise<{
-//     slug: string
-//   }>
-// }
+interface BlogPostPageProps {
+  params: Promise<{
+    slug: string
+  }>
+}
 
-export default async function BlogPostPage({ 
-  params 
-}: {
-  params: Promise<{ slug: string }>
-}) {
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params
   const post = getPostById(slug)
 
@@ -29,40 +24,140 @@ export default async function BlogPostPage({
 
   const relatedPosts = getRelatedPosts(post, 2)
 
-  // Convert markdown-like content to JSX (basic conversion)
+  // Convert markdown-like content to JSX
   const formatContent = (content: string) => {
-    return content
-      .split('\n')
-      .map((line, index) => {
-        // Headers
-        if (line.startsWith('### ')) {
-          return <h3 key={index} className="text-xl font-semibold mt-8 mb-4">{line.replace('### ', '')}</h3>
+    const lines = content.split('\n')
+    const elements: JSX.Element[] = []
+    let i = 0
+    let inCodeBlock = false
+    let codeLines: string[] = []
+    let codeLanguage = ''
+    let inList = false
+    let listItems: string[] = []
+
+    const flushList = () => {
+      if (listItems.length > 0) {
+        elements.push(
+          <ul key={`list-${elements.length}`} className="list-disc list-inside space-y-2 mb-6 ml-4">
+            {listItems.map((item, idx) => (
+              <li key={idx} className="leading-relaxed">{item}</li>
+            ))}
+          </ul>
+        )
+        listItems = []
+        inList = false
+      }
+    }
+
+    const flushCodeBlock = () => {
+      if (codeLines.length > 0) {
+        elements.push(
+          <div key={`code-${elements.length}`} className="mb-6">
+            <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
+              <code className={`language-${codeLanguage} text-sm`}>
+                {codeLines.join('\n')}
+              </code>
+            </pre>
+          </div>
+        )
+        codeLines = []
+        codeLanguage = ''
+        inCodeBlock = false
+      }
+    }
+
+    while (i < lines.length) {
+      const line = lines[i]
+      const trimmedLine = line.trim()
+
+      // Handle code blocks
+      if (trimmedLine.startsWith('```')) {
+        if (inCodeBlock) {
+          flushCodeBlock()
+        } else {
+          flushList()
+          inCodeBlock = true
+          codeLanguage = trimmedLine.replace('```', '') || 'text'
         }
-        if (line.startsWith('## ')) {
-          return <h2 key={index} className="text-2xl font-semibold mt-8 mb-4">{line.replace('## ', '')}</h2>
+        i++
+        continue
+      }
+
+      if (inCodeBlock) {
+        codeLines.push(line)
+        i++
+        continue
+      }
+
+      // Handle lists
+      if (trimmedLine.startsWith('- ')) {
+        if (!inList) {
+          inList = true
         }
-        if (line.startsWith('# ')) {
-          return <h1 key={index} className="text-3xl font-bold mt-8 mb-6">{line.replace('# ', '')}</h1>
+        listItems.push(trimmedLine.replace('- ', ''))
+        i++
+        continue
+      } else if (inList && trimmedLine === '') {
+        // Continue list if empty line
+        i++
+        continue
+      } else if (inList) {
+        // End of list
+        flushList()
+      }
+
+      // Handle headers
+      if (trimmedLine.startsWith('### ')) {
+        elements.push(
+          <h3 key={`h3-${i}`} className="text-xl font-semibold mt-8 mb-4 text-primary">
+            {trimmedLine.replace('### ', '')}
+          </h3>
+        )
+      } else if (trimmedLine.startsWith('## ')) {
+        elements.push(
+          <h2 key={`h2-${i}`} className="text-2xl font-semibold mt-10 mb-6 text-primary">
+            {trimmedLine.replace('## ', '')}
+          </h2>
+        )
+      } else if (trimmedLine.startsWith('# ')) {
+        elements.push(
+          <h1 key={`h1-${i}`} className="text-3xl font-bold mt-12 mb-8">
+            {trimmedLine.replace('# ', '')}
+          </h1>
+        )
+      } else if (trimmedLine === '') {
+        // Empty line - add spacing
+        elements.push(<div key={`space-${i}`} className="h-4" />)
+      } else if (trimmedLine) {
+        // Regular paragraph - handle inline formatting
+        const formatInlineContent = (text: string) => {
+          // Handle bold **text**
+          text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          // Handle links [text](url)
+          text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-primary hover:underline" target="_blank" rel="noopener noreferrer">$1</a>')
+          // Handle inline code `code`
+          text = text.replace(/`([^`]+)`/g, '<code class="bg-muted px-1.5 py-0.5 rounded text-sm">$1</code>')
+          
+          return text
         }
-        
-        // Lists
-        if (line.startsWith('- ')) {
-          return <li key={index} className="ml-4">{line.replace('- ', '')}</li>
-        }
-        
-        // Empty lines
-        if (line.trim() === '') {
-          return <br key={index} />
-        }
-        
-        // Regular paragraphs
-        if (line.trim() && !line.startsWith('##') && !line.startsWith('- ')) {
-          return <p key={index} className="mb-4 leading-relaxed">{line}</p>
-        }
-        
-        return null
-      })
-      .filter(Boolean)
+
+        elements.push(
+          <p 
+            key={`p-${i}`} 
+            className="mb-4 leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: formatInlineContent(trimmedLine) }}
+          />
+        )
+      }
+
+      i++
+    }
+
+    // Flush any remaining content
+    flushList()
+    flushCodeBlock()
+
+    return elements
   }
 
   return (
@@ -153,7 +248,6 @@ export default async function BlogPostPage({
 
 // Generate static params for all blog posts
 export async function generateStaticParams() {
-  const { getAllPosts } = await import("../../lib/blog")
   const posts = getAllPosts()
   
   return posts.map((post) => ({
@@ -162,11 +256,7 @@ export async function generateStaticParams() {
 }
 
 // Generate metadata for each post
-export async function generateMetadata({ 
-  params 
-}: {
-  params: Promise<{ slug: string }>
-}) {
+export async function generateMetadata({ params }: BlogPostPageProps) {
   const { slug } = await params
   const post = getPostById(slug)
 
