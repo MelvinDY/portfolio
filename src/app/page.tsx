@@ -6,14 +6,18 @@ import ContactForm from "./components/contact-form"
 import ProjectCard from "./components/project-card"
 import TechStack from "./components/tech-stack"
 import RecentPostsSection from "./components/recent-posts-section"
+import AnimatedBackground from "./components/animated-background"
+import React from "react"
 
 export default function Page() {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader variant="home" />
       <main className="w-full">
-        <section id="about" className="py-12 md:py-24 lg:py-32">
-          <div className="container mx-auto px-4 md:px-6">
+        {/* Hero Section with Animated Background */}
+        <section id="about" className="py-12 md:py-24 lg:py-32 relative overflow-hidden">
+          <AnimatedBackground className="opacity-30" />
+          <div className="container mx-auto px-4 md:px-6 relative z-10">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">

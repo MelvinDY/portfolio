@@ -6,11 +6,11 @@ import BlogCard from "./blog-card"
 // Sample blog data - this should match your actual data
 const recentPosts = [
   {
-    id: "tt4d-lottery-playground",
-    title: "Introducing TT4D – My Fullstack Lottery Playground",
-    excerpt: "Generate winning combinations, view past results, and analyze lottery trends all in one place.",
+    id: "hello-world",
+    title: "Hello World!",
+    excerpt: "Welcome to my blog! This is my first post, and honestly, I'm just testing to make sure everything works as expected.",
     date: "April 21, 2025",
-    tags: ["BS4", "Docker", "FastAPI", "Fly.io", "NextJS", "PostgreSQL", "Python", "TailwindCSS"]
+    tags: ["Blog", "Hello World", "Next.js", "Testing"]
   },
   {
     id: "portfolio-live",
