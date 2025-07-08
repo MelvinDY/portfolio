@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
 interface SiteHeaderProps {
-  variant?: "home" | "about"
+  variant?: "home" | "about" | "blog"
 }
 
 export default function SiteHeader({ variant = "home" }: SiteHeaderProps) {
@@ -12,6 +12,7 @@ export default function SiteHeader({ variant = "home" }: SiteHeaderProps) {
   const homeNavItems = [
     { href: "/about", label: "About", emoji: "👨‍💻", title: "About Me" },
     { href: "#projects", label: "Projects", emoji: "🚀", title: "Projects" },
+    { href: "/blog", label: "Blog", emoji: "📝", title: "Blog" },
     { href: "#contact", label: "Contact", emoji: "📧", title: "Contact" }
   ]
 
@@ -22,7 +23,25 @@ export default function SiteHeader({ variant = "home" }: SiteHeaderProps) {
     { href: "#contact", label: "Contact", emoji: "📧", title: "Contact" }
   ]
 
-  const navItems = variant === "home" ? homeNavItems : aboutNavItems
+  const blogNavItems = [
+    { href: "/", label: "Home", emoji: "🏠", title: "Home" },
+    { href: "/about", label: "About", emoji: "👨‍💻", title: "About" },
+    { href: "#projects", label: "Projects", emoji: "🚀", title: "Projects" },
+    { href: "#contact", label: "Contact", emoji: "📧", title: "Contact" }
+  ]
+
+  const getNavItems = () => {
+    switch (variant) {
+      case "about":
+        return aboutNavItems
+      case "blog":
+        return blogNavItems
+      default:
+        return homeNavItems
+    }
+  }
+
+  const navItems = getNavItems()
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -65,6 +84,12 @@ export default function SiteHeader({ variant = "home" }: SiteHeaderProps) {
           <Button variant="outline">
             Resume
           </Button>
+        ) : variant === "blog" ? (
+          <Link href="/">
+            <Button variant="outline" size="sm">
+              ← Back to Home
+            </Button>
+          </Link>
         ) : (
           <Link href="/">
             <Button variant="outline" size="sm">

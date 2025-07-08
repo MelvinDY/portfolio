@@ -5,6 +5,7 @@ import SiteHeader from "./components/site-header"
 import ContactForm from "./components/contact-form"
 import ProjectCard from "./components/project-card"
 import TechStack from "./components/tech-stack"
+import RecentPostsSection from "./components/recent-posts-section"
 
 export default function Page() {
   return (
@@ -92,6 +93,8 @@ export default function Page() {
             </div>
           </div>
         </section>
+
+        <RecentPostsSection />
 
         <section id="contact" className="py-12 md:py-24 lg:py-32">
           <div className="container mx-auto px-4 md:px-6">

@@ -205,7 +205,7 @@ export default function AboutPage() {
                     </Button>
                     
                     <Button variant="ghost" size="sm" asChild>
-                      <Link href="https://instagram.com/your-pet-instagram" target="_blank">
+                      <Link href="https://www.instagram.com/iamrigbycat" target="_blank">
                         <Instagram className="h-4 w-4 mr-2" />
                         Pet Support
                       </Link>
@@ -217,6 +217,19 @@ export default function AboutPage() {
           </div>
         </section>
       </main>
+      <footer className="border-t">
+        <div className="container mx-auto flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6">
+          <p className="text-xs text-gray-500 dark:text-gray-400">© 2025 MelvinDY All rights reserved.</p>
+          <nav className="sm:ml-auto flex gap-4 sm:gap-6">
+            <Link className="text-xs hover:underline underline-offset-4" href="/privacy">
+              Privacy Policy
+            </Link>
+            <Link className="text-xs hover:underline underline-offset-4" href="mailto:melvindarialyogiana@gmail.com">
+              Contact
+            </Link>
+          </nav>
+        </div>
+      </footer>
     </div>
   )
 }
