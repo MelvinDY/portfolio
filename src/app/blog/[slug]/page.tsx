@@ -8,13 +8,14 @@ import { getPostById, getRelatedPosts } from "../../lib/blog"
 import BlogCard from "@/app/components/blog-card"
 
 interface BlogPostPageProps {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
-export default function BlogPostPage({ params }: BlogPostPageProps) {
-  const post = getPostById(params.slug)
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  const { slug } = await params
+  const post = getPostById(slug)
 
   if (!post) {
     notFound()
@@ -156,7 +157,8 @@ export async function generateStaticParams() {
 
 // Generate metadata for each post
 export async function generateMetadata({ params }: BlogPostPageProps) {
-  const post = getPostById(params.slug)
+  const { slug } = await params
+  const post = getPostById(slug)
 
   if (!post) {
     return {
