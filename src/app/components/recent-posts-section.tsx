@@ -2,26 +2,11 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 import BlogCard from "./blog-card"
-
-// Sample blog data - this should match your actual data
-const recentPosts = [
-  {
-    id: "hello-world",
-    title: "Hello World!",
-    excerpt: "Welcome to my blog! This is my first post, and honestly, I'm just testing to make sure everything works as expected.",
-    date: "April 21, 2025",
-    tags: ["Blog", "Hello World", "Next.js", "Testing"]
-  },
-  {
-    id: "portfolio-live",
-    title: "My Portfolio is Live: Here's What I Learned",
-    excerpt: "From a sleek, minimal design to an integrated AI chatbot. It even got a live review from one of my favorite creators!",
-    date: "September 27, 2024",
-    tags: ["Next.js", "React", "Portfolio", "Design"]
-  }
-]
+import { getRecentPosts } from "../lib/blog"
 
 export default function RecentPostsSection() {
+  const recentPosts = getRecentPosts(2)
+  
   return (
     <section className="py-12 md:py-24 lg:py-32 bg-muted/20">
       <div className="container mx-auto px-4 md:px-6">

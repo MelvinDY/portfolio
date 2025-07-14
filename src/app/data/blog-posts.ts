@@ -1,7 +1,10 @@
 // src/data/blog-posts.ts
 import { BlogPost } from "../types/blog"
+import blogPostsData from "./blog-posts.json"
 
-export const blogPosts: BlogPost[] = [
+export const blogPosts: BlogPost[] = blogPostsData as BlogPost[]
+
+export const staticBlogPosts: BlogPost[] = [
   {
     id: "portfolio-live",
     title: "My Portfolio is Live: Here's What I Learned",
