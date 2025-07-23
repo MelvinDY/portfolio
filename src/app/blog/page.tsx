@@ -7,24 +7,7 @@ import { Search, X } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import SiteHeader from "../components/site-header"
-
-// Sample blog data - replace with your actual data source
-const blogPosts = [
-  {
-    id: "portfolio-live",
-    title: "My Portfolio is Live: Here's What I Learned",
-    excerpt: "From a sleek, minimal design to an integrated AI chatbot. It even got a live review from one of my favorite creators!",
-    date: "September 27, 2024",
-    tags: ["Next.js", "React", "Portfolio", "Design"]
-  },
-  {
-    id: "hello-world",
-    title: "Hello World!",
-    excerpt: "This is my first post on my blog to test out how things look in markdown.",
-    date: "September 7, 2024",
-    tags: ["Blog", "Hello World"]
-  }
-]
+import { blogPosts } from "../data/blog-posts"
 
 export default function BlogPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -88,9 +71,11 @@ export default function BlogPage() {
                     <h2 className="text-xl md:text-2xl font-semibold hover:text-primary transition-colors mb-2 md:mb-0">
                       {post.title}
                     </h2>
-                    <span className="text-muted-foreground text-sm md:text-base whitespace-nowrap">
-                      {post.date}
-                    </span>
+                    <div className="flex items-center gap-2 text-muted-foreground text-sm md:text-base whitespace-nowrap">
+                      <span>{post.date}</span>
+                      <span>•</span>
+                      <span>{post.readTime}</span>
+                    </div>
                   </div>
                   
                   <p className="text-muted-foreground mb-4 leading-relaxed">
