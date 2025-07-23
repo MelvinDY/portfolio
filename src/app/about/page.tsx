@@ -48,7 +48,25 @@ export default function AboutPage() {
                       <span className="sr-only">LinkedIn</span>
                     </Button>
                   </Link>
-                  <Link href="mailto:melvindarialyogiana@gmail.com">
+                  <Link 
+                    href="mailto:melvindarialyogiana@gmail.com"
+                    title="Send email to melvindarialyogiana@gmail.com"
+                    onClick={(e) => {
+                      const fallback = () => {
+                        navigator.clipboard.writeText("melvindarialyogiana@gmail.com").then(() => {
+                          alert("Email address copied to clipboard: melvindarialyogiana@gmail.com");
+                        }).catch(() => {
+                          alert("Email: melvindarialyogiana@gmail.com");
+                        });
+                      };
+                      
+                      const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                      if (!isMobile && !window.confirm("This will open your email client. Click OK to continue, or Cancel to copy the email address instead.")) {
+                        e.preventDefault();
+                        fallback();
+                      }
+                    }}
+                  >
                     <Button variant="outline" size="icon">
                       <Mail className="h-4 w-4" />
                       <span className="sr-only">Email</span>
@@ -168,7 +186,25 @@ export default function AboutPage() {
 
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button asChild size="lg">
-                      <Link href="mailto:melvindarialyogiana@gmail.com">
+                      <Link 
+                        href="mailto:melvindarialyogiana@gmail.com"
+                        title="Send email to melvindarialyogiana@gmail.com"
+                        onClick={(e) => {
+                          const fallback = () => {
+                            navigator.clipboard.writeText("melvindarialyogiana@gmail.com").then(() => {
+                              alert("Email address copied to clipboard: melvindarialyogiana@gmail.com");
+                            }).catch(() => {
+                              alert("Email: melvindarialyogiana@gmail.com");
+                            });
+                          };
+                          
+                          const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                          if (!isMobile && !window.confirm("This will open your email client. Click OK to continue, or Cancel to copy the email address instead.")) {
+                            e.preventDefault();
+                            fallback();
+                          }
+                        }}
+                      >
                         <Mail className="h-4 w-4 mr-2" />
                         Send me an email
                       </Link>
@@ -224,7 +260,26 @@ export default function AboutPage() {
             <Link className="text-xs hover:underline underline-offset-4" href="/privacy">
               Privacy Policy
             </Link>
-            <Link className="text-xs hover:underline underline-offset-4" href="mailto:melvindarialyogiana@gmail.com">
+            <Link 
+              className="text-xs hover:underline underline-offset-4" 
+              href="mailto:melvindarialyogiana@gmail.com"
+              title="Send email to melvindarialyogiana@gmail.com"
+              onClick={(e) => {
+                const fallback = () => {
+                  navigator.clipboard.writeText("melvindarialyogiana@gmail.com").then(() => {
+                    alert("Email address copied to clipboard: melvindarialyogiana@gmail.com");
+                  }).catch(() => {
+                    alert("Email: melvindarialyogiana@gmail.com");
+                  });
+                };
+                
+                const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                if (!isMobile && !window.confirm("This will open your email client. Click OK to continue, or Cancel to copy the email address instead.")) {
+                  e.preventDefault();
+                  fallback();
+                }
+              }}
+            >
               Contact
             </Link>
           </nav>

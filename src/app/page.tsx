@@ -284,7 +284,27 @@ export default function Page() {
                     <span className="sr-only">Pet Support</span>
                   </Button>
                 </Link>
-                <Link href="mailto:melvindarialyogiana@gmail.com">
+                <Link 
+                  href="mailto:melvindarialyogiana@gmail.com"
+                  title="Send email to melvindarialyogiana@gmail.com"
+                  onClick={(e) => {
+                    // Fallback: copy email to clipboard if mailto fails
+                    const fallback = () => {
+                      navigator.clipboard.writeText("melvindarialyogiana@gmail.com").then(() => {
+                        alert("Email address copied to clipboard: melvindarialyogiana@gmail.com");
+                      }).catch(() => {
+                        alert("Email: melvindarialyogiana@gmail.com");
+                      });
+                    };
+                    
+                    // Check if user agent supports mailto
+                    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                    if (!isMobile && !window.confirm("This will open your email client. Click OK to continue, or Cancel to copy the email address instead.")) {
+                      e.preventDefault();
+                      fallback();
+                    }
+                  }}
+                >
                   <Button variant="outline" size="icon">
                     <Mail className="h-4 w-4" />
                     <span className="sr-only">Email</span>
@@ -299,8 +319,13 @@ export default function Page() {
 
         <section id="projects" className="py-12 md:py-24 lg:py-32">
           <div className="container mx-auto px-4 md:px-6">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-12 text-center">Projects</h2>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-4">Featured Projects</h2>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                A selection of my most notable work showcasing different technologies and problem-solving approaches.
+              </p>
+            </div>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto mb-12">
               <ProjectCard
                 title="E-commerce Platform"
                 description="A full-stack e-commerce platform built with Next.js, Prisma, and Stripe integration."
@@ -322,6 +347,13 @@ export default function Page() {
                 link="https://github.com"
                 tags={["OpenAI", "Next.js", "TailwindCSS"]}
               />
+            </div>
+            <div className="text-center">
+              <Link href="/projects">
+                <Button variant="outline" size="lg">
+                  View All Projects
+                </Button>
+              </Link>
             </div>
           </div>
         </section>
@@ -358,7 +390,26 @@ export default function Page() {
             <Link className="text-xs hover:underline underline-offset-4" href="/privacy">
               Privacy Policy
             </Link>
-            <Link className="text-xs hover:underline underline-offset-4" href="mailto:melvindarialyogiana@gmail.com">
+            <Link 
+              className="text-xs hover:underline underline-offset-4" 
+              href="mailto:melvindarialyogiana@gmail.com"
+              title="Send email to melvindarialyogiana@gmail.com"
+              onClick={(e) => {
+                const fallback = () => {
+                  navigator.clipboard.writeText("melvindarialyogiana@gmail.com").then(() => {
+                    alert("Email address copied to clipboard: melvindarialyogiana@gmail.com");
+                  }).catch(() => {
+                    alert("Email: melvindarialyogiana@gmail.com");
+                  });
+                };
+                
+                const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                if (!isMobile && !window.confirm("This will open your email client. Click OK to continue, or Cancel to copy the email address instead.")) {
+                  e.preventDefault();
+                  fallback();
+                }
+              }}
+            >
               Contact
             </Link>
           </nav>

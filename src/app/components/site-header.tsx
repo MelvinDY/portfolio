@@ -6,7 +6,7 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 
 interface SiteHeaderProps {
-  variant?: "home" | "about" | "blog"
+  variant?: "home" | "about" | "blog" | "projects"
 }
 
 export default function SiteHeader({ variant = "home" }: SiteHeaderProps) {
@@ -31,7 +31,7 @@ export default function SiteHeader({ variant = "home" }: SiteHeaderProps) {
   // Navigation items for different pages
   const homeNavItems = [
     { href: "/about", label: "About", emoji: "👨‍💻", title: "About Me" },
-    { href: "#projects", label: "Projects", emoji: "🚀", title: "Projects" },
+    { href: "/projects", label: "Projects", emoji: "🚀", title: "Projects" },
     { href: "/blog", label: "Blog", emoji: "📝", title: "Blog" },
     { href: "#contact", label: "Contact", emoji: "📧", title: "Contact" }
   ]
@@ -46,7 +46,14 @@ export default function SiteHeader({ variant = "home" }: SiteHeaderProps) {
   const blogNavItems = [
     { href: "/", label: "Home", emoji: "🏠", title: "Home" },
     { href: "/about", label: "About", emoji: "👨‍💻", title: "About" },
-    { href: "#projects", label: "Projects", emoji: "🚀", title: "Projects" },
+    { href: "/projects", label: "Projects", emoji: "🚀", title: "Projects" },
+    { href: "#contact", label: "Contact", emoji: "📧", title: "Contact" }
+  ]
+
+  const projectsNavItems = [
+    { href: "/", label: "Home", emoji: "🏠", title: "Home" },
+    { href: "/about", label: "About", emoji: "👨‍💻", title: "About" },
+    { href: "/blog", label: "Blog", emoji: "📝", title: "Blog" },
     { href: "#contact", label: "Contact", emoji: "📧", title: "Contact" }
   ]
 
@@ -56,6 +63,8 @@ export default function SiteHeader({ variant = "home" }: SiteHeaderProps) {
         return aboutNavItems
       case "blog":
         return blogNavItems
+      case "projects":
+        return projectsNavItems
       default:
         return homeNavItems
     }
@@ -116,6 +125,12 @@ export default function SiteHeader({ variant = "home" }: SiteHeaderProps) {
               Resume
             </Button>
           ) : variant === "blog" ? (
+            <Link href="/">
+              <Button variant="outline" size="sm">
+                ← Back to Home
+              </Button>
+            </Link>
+          ) : variant === "projects" ? (
             <Link href="/">
               <Button variant="outline" size="sm">
                 ← Back to Home
