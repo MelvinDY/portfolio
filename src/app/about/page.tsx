@@ -36,13 +36,13 @@ export default function AboutPage() {
 
                 {/* Social Links */}
                 <div className="flex justify-center lg:justify-start space-x-4">
-                  <Link href="https://github.com" target="_blank">
+                  <Link href="https://github.com/MelvinDY" target="_blank">
                     <Button variant="outline" size="icon">
                       <Github className="h-4 w-4" />
                       <span className="sr-only">GitHub</span>
                     </Button>
                   </Link>
-                  <Link href="https://linkedin.com" target="_blank">
+                  <Link href="https://www.linkedin.com/in/melvin-yogiana-113152335/" target="_blank">
                     <Button variant="outline" size="icon">
                       <Linkedin className="h-4 w-4" />
                       <span className="sr-only">LinkedIn</span>

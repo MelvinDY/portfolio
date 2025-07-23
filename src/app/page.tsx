@@ -1,4 +1,7 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import { Github, Linkedin, Mail, Instagram } from "lucide-react"
 import Link from "next/link"
 import SiteHeader from "./components/site-header"
@@ -7,7 +10,241 @@ import ProjectCard from "./components/project-card"
 import TechStack from "./components/tech-stack"
 import RecentPostsSection from "./components/recent-posts-section"
 import AnimatedBackground from "./components/animated-background"
-import React from "react"
+import { ExternalLink, MapPin, Calendar, Briefcase, GraduationCap } from "lucide-react"
+import React, { useState } from "react"
+
+const workExperience: {
+  id: string;
+  company: string;
+  role: string;
+  period: string;
+  location: string;
+  logo: string;
+  achievements: string[];
+  skills: string[];
+  links?: { label: string; url: string; }[];
+}[] = []
+
+const education = [
+  {
+    id: "UNSW",
+    institution: "University of New South Wales",
+    degree: "Bachelor of Science in Computer Science",
+    period: "Dec 2023 - Dec 2025",
+    location: "Sydney, Australia",
+    logo: "/UNSW.png",
+    achievements: [
+      "First Place winner of 2025 CSESoc Flagship Hackathon"
+    ],
+    links: [
+      { label: "Final Year Project", url: "#" },
+      { label: "CSESoc Flagship Hackathon", url: "https://devpost.com/software/onlycode?_gl=1*zdc20o*_gcl_au*MTM2NjU0NjcxNC4xNzUzMjYwNzcz*_ga*MTkwOTI3MTYwNC4xNzUzMjYwNzc0*_ga_0YHJK3Y10M*czE3NTMyNjc3ODgkbzIkZzEkdDE3NTMyNjc4MTEkajM3JGwwJGgw" },
+      { label: "Terrible Ideas Hackathon", url: "https://terriblehack.com/projects/stall-wars" }
+
+    ]
+  },
+  {
+    id: "UNSW-global",
+    institution: "UNSW Global",
+    degree: "Diploma in Computer Science",
+    period: "Aug 2022 - Dec 2023",
+    location: "Sydney, Australia", 
+    logo: "/UNSW-Global.png",
+    achievements: []
+  }
+]
+
+interface ExperienceItemProps {
+  item: typeof workExperience[0] | typeof education[0]
+  type: "work" | "education"
+}
+
+function TimelineSection({ items, type }: { items: (typeof workExperience[0] | typeof education[0])[], type: "work" | "education" }) {
+  if (items.length === 0) {
+    return (
+      <Card className="p-8 text-center">
+        <div className="text-muted-foreground">
+          <Briefcase className="h-12 w-12 mx-auto mb-4 opacity-50" />
+          <p className="text-lg">No work experience yet</p>
+          <p className="text-sm">Currently focusing on education and personal projects</p>
+        </div>
+      </Card>
+    )
+  }
+
+  return (
+    <Card className="p-6">
+      <div className="relative">
+        {/* Vertical Timeline Line */}
+        <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border"></div>
+        
+        <div className="space-y-8">
+          {items.map((item, index) => (
+            <div key={item.id} className="relative flex gap-6">
+              {/* Timeline Dot and Logo */}
+              <div className="relative flex-shrink-0">
+                <div className="w-12 h-12 bg-background border-2 border-border rounded-lg flex items-center justify-center overflow-hidden">
+                  <img 
+                    src={item.logo} 
+                    alt={type === "work" ? (item as any).company : (item as any).institution}
+                    className="w-8 h-8 object-contain"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const fallback = target.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = 'block';
+                    }}
+                  />
+                  <div className="w-8 h-8 bg-primary/20 rounded hidden"></div>
+                </div>
+                {/* Timeline connector dot */}
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full border-2 border-background"></div>
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 min-w-0 pb-8">
+                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-3">
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground mb-1">
+                      {type === "work" ? (item as any).role : (item as any).degree}
+                    </h3>
+                    <p className="text-primary font-medium">
+                      {type === "work" ? (item as any).company : (item as any).institution}
+                    </p>
+                  </div>
+                  
+                  <div className="flex flex-col lg:items-end gap-1 mt-2 lg:mt-0">
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <Calendar className="h-4 w-4" />
+                      {item.period}
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <MapPin className="h-4 w-4" />
+                      {item.location}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Achievements */}
+                {item.achievements && item.achievements.length > 0 && (
+                  <div className="mb-4">
+                    <ul className="space-y-2">
+                      {item.achievements.map((achievement: string, achieveIndex: number) => (
+                        <li key={achieveIndex} className="text-muted-foreground leading-relaxed flex items-start gap-2">
+                          <span className="text-primary mt-2 text-xs">•</span>
+                          <span>{achievement}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Skills */}
+                {(item as any).skills && (item as any).skills.length > 0 && (
+                  <div className="mb-4">
+                    <div className="flex flex-wrap gap-2">
+                      {(item as any).skills.map((skill: string) => (
+                        <span
+                          key={skill}
+                          className="inline-flex items-center rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary ring-1 ring-inset ring-primary/20"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Links */}
+                {(item as any).links && (item as any).links.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {(item as any).links.map((link: { label: string; url: string }) => (
+                      <Link key={link.label} href={link.url} target="_blank">
+                        <Button variant="ghost" size="sm" className="h-8 px-3">
+                          <ExternalLink className="h-3 w-3 mr-1" />
+                          {link.label}
+                        </Button>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+function ExperienceSection() {
+  const [activeTab, setActiveTab] = useState<"education" | "work">("education")
+
+  return (
+    <section className="py-12 md:py-24 lg:py-32 bg-muted/20">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="max-w-4xl mx-auto">
+          {/* Section Header */}
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-4">
+              Experience
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-8">
+              My journey as a developer, from internships to full-time roles, 
+              building experiences across fintech, education, and mobile platforms.
+            </p>
+            
+            {/* Toggle Buttons */}
+            <div className="flex justify-center gap-2 p-1 bg-muted rounded-lg inline-flex">
+              <Button
+                variant={activeTab === "education" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setActiveTab("education")}
+                className="flex items-center gap-2"
+              >
+                <GraduationCap className="h-4 w-4" />
+                Education
+              </Button>
+              <Button
+                variant={activeTab === "work" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setActiveTab("work")}
+                className="flex items-center gap-2"
+              >
+                <Briefcase className="h-4 w-4" />
+                Work Experience
+              </Button>
+            </div>
+          </div>
+
+          {/* Content Based on Active Tab */}
+          <div>
+            {activeTab === "work" && (
+              <TimelineSection items={workExperience} type="work" />
+            )}
+            {activeTab === "education" && (
+              <TimelineSection items={education} type="education" />
+            )}
+          </div>
+
+          {/* Call to Action */}
+          <div className="text-center mt-12 pt-8 border-t">
+            <p className="text-muted-foreground mb-4">
+              Want to know more about my work or discuss opportunities?
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/about">
+                <Button variant="outline">
+                  Learn More About Me
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
 
 export default function Page() {
   return (
@@ -57,6 +294,8 @@ export default function Page() {
             </div>
           </div>
         </section>
+
+        <ExperienceSection />
 
         <section id="projects" className="py-12 md:py-24 lg:py-32">
           <div className="container mx-auto px-4 md:px-6">
