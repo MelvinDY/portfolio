@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Github, Linkedin, Mail, Instagram, FileText, ChevronDown } from "lucide-react"
 import Link from "next/link"
@@ -42,7 +44,7 @@ export default function AboutPage() {
                       <span className="sr-only">GitHub</span>
                     </Button>
                   </Link>
-                  <Link href="https://www.linkedin.com/in/melvin-yogiana-113152335/" target="_blank">
+                  <Link href="https://www.linkedin.com/in/melvin-yogiana/" target="_blank">
                     <Button variant="outline" size="icon">
                       <Linkedin className="h-4 w-4" />
                       <span className="sr-only">LinkedIn</span>
@@ -72,7 +74,7 @@ export default function AboutPage() {
                       <span className="sr-only">Email</span>
                     </Button>
                   </Link>
-                  <Link href="https://instagram.com/your-pet-instagram" target="_blank">
+                  <Link href="https://www.instagram.com/melvindarialyogiana" target="_blank">
                     <Button variant="outline" size="icon">
                       <Instagram className="h-4 w-4" />
                       <span className="sr-only">Pet Support</span>
@@ -86,7 +88,7 @@ export default function AboutPage() {
                 <div className="relative">
                   <div className="aspect-[4/5] w-80 relative rounded-2xl overflow-hidden">
                     <Image
-                      src="/placeholder.svg?height=600&width=480"
+                      src="/purin.jpg?height=600&width=480"
                       alt="Melvin - Full Stack Developer"
                       fill
                       className="object-cover"
@@ -143,7 +145,7 @@ export default function AboutPage() {
                     <p className="text-sm text-muted-foreground">
                       Want to see my furry coding companion? Check out my 
                       <Link 
-                        href="https://instagram.com/your-pet-instagram" 
+                        href="https://www.instagram.com/iamrigbycat" 
                         target="_blank" 
                         className="text-primary hover:underline ml-1"
                       >
@@ -227,23 +229,23 @@ export default function AboutPage() {
                   {/* Social Links */}
                   <div className="flex justify-center gap-4 pt-4">
                     <Button variant="ghost" size="sm" asChild>
-                      <Link href="https://github.com" target="_blank">
+                      <Link href="https://github.com/MelvinDY" target="_blank">
                         <Github className="h-4 w-4 mr-2" />
                         GitHub
                       </Link>
                     </Button>
                     
                     <Button variant="ghost" size="sm" asChild>
-                      <Link href="https://linkedin.com" target="_blank">
+                      <Link href="https://www.linkedin.com/in/melvin-yogiana" target="_blank">
                         <Linkedin className="h-4 w-4 mr-2" />
                         LinkedIn
                       </Link>
                     </Button>
                     
                     <Button variant="ghost" size="sm" asChild>
-                      <Link href="https://www.instagram.com/iamrigbycat" target="_blank">
+                      <Link href="https://www.instagram.com/melvindarialyogiana" target="_blank">
                         <Instagram className="h-4 w-4 mr-2" />
-                        Pet Support
+                        Instagram 
                       </Link>
                     </Button>
                   </div>
