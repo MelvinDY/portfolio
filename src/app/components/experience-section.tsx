@@ -92,7 +92,7 @@ const education = [
 ]
 
 interface ExperienceItemProps {
-  item: typeof workExperience[0]
+  item: typeof workExperience[0] | typeof education[0]
   type: "work" | "education"
 }
 
@@ -113,10 +113,10 @@ function ExperienceItem({ item, type }: ExperienceItemProps) {
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-3">
             <div>
               <h3 className="text-lg font-semibold text-foreground mb-1">
-                {type === "work" ? item.role : (item as any).degree}
+                {type === "work" ? (item as any).role : (item as any).degree}
               </h3>
               <p className="text-primary font-medium">
-                {type === "work" ? item.company : (item as any).institution}
+                {type === "work" ? (item as any).company : (item as any).institution}
               </p>
             </div>
             
@@ -147,10 +147,10 @@ function ExperienceItem({ item, type }: ExperienceItemProps) {
           )}
 
           {/* Skills */}
-          {item.skills && item.skills.length > 0 && (
+          {type === "work" && (item as any).skills && (item as any).skills.length > 0 && (
             <div className="mb-4">
               <div className="flex flex-wrap gap-2">
-                {item.skills.map((skill) => (
+                {(item as any).skills.map((skill: string) => (
                   <span
                     key={skill}
                     className="inline-flex items-center rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary ring-1 ring-inset ring-primary/20"
