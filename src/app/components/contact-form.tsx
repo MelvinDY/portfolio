@@ -5,30 +5,46 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useState } from "react"
-import { submitContactForm } from "../actions"
 
 export default function ContactForm() {
   const [pending, setPending] = useState(false)
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
 
-  async function handleSubmit(formData: FormData) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
     setPending(true)
     setMessage("")
     setError("")
     
+    const form = e.currentTarget
+    const formData = new FormData(form)
+    
+    const data = {
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      message: formData.get("message") as string,
+    }
+    
     try {
-      const response = await submitContactForm(formData)
+      const response = await fetch('/api/email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
       
-      if (response.error) {
-        setError(response.error)
-      } else if (response.message) {
-        setMessage(response.message)
-        // Reset form on success
-        const form = document.querySelector('form') as HTMLFormElement
-        form?.reset()
+      const result = await response.json()
+      
+      if (!response.ok) {
+        setError(result.error || "Failed to send email. Please try again.")
+      } else {
+        setMessage(result.message)
+        form.reset()
       }
     } catch (error) {
+      console.error('Error:', error)
       setError("Something went wrong. Please try again.")
     } finally {
       setPending(false)
@@ -37,7 +53,7 @@ export default function ContactForm() {
 
   return (
     <Card className="p-6">
-      <form action={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="name" className="block text-sm font-medium mb-2">
             Name *

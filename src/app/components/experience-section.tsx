@@ -2,10 +2,32 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ExternalLink, MapPin, Calendar } from "lucide-react"
 import Link from "next/link"
-import Image from "next/image"
+
+interface WorkExperience {
+  id: string
+  company: string
+  role: string
+  period: string
+  location: string
+  logo: string
+  achievements: string[]
+  skills: string[]
+  links?: { label: string; url: string }[]
+}
+
+interface Education {
+  id: string
+  institution: string
+  degree: string
+  period: string
+  location: string
+  logo: string
+  achievements: string[]
+  links?: { label: string; url: string }[]
+}
 
 // Experience data based on the resume images
-const workExperience = [
+const workExperience: WorkExperience[] = [
   {
     id: "dbs-graduate",
     company: "DBS Bank",
@@ -62,7 +84,7 @@ const workExperience = [
   }
 ]
 
-const education = [
+const education: Education[] = [
   {
     id: "digipen",
     institution: "Digipen Institute of Technology Singapore",
@@ -91,12 +113,11 @@ const education = [
   }
 ]
 
-interface ExperienceItemProps {
-  item: typeof workExperience[0] | typeof education[0]
-  type: "work" | "education"
-}
+function ExperienceItem({ item, type }: { item: WorkExperience | Education, type: "work" | "education" }) {
+  const isWork = type === "work"
+  const workItem = isWork ? item as WorkExperience : null
+  const educationItem = !isWork ? item as Education : null
 
-function ExperienceItem({ item, type }: ExperienceItemProps) {
   return (
     <Card className="p-6 hover:shadow-lg transition-shadow">
       <div className="flex flex-col lg:flex-row lg:items-start gap-4">
@@ -113,13 +134,13 @@ function ExperienceItem({ item, type }: ExperienceItemProps) {
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-3">
             <div>
               <h3 className="text-lg font-semibold text-foreground mb-1">
-                {type === "work" ? (item as any).role : (item as any).degree}
+                {isWork ? workItem!.role : educationItem!.degree}
               </h3>
               <p className="text-primary font-medium">
-                {type === "work" ? (item as any).company : (item as any).institution}
+                {isWork ? workItem!.company : educationItem!.institution}
               </p>
             </div>
-            
+
             <div className="flex flex-col lg:items-end gap-1 mt-2 lg:mt-0">
               <div className="flex items-center gap-1 text-sm text-muted-foreground">
                 <Calendar className="h-4 w-4" />
@@ -147,10 +168,10 @@ function ExperienceItem({ item, type }: ExperienceItemProps) {
           )}
 
           {/* Skills */}
-          {type === "work" && (item as any).skills && (item as any).skills.length > 0 && (
+          {isWork && workItem!.skills && workItem!.skills.length > 0 && (
             <div className="mb-4">
               <div className="flex flex-wrap gap-2">
-                {(item as any).skills.map((skill: string) => (
+                {workItem!.skills.map((skill) => (
                   <span
                     key={skill}
                     className="inline-flex items-center rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary ring-1 ring-inset ring-primary/20"

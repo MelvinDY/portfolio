@@ -131,19 +131,39 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       } else if (trimmedLine) {
         // Regular paragraph - handle inline formatting
         const formatInlineContent = (text: string) => {
+          // Escape HTML entities first to prevent XSS
+          const escapeHtml = (str: string) => {
+            return str
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;')
+              .replace(/'/g, '&#039;')
+          }
+
+          // Escape the entire text first
+          let escaped = escapeHtml(text)
+
+          // Now apply markdown transformations on the escaped text
           // Handle bold **text**
-          text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-          // Handle links [text](url)
-          text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-primary hover:underline" target="_blank" rel="noopener noreferrer">$1</a>')
+          escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          // Handle links [text](url) - sanitize URL
+          escaped = escaped.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, linkText, url) => {
+            // Only allow http(s) URLs
+            if (url.match(/^https?:\/\//)) {
+              return `<a href="${url}" class="text-primary hover:underline" target="_blank" rel="noopener noreferrer">${linkText}</a>`
+            }
+            return match
+          })
           // Handle inline code `code`
-          text = text.replace(/`([^`]+)`/g, '<code class="bg-muted px-1.5 py-0.5 rounded text-sm">$1</code>')
-          
-          return text
+          escaped = escaped.replace(/`([^`]+)`/g, '<code class="bg-muted px-1.5 py-0.5 rounded text-sm">$1</code>')
+
+          return escaped
         }
 
         elements.push(
-          <p 
-            key={`p-${i}`} 
+          <p
+            key={`p-${i}`}
             className="mb-4 leading-relaxed"
             dangerouslySetInnerHTML={{ __html: formatInlineContent(trimmedLine) }}
           />

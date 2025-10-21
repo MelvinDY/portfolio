@@ -124,15 +124,15 @@ export default function AboutPage() {
                     </p>
                     
                     <p>
-                      When I'm not coding, you'll probably find me exploring Sydney's 
-                      coffee scene or planning my next adventure. I believe the best 
+                      When I&apos;m not coding, you&apos;ll probably find me exploring Sydney&apos;s
+                      coffee scene or planning my next adventure. I believe the best
                       developers are curious about everything, not just code.
                     </p>
 
                     <p>
-                      I'm passionate about building things that matter - whether it's 
-                      a sleek user interface, a robust API, or just a fun side project 
-                      that makes someone's day a little better.
+                      I&apos;m passionate about building things that matter - whether it&apos;s
+                      a sleek user interface, a robust API, or just a fun side project
+                      that makes someone&apos;s day a little better.
                     </p>
                   </div>
 
@@ -179,10 +179,10 @@ export default function AboutPage() {
               <Card className="p-8 md:p-12">
                 <div className="space-y-8 text-center">
                   <div className="space-y-4">
-                    <h2 className="text-3xl md:text-4xl font-bold">Let's Build Something Together</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold">Let&apos;s Build Something Together</h2>
                     <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                      I'm always excited about new projects and opportunities to learn. 
-                      Whether you have a project in mind or just want to chat about tech, let's connect!
+                      I&apos;m always excited about new projects and opportunities to learn.
+                      Whether you have a project in mind or just want to chat about tech, let&apos;s connect!
                     </p>
                   </div>
 

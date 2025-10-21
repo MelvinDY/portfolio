@@ -14,7 +14,7 @@ interface BlogCardProps {
   variant?: "home" | "full"
 }
 
-export default function BlogCard({ post, variant = "home" }: BlogCardProps) {
+export default function BlogCard({ post }: BlogCardProps) {
   return (
     <Card className="p-6 hover:shadow-lg transition-shadow">
       <Link href={`/blog/${post.id}`} className="block">

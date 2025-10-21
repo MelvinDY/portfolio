@@ -36,8 +36,8 @@ export default function PrivacyPage() {
               <section className="space-y-4">
                 <h2 className="text-2xl font-semibold text-primary">Hey, Welcome! 👋</h2>
                 <p className="text-lg leading-relaxed">
-                  Thanks for stopping by! This <strong>Privacy Policy</strong> is just here to let you know how things work around here. 
-                  My website is mainly about showcasing my work, and I'm all about respecting your privacy.
+                  Thanks for stopping by! This <strong>Privacy Policy</strong> is just here to let you know how things work around here.
+                  My website is mainly about showcasing my work, and I&apos;m all about respecting your privacy.
                 </p>
               </section>
 
@@ -45,8 +45,8 @@ export default function PrivacyPage() {
               <section className="space-y-4">
                 <h2 className="text-2xl font-semibold text-primary">What Information I Collect (Hint: Not Much)</h2>
                 <p className="leading-relaxed">
-                  Honestly, this is just a portfolio website, so I don't actively collect any personal information. 
-                  There's no account creation, no tracking cookies, and definitely no sneaky data gathering.
+                  Honestly, this is just a portfolio website, so I don&apos;t actively collect any personal information.
+                  There&apos;s no account creation, no tracking cookies, and definitely no sneaky data gathering.
                 </p>
                 
                 <div className="space-y-4 ml-4">
@@ -71,7 +71,7 @@ export default function PrivacyPage() {
               {/* How I Use Info */}
               <section className="space-y-4">
                 <h2 className="text-2xl font-semibold text-primary">How I Use the Info</h2>
-                <p className="leading-relaxed">Here's what I might do with any information I collect:</p>
+                <p className="leading-relaxed">Here&apos;s what I might do with any information I collect:</p>
                 <ul className="list-disc list-inside space-y-2 ml-4 text-muted-foreground">
                   <li>Respond to your questions or project inquiries</li>
                   <li>Make sure the site is running smoothly</li>
@@ -82,19 +82,19 @@ export default function PrivacyPage() {
 
               {/* Sharing Info */}
               <section className="space-y-4">
-                <h2 className="text-2xl font-semibold text-primary">Sharing Your Info (Spoiler: I Don't)</h2>
+                <h2 className="text-2xl font-semibold text-primary">Sharing Your Info (Spoiler: I Don&apos;t)</h2>
                 <p className="leading-relaxed">
-                  I don't sell, trade, or rent your personal info to anyone. Ever. If you shared something sensitive by accident, 
-                  feel free to reach out, and I'll help you remove it. Your information stays between us.
+                  I don&apos;t sell, trade, or rent your personal info to anyone. Ever. If you shared something sensitive by accident,
+                  feel free to reach out, and I&apos;ll help you remove it. Your information stays between us.
                 </p>
               </section>
 
               {/* Security */}
               <section className="space-y-4">
-                <h2 className="text-2xl font-semibold text-primary">Security (The Internet Isn't Perfect)</h2>
+                <h2 className="text-2xl font-semibold text-primary">Security (The Internet Isn&apos;t Perfect)</h2>
                 <p className="leading-relaxed">
-                  I'll do my best to keep any info you share safe using industry-standard practices, but let's be real—no system is foolproof. 
-                  While I'll take reasonable steps to protect your information, I can't promise 100% security. 
+                  I&apos;ll do my best to keep any info you share safe using industry-standard practices, but let&apos;s be real—no system is foolproof.
+                  While I&apos;ll take reasonable steps to protect your information, I can&apos;t promise 100% security.
                   The internet is a wild place! 🌐
                 </p>
               </section>
@@ -103,9 +103,9 @@ export default function PrivacyPage() {
               <section className="space-y-4">
                 <h2 className="text-2xl font-semibold text-primary">Third-Party Services</h2>
                 <p className="leading-relaxed">
-                  This site is hosted on <strong>Vercel</strong> and uses <strong>Resend</strong> for email delivery. 
-                  These services have their own privacy policies, which I encourage you to check out if you're curious. 
-                  I've chosen them because they respect privacy and security.
+                  This site is hosted on <strong>Vercel</strong> and uses <strong>Resend</strong> for email delivery.
+                  These services have their own privacy policies, which I encourage you to check out if you&apos;re curious.
+                  I&apos;ve chosen them because they respect privacy and security.
                 </p>
               </section>
 
@@ -113,8 +113,8 @@ export default function PrivacyPage() {
               <section className="space-y-4">
                 <h2 className="text-2xl font-semibold text-primary">Policy Updates (No Surprises)</h2>
                 <p className="leading-relaxed">
-                  This policy is current as of <strong>July 2025</strong>. If I make any changes, I'll update it here, 
-                  so you're always in the loop. Feel free to check back occasionally, but don't worry—I'm not making any 
+                  This policy is current as of <strong>July 2025</strong>. If I make any changes, I&apos;ll update it here,
+                  so you&apos;re always in the loop. Feel free to check back occasionally, but don&apos;t worry—I&apos;m not making any
                   big changes without being transparent about it.
                 </p>
               </section>
@@ -124,7 +124,7 @@ export default function PrivacyPage() {
                 <h2 className="text-2xl font-semibold text-primary">Got Questions? 🤔</h2>
                 <div className="bg-muted/50 p-6 rounded-lg">
                   <p className="leading-relaxed mb-4">
-                    If you have any questions, concerns, or just want to say hi, I'd love to hear from you!
+                    If you have any questions, concerns, or just want to say hi, I&apos;d love to hear from you!
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4">
                     <Link href="mailto:hello@example.com">

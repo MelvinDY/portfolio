@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Github, Linkedin, Mail, Instagram } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import SiteHeader from "./components/site-header"
 import ContactForm from "./components/contact-form"
 import ProjectCard from "./components/project-card"
@@ -13,7 +14,7 @@ import AnimatedBackground from "./components/animated-background"
 import { ExternalLink, MapPin, Calendar, Briefcase, GraduationCap } from "lucide-react"
 import React, { useState } from "react"
 
-const workExperience: {
+interface WorkExperience {
   id: string;
   company: string;
   role: string;
@@ -23,9 +24,22 @@ const workExperience: {
   achievements: string[];
   skills: string[];
   links?: { label: string; url: string; }[];
-}[] = []
+}
 
-const education = [
+interface Education {
+  id: string;
+  institution: string;
+  degree: string;
+  period: string;
+  location: string;
+  logo: string;
+  achievements: string[];
+  links?: { label: string; url: string; }[];
+}
+
+const workExperience: WorkExperience[] = []
+
+const education: Education[] = [
   {
     id: "UNSW",
     institution: "University of New South Wales",
@@ -48,18 +62,13 @@ const education = [
     institution: "UNSW Global",
     degree: "Diploma in Computer Science",
     period: "Aug 2022 - Dec 2023",
-    location: "Sydney, Australia", 
+    location: "Sydney, Australia",
     logo: "/UNSW-Global.png",
     achievements: []
   }
 ]
 
-interface ExperienceItemProps {
-  item: typeof workExperience[0] | typeof education[0]
-  type: "work" | "education"
-}
-
-function TimelineSection({ items, type }: { items: (typeof workExperience[0] | typeof education[0])[], type: "work" | "education" }) {
+function TimelineSection({ items, type }: { items: WorkExperience[] | Education[], type: "work" | "education" }) {
   if (items.length === 0) {
     return (
       <Card className="p-8 text-center">
@@ -79,98 +88,106 @@ function TimelineSection({ items, type }: { items: (typeof workExperience[0] | t
         <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border"></div>
         
         <div className="space-y-8">
-          {items.map((item, index) => (
-            <div key={item.id} className="relative flex gap-6">
-              {/* Timeline Dot and Logo */}
-              <div className="relative flex-shrink-0">
-                <div className="w-12 h-12 bg-background border-2 border-border rounded-lg flex items-center justify-center overflow-hidden">
-                  <img 
-                    src={item.logo} 
-                    alt={type === "work" ? (item as any).company : (item as any).institution}
-                    className="w-8 h-8 object-contain"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      const fallback = target.nextElementSibling as HTMLElement;
-                      if (fallback) fallback.style.display = 'block';
-                    }}
-                  />
-                  <div className="w-8 h-8 bg-primary/20 rounded hidden"></div>
-                </div>
-                {/* Timeline connector dot */}
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full border-2 border-background"></div>
-              </div>
+          {items.map((item) => {
+            const isWork = type === "work"
+            const workItem = isWork ? item as WorkExperience : null
+            const educationItem = !isWork ? item as Education : null
 
-              {/* Content */}
-              <div className="flex-1 min-w-0 pb-8">
-                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-3">
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-1">
-                      {type === "work" ? (item as any).role : (item as any).degree}
-                    </h3>
-                    <p className="text-primary font-medium">
-                      {type === "work" ? (item as any).company : (item as any).institution}
-                    </p>
+            return (
+              <div key={item.id} className="relative flex gap-6">
+                {/* Timeline Dot and Logo */}
+                <div className="relative flex-shrink-0">
+                  <div className="w-12 h-12 bg-background border-2 border-border rounded-lg flex items-center justify-center overflow-hidden">
+                    <Image
+                      src={item.logo}
+                      alt={isWork ? workItem!.company : educationItem!.institution}
+                      width={32}
+                      height={32}
+                      className="object-contain"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const fallback = target.nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = 'block';
+                      }}
+                    />
+                    <div className="w-8 h-8 bg-primary/20 rounded hidden"></div>
                   </div>
-                  
-                  <div className="flex flex-col lg:items-end gap-1 mt-2 lg:mt-0">
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <Calendar className="h-4 w-4" />
-                      {item.period}
-                    </div>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <MapPin className="h-4 w-4" />
-                      {item.location}
-                    </div>
-                  </div>
+                  {/* Timeline connector dot */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full border-2 border-background"></div>
                 </div>
 
-                {/* Achievements */}
-                {item.achievements && item.achievements.length > 0 && (
-                  <div className="mb-4">
-                    <ul className="space-y-2">
-                      {item.achievements.map((achievement: string, achieveIndex: number) => (
-                        <li key={achieveIndex} className="text-muted-foreground leading-relaxed flex items-start gap-2">
-                          <span className="text-primary mt-2 text-xs">•</span>
-                          <span>{achievement}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                {/* Content */}
+                <div className="flex-1 min-w-0 pb-8">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-3">
+                    <div>
+                      <h3 className="text-lg font-semibold text-foreground mb-1">
+                        {isWork ? workItem!.role : educationItem!.degree}
+                      </h3>
+                      <p className="text-primary font-medium">
+                        {isWork ? workItem!.company : educationItem!.institution}
+                      </p>
+                    </div>
 
-                {/* Skills */}
-                {(item as any).skills && (item as any).skills.length > 0 && (
-                  <div className="mb-4">
+                    <div className="flex flex-col lg:items-end gap-1 mt-2 lg:mt-0">
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <Calendar className="h-4 w-4" />
+                        {item.period}
+                      </div>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <MapPin className="h-4 w-4" />
+                        {item.location}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Achievements */}
+                  {item.achievements && item.achievements.length > 0 && (
+                    <div className="mb-4">
+                      <ul className="space-y-2">
+                        {item.achievements.map((achievement, achieveIndex) => (
+                          <li key={achieveIndex} className="text-muted-foreground leading-relaxed flex items-start gap-2">
+                            <span className="text-primary mt-2 text-xs">•</span>
+                            <span>{achievement}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Skills */}
+                  {isWork && workItem!.skills && workItem!.skills.length > 0 && (
+                    <div className="mb-4">
+                      <div className="flex flex-wrap gap-2">
+                        {workItem!.skills.map((skill) => (
+                          <span
+                            key={skill}
+                            className="inline-flex items-center rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary ring-1 ring-inset ring-primary/20"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Links */}
+                  {item.links && item.links.length > 0 && (
                     <div className="flex flex-wrap gap-2">
-                      {(item as any).skills.map((skill: string) => (
-                        <span
-                          key={skill}
-                          className="inline-flex items-center rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary ring-1 ring-inset ring-primary/20"
-                        >
-                          {skill}
-                        </span>
+                      {item.links.map((link) => (
+                        <Link key={link.label} href={link.url} target="_blank">
+                          <Button variant="ghost" size="sm" className="h-8 px-3">
+                            <ExternalLink className="h-3 w-3 mr-1" />
+                            {link.label}
+                          </Button>
+                        </Link>
                       ))}
                     </div>
-                  </div>
-                )}
-
-                {/* Links */}
-                {(item as any).links && (item as any).links.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {(item as any).links.map((link: { label: string; url: string }) => (
-                      <Link key={link.label} href={link.url} target="_blank">
-                        <Button variant="ghost" size="sm" className="h-8 px-3">
-                          <ExternalLink className="h-3 w-3 mr-1" />
-                          {link.label}
-                        </Button>
-                      </Link>
-                    ))}
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     </Card>

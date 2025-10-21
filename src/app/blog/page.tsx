@@ -60,7 +60,7 @@ export default function BlogPage() {
           {filteredPosts.length === 0 ? (
             <Card className="p-8 text-center">
               <p className="text-muted-foreground">
-                No posts found matching "{searchTerm}". Try a different search term.
+                No posts found matching &quot;{searchTerm}&quot;. Try a different search term.
               </p>
             </Card>
           ) : (
