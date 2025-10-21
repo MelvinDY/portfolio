@@ -370,7 +370,7 @@ const ThreeJSHero = () => {
       <div className="relative z-30 max-w-6xl mx-auto px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-8 text-center">
           <div className="space-y-6">
-            <h1 className="text-6xl font-bold tracking-tight sm:text-7xl md:text-8xl lg:text-9xl">
+            <h1 className="text-6xl font-bold tracking-tight sm:text-7xl md:text-8xl lg:text-9xl font-mono">
               <span
                 className="text-foreground inline-block animate-fade-in-up"
                 style={{
@@ -382,7 +382,7 @@ const ThreeJSHero = () => {
                 Melvin Darial Yogiana
               </span>
             </h1>
-            <p className="mx-auto max-w-[800px] text-2xl md:text-3xl lg:text-4xl text-foreground backdrop-blur-sm bg-muted/50 rounded-xl p-6 border border-border inline-block animate-fade-in-up"
+            <p className="mx-auto max-w-[800px] text-2xl md:text-3xl lg:text-4xl text-foreground backdrop-blur-sm bg-muted/50 rounded-xl p-6 border border-border inline-block animate-fade-in-up font-mono"
                style={{
                  animation: 'fadeInUp 1.2s ease-out forwards',
                  animationDelay: '0.8s',

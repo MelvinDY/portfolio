@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card"
 import Link from "next/link"
 import Image from "next/image"
 import SiteHeader from "./components/site-header"
-import ContactForm from "./components/contact-form"
+import TerminalContact from "./components/terminal-contact"
 import ProjectCard from "./components/project-card"
 import TechStack from "./components/tech-stack"
 import RecentPostsSection from "./components/recent-posts-section"
@@ -320,14 +320,7 @@ export default function Page() {
         <RecentPostsSection />
 
         <section id="contact" className="min-h-screen flex items-center py-12 snap-start">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="mx-auto max-w-2xl">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-12 text-center">
-                Get in Touch
-              </h2>
-              <ContactForm />
-            </div>
-          </div>
+          <TerminalContact />
         </section>
       </main>
 
