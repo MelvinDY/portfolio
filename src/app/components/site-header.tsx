@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { useTheme } from "next-themes"
 import Link from "next/link"
 import { useEffect, useState } from "react"
+import { Moon, Sun } from "lucide-react"
 
 interface SiteHeaderProps {
   variant?: "home" | "about" | "blog" | "projects"
@@ -20,12 +21,6 @@ export default function SiteHeader({ variant = "home" }: SiteHeaderProps) {
 
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light")
-  }
-
-  // Get the appropriate emoji for current theme
-  const getThemeEmoji = () => {
-    if (!mounted) return "🌙" // Default to moon during SSR
-    return theme === "light" ? "🌙" : "☀️"
   }
 
   // Navigation items for different pages
@@ -128,10 +123,11 @@ export default function SiteHeader({ variant = "home" }: SiteHeaderProps) {
           {/* Theme Toggle Button - Hidden on very small screens */}
           <button
             onClick={toggleTheme}
-            className="hidden sm:flex p-2 hover:bg-accent rounded-md transition-colors text-lg"
+            className="hidden sm:flex p-2 hover:bg-accent rounded-md transition-colors"
             title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
           >
-            {getThemeEmoji()}
+            {mounted && (theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />)}
+            {!mounted && <Moon className="h-5 w-5" />}
           </button>
 
           {/* Main action button */}
