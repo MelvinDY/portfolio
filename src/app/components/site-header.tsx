@@ -75,7 +75,11 @@ export default function SiteHeader({ variant = "home" }: SiteHeaderProps) {
   const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (variant === "home") {
       e.preventDefault()
-      window.scrollTo({ top: 0, behavior: "smooth" })
+      // Find the main scroll container and scroll it to top
+      const mainContainer = document.querySelector('main')
+      if (mainContainer) {
+        mainContainer.scrollTo({ top: 0, behavior: "smooth" })
+      }
     }
   }
 
