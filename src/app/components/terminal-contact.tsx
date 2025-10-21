@@ -135,69 +135,78 @@ const TerminalContact = () => {
               {/* Contact Form */}
               {formVisible && (
                 <div className="mt-8 animate-fade-in">
-                  <div className="text-foreground mb-4">
+                  <div className="text-foreground mb-6">
                     $ compose_message --interactive
                   </div>
-                  <form onSubmit={handleSubmit} className="space-y-4">
+                  <form onSubmit={handleSubmit} className="space-y-3">
                     <div>
-                      <label className="text-muted-foreground block mb-2">Name:</label>
-                      <input
-                        type="text"
-                        value={formData.name}
-                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                        required
-                        className="w-full bg-background border border-border rounded px-3 py-2 text-foreground font-mono focus:border-primary focus:outline-none"
-                        placeholder="Enter your name..."
-                      />
+                      <div className="text-muted-foreground mb-1">name:</div>
+                      <div className="flex items-center">
+                        <span className="text-primary mr-2">{'>'}</span>
+                        <input
+                          type="text"
+                          value={formData.name}
+                          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                          required
+                          className="flex-1 bg-transparent border-0 border-b border-border text-foreground font-mono focus:border-primary focus:outline-none p-0 pb-1"
+                          placeholder="john_doe"
+                        />
+                      </div>
                     </div>
                     <div>
-                      <label className="text-muted-foreground block mb-2">Email:</label>
-                      <input
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                        required
-                        className="w-full bg-background border border-border rounded px-3 py-2 text-foreground font-mono focus:border-primary focus:outline-none"
-                        placeholder="your.email@example.com"
-                      />
+                      <div className="text-muted-foreground mb-1">email:</div>
+                      <div className="flex items-center">
+                        <span className="text-primary mr-2">{'>'}</span>
+                        <input
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                          required
+                          className="flex-1 bg-transparent border-0 border-b border-border text-foreground font-mono focus:border-primary focus:outline-none p-0 pb-1"
+                          placeholder="john@example.com"
+                        />
+                      </div>
                     </div>
                     <div>
-                      <label className="text-muted-foreground block mb-2">Message:</label>
-                      <textarea
-                        rows={6}
-                        value={formData.message}
-                        onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                        required
-                        className="w-full bg-background border border-border rounded px-3 py-2 text-foreground font-mono focus:border-primary focus:outline-none resize-none"
-                        placeholder="Type your message here..."
-                      />
+                      <div className="text-muted-foreground mb-1">message:</div>
+                      <div className="flex items-start">
+                        <span className="text-primary mr-2 mt-1">{'>'}</span>
+                        <textarea
+                          rows={4}
+                          value={formData.message}
+                          onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+                          required
+                          className="flex-1 bg-transparent border border-border text-foreground font-mono focus:border-primary focus:outline-none p-2 resize-none"
+                          placeholder="your message here..."
+                        />
+                      </div>
                     </div>
 
                     {status === 'success' && (
                       <div className="text-green-500 font-mono text-sm">
-                        ✓ Message sent successfully!
+                        [✓] message_sent: transmission successful
                       </div>
                     )}
                     {status === 'error' && (
                       <div className="text-red-500 font-mono text-sm">
-                        ✗ Failed to send message. Please try again.
+                        [✗] error: transmission_failed - retry recommended
                       </div>
                     )}
 
-                    <div className="flex space-x-4">
+                    <div className="flex space-x-4 pt-2">
                       <button
                         type="submit"
                         disabled={status === 'loading'}
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded font-mono transition-colors disabled:opacity-50"
+                        className="border border-primary text-primary hover:bg-primary hover:text-primary-foreground px-4 py-1 font-mono transition-colors disabled:opacity-50 text-sm"
                       >
-                        {status === 'loading' ? 'Sending...' : 'Send Message'}
+                        {status === 'loading' ? '[ sending... ]' : '[ send ]'}
                       </button>
                       <button
                         type="button"
                         onClick={handleClear}
-                        className="bg-muted hover:bg-muted/80 text-foreground px-6 py-2 rounded font-mono transition-colors"
+                        className="border border-border text-muted-foreground hover:text-foreground px-4 py-1 font-mono transition-colors text-sm"
                       >
-                        Clear
+                        [ clear ]
                       </button>
                     </div>
                   </form>
