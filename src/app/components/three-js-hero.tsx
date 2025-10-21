@@ -93,7 +93,7 @@ const ThreeJSHero = () => {
     asciiRenderer.style.left = '0'
     asciiRenderer.style.width = '100%'
     asciiRenderer.style.height = '100%'
-    asciiRenderer.style.color = 'white'
+    asciiRenderer.style.color = 'currentColor'
     asciiRenderer.style.fontFamily = 'Courier, monospace'
 
     // Calculate initial font size to fill the screen
@@ -349,7 +349,7 @@ const ThreeJSHero = () => {
   }, [])
 
   return (
-    <div className="relative h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden bg-black snap-start">
+    <div className="relative h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden bg-background text-foreground snap-start">
       {/* Three.js Canvas */}
       <div
         ref={mountRef}
@@ -358,10 +358,10 @@ const ThreeJSHero = () => {
 
       {/* Loading indicator */}
       {!isLoaded && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/80">
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/80">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <p className="text-white/70">Loading 3D Scene...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading 3D Scene...</p>
           </div>
         </div>
       )}
@@ -372,7 +372,7 @@ const ThreeJSHero = () => {
           <div className="space-y-6">
             <h1 className="text-6xl font-bold tracking-tight sm:text-7xl md:text-8xl lg:text-9xl">
               <span
-                className="text-white inline-block animate-fade-in-up"
+                className="text-foreground inline-block animate-fade-in-up"
                 style={{
                   animation: 'fadeInUp 1.2s ease-out forwards',
                   animationDelay: '0.3s',
@@ -382,7 +382,7 @@ const ThreeJSHero = () => {
                 Melvin Darial Yogiana
               </span>
             </h1>
-            <p className="mx-auto max-w-[800px] text-2xl md:text-3xl lg:text-4xl text-white/90 backdrop-blur-sm bg-white/5 rounded-xl p-6 border border-white/10 inline-block animate-fade-in-up"
+            <p className="mx-auto max-w-[800px] text-2xl md:text-3xl lg:text-4xl text-foreground backdrop-blur-sm bg-muted/50 rounded-xl p-6 border border-border inline-block animate-fade-in-up"
                style={{
                  animation: 'fadeInUp 1.2s ease-out forwards',
                  animationDelay: '0.8s',
@@ -393,7 +393,7 @@ const ThreeJSHero = () => {
           </div>
 
           {/* Social Links */}
-          <div className="flex space-x-6 backdrop-blur-sm bg-white/5 rounded-xl p-6 border border-white/10 animate-fade-in-up"
+          <div className="flex space-x-6 backdrop-blur-sm bg-muted/50 rounded-xl p-6 border border-border animate-fade-in-up"
                style={{
                  animation: 'fadeInUp 1.2s ease-out forwards',
                  animationDelay: '1.3s',
@@ -404,7 +404,7 @@ const ThreeJSHero = () => {
               <Button
                 variant="outline"
                 size="icon"
-                className="w-14 h-14 backdrop-blur-sm bg-white/10 hover:bg-white/20 border-white/20 text-white hover:text-white transition-all duration-300 hover:shadow-lg hover:shadow-white/25"
+                className="w-14 h-14 backdrop-blur-sm bg-muted/50 hover:bg-muted border-border text-foreground hover:text-foreground transition-all duration-300 hover:shadow-lg"
               >
                 <Github className="h-6 w-6" />
                 <span className="sr-only">GitHub</span>
@@ -415,7 +415,7 @@ const ThreeJSHero = () => {
               <Button
                 variant="outline"
                 size="icon"
-                className="w-14 h-14 backdrop-blur-sm bg-white/10 hover:bg-white/20 border-white/20 text-white hover:text-white transition-all duration-300 hover:shadow-lg hover:shadow-white/25"
+                className="w-14 h-14 backdrop-blur-sm bg-muted/50 hover:bg-muted border-border text-foreground hover:text-foreground transition-all duration-300 hover:shadow-lg"
               >
                 <Linkedin className="h-6 w-6" />
                 <span className="sr-only">LinkedIn</span>
@@ -426,7 +426,7 @@ const ThreeJSHero = () => {
               <Button
                 variant="outline"
                 size="icon"
-                className="w-14 h-14 backdrop-blur-sm bg-white/10 hover:bg-white/20 border-white/20 text-white hover:text-white transition-all duration-300 hover:shadow-lg hover:shadow-white/25"
+                className="w-14 h-14 backdrop-blur-sm bg-muted/50 hover:bg-muted border-border text-foreground hover:text-foreground transition-all duration-300 hover:shadow-lg"
               >
                 <Instagram className="h-6 w-6" />
                 <span className="sr-only">Pet Support</span>
@@ -440,7 +440,7 @@ const ThreeJSHero = () => {
               <Button
                 variant="outline"
                 size="icon"
-                className="w-14 h-14 backdrop-blur-sm bg-white/10 hover:bg-white/20 border-white/20 text-white hover:text-white transition-all duration-300 hover:shadow-lg hover:shadow-white/25"
+                className="w-14 h-14 backdrop-blur-sm bg-muted/50 hover:bg-muted border-border text-foreground hover:text-foreground transition-all duration-300 hover:shadow-lg"
               >
                 <Mail className="h-6 w-6" />
                 <span className="sr-only">Email</span>
@@ -456,15 +456,12 @@ const ThreeJSHero = () => {
                  animationDelay: '2s',
                  opacity: 0
                }}>
-            <div className="w-8 h-12 border-2 border-white/40 rounded-full backdrop-blur-sm bg-white/10 transition-all duration-300 hover:border-white/60 hover:bg-white/20">
-              <div className="w-1.5 h-4 bg-white/70 rounded-full mx-auto mt-2 animate-pulse"></div>
+            <div className="w-8 h-12 border-2 border-border rounded-full backdrop-blur-sm bg-muted/50 transition-all duration-300 hover:border-primary hover:bg-muted">
+              <div className="w-1.5 h-4 bg-primary rounded-full mx-auto mt-2 animate-pulse"></div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Gradient Overlay for better text readability */}
-      <div className="absolute inset-0 z-20 bg-gradient-to-b from-black/20 via-transparent to-black/40 pointer-events-none"></div>
 
       {/* Add CSS keyframes */}
       <style jsx>{`
