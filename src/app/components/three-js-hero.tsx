@@ -59,11 +59,11 @@ const Instagram = ({ className = "h-4 w-4" }: { className?: string }) => (
 // Three.js Hero Component
 const ThreeJSHero = () => {
   const mountRef = useRef<HTMLDivElement>(null)
-  const sceneRef = useRef<THREE.Scene>()
-  const rendererRef = useRef<THREE.WebGLRenderer>()
-  const asciiRendererRef = useRef<HTMLDivElement>()
-  const cameraRef = useRef<THREE.PerspectiveCamera>()
-  const geometryRef = useRef<THREE.Group>()
+  const sceneRef = useRef<THREE.Scene | undefined>(undefined)
+  const rendererRef = useRef<THREE.WebGLRenderer | undefined>(undefined)
+  const asciiRendererRef = useRef<HTMLDivElement | undefined>(undefined)
+  const cameraRef = useRef<THREE.PerspectiveCamera | undefined>(undefined)
+  const geometryRef = useRef<THREE.Group | undefined>(undefined)
   const mouseRef = useRef({ x: 0, y: 0 })
   const [isLoaded, setIsLoaded] = useState(false)
 
