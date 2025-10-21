@@ -2,6 +2,32 @@
 
 import React, { useEffect, useState } from 'react'
 
+// Terminal content
+const terminalLines = [
+  "$ whoami",
+  "melvin@portfolio:~$ contact_info --get-in-touch",
+  "",
+  "Loading contact information...",
+  "Connection established ✓",
+  "",
+  "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+  "│ CONTACT INTERFACE v2.1.0                     │",
+  "│ Status: ONLINE ● Ready to receive messages   │",
+  "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+  "",
+  "Available communication channels:",
+  "",
+  "├── email: melvindarialyogiana@gmail.com",
+  "├── github: github.com/MelvinDY",
+  "├── linkedin: linkedin.com/in/melvin-yogiana",
+  "└── instagram: @melvindarialyogiana",
+  "",
+  "Response time: Usually within 24 hours",
+  "Preferred topics: Web dev, CS projects, opportunities",
+  "",
+  "Type 'send' to compose a message..."
+]
+
 // Terminal Contact Page Component
 const TerminalContact = () => {
   const [currentLine, setCurrentLine] = useState(0)
@@ -10,32 +36,6 @@ const TerminalContact = () => {
   const [formVisible, setFormVisible] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
-
-  // Terminal content
-  const terminalLines = [
-    "$ whoami",
-    "melvin@portfolio:~$ contact_info --get-in-touch",
-    "",
-    "Loading contact information...",
-    "Connection established ✓",
-    "",
-    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-    "│ CONTACT INTERFACE v2.1.0                     │",
-    "│ Status: ONLINE ● Ready to receive messages   │",
-    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-    "",
-    "Available communication channels:",
-    "",
-    "├── email: melvindarialyogiana@gmail.com",
-    "├── github: github.com/MelvinDY",
-    "├── linkedin: linkedin.com/in/melvin-yogiana",
-    "└── instagram: @melvindarialyogiana",
-    "",
-    "Response time: Usually within 24 hours",
-    "Preferred topics: Web dev, CS projects, opportunities",
-    "",
-    "Type 'send' to compose a message..."
-  ]
 
   // Terminal typing animation
   useEffect(() => {
@@ -94,7 +94,7 @@ const TerminalContact = () => {
         setStatus('error')
         setTimeout(() => setStatus('idle'), 5000)
       }
-    } catch (error) {
+    } catch {
       setStatus('error')
       setTimeout(() => setStatus('idle'), 5000)
     }
