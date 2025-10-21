@@ -260,7 +260,7 @@ Things I'm excited to write about:
 - Portfolio development journey
 
 ### Links
-Check out my [GitHub](https://github.com) for the source code of this site!
+Check out my [GitHub](https://github.com/MelvinDY) for the source code of this site!
 
 ## What's Coming Next
 

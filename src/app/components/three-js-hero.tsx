@@ -399,7 +399,7 @@ const ThreeJSHero = () => {
                  animationDelay: '1.3s',
                  opacity: 0
                }}>
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer"
+            <a href="https://github.com/MelvinDY" target="_blank" rel="noopener noreferrer"
                className="transform transition-all duration-300 hover:scale-110 hover:-translate-y-2">
               <Button
                 variant="outline"
@@ -410,7 +410,7 @@ const ThreeJSHero = () => {
                 <span className="sr-only">GitHub</span>
               </Button>
             </a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"
+            <a href="https://www.linkedin.com/in/melvin-yogiana/" target="_blank" rel="noopener noreferrer"
                className="transform transition-all duration-300 hover:scale-110 hover:-translate-y-2">
               <Button
                 variant="outline"
@@ -421,7 +421,7 @@ const ThreeJSHero = () => {
                 <span className="sr-only">LinkedIn</span>
               </Button>
             </a>
-            <a href="https://instagram.com/your-pet-instagram" target="_blank" rel="noopener noreferrer"
+            <a href="https://www.instagram.com/melvindarialyogiana/" target="_blank" rel="noopener noreferrer"
                className="transform transition-all duration-300 hover:scale-110 hover:-translate-y-2">
               <Button
                 variant="outline"
@@ -429,7 +429,7 @@ const ThreeJSHero = () => {
                 className="w-14 h-14 backdrop-blur-sm bg-muted/50 hover:bg-muted border-border text-foreground hover:text-foreground transition-all duration-300 hover:shadow-lg"
               >
                 <Instagram className="h-6 w-6" />
-                <span className="sr-only">Pet Support</span>
+                <span className="sr-only">Instagram</span>
               </Button>
             </a>
             <a
