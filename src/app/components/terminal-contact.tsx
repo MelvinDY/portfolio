@@ -201,43 +201,6 @@ const TerminalContact = () => {
                       </button>
                     </div>
                   </form>
-
-                  {/* Quick Contact Links */}
-                  <div className="mt-8 pt-6 border-t border-border">
-                    <div className="text-muted-foreground mb-4">Quick connect:</div>
-                    <div className="flex flex-wrap gap-4">
-                      <a
-                        href="mailto:melvindarialyogiana@gmail.com"
-                        className="bg-muted hover:bg-muted/80 border border-border text-foreground px-4 py-2 rounded font-mono transition-colors text-sm"
-                      >
-                        📧 Email
-                      </a>
-                      <a
-                        href="https://github.com/MelvinDY"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-muted hover:bg-muted/80 border border-border text-foreground px-4 py-2 rounded font-mono transition-colors text-sm"
-                      >
-                        💻 GitHub
-                      </a>
-                      <a
-                        href="https://www.linkedin.com/in/melvin-yogiana/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-muted hover:bg-muted/80 border border-border text-foreground px-4 py-2 rounded font-mono transition-colors text-sm"
-                      >
-                        💼 LinkedIn
-                      </a>
-                      <a
-                        href="https://www.instagram.com/melvindarialyogiana/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-muted hover:bg-muted/80 border border-border text-foreground px-4 py-2 rounded font-mono transition-colors text-sm"
-                      >
-                        📷 Instagram
-                      </a>
-                    </div>
-                  </div>
                 </div>
               )}
             </div>
