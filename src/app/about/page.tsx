@@ -13,9 +13,9 @@ export default function AboutPage() {
     <div className="min-h-screen bg-background">
       <SiteHeader variant="about" />
 
-      <main className="w-full">
+      <main className="w-full snap-y snap-mandatory overflow-y-scroll h-[calc(100vh-4rem)] scroll-smooth">
         {/* Hero Section - Full Screen */}
-        <section id="hero" className="min-h-screen flex items-center justify-center py-12 md:py-24 lg:py-32 relative">
+        <section id="hero" className="min-h-screen flex items-center justify-center py-12 snap-start relative">
           <div className="container mx-auto px-4 md:px-6">
             <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
               {/* Left Content */}
@@ -107,7 +107,7 @@ export default function AboutPage() {
         </section>
 
         {/* My Story Section */}
-        <section id="story" className="py-12 md:py-24 lg:py-32 bg-muted/20">
+        <section id="story" className="min-h-screen flex items-center py-12 bg-muted/20 snap-start">
           <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-4xl mx-auto">
               <Card className="p-8 md:p-12">
@@ -161,7 +161,7 @@ export default function AboutPage() {
         </section>
 
         {/* Currently Learning Section */}
-        <section id="tech" className="py-12 md:py-24 lg:py-32">
+        <section id="tech" className="min-h-screen flex items-center py-12 snap-start">
           <div className="container mx-auto px-4 md:px-6">
             <div className="text-center mb-12 space-y-4">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
@@ -178,7 +178,7 @@ export default function AboutPage() {
         </section>
 
         {/* Contact Section */}
-        <section id="contact" className="py-12 md:py-24 lg:py-32 bg-muted/20">
+        <section id="contact" className="min-h-screen flex items-center py-12 bg-muted/20 snap-start">
           <div className="container mx-auto px-4 md:px-6">
             <div className="mx-auto max-w-2xl">
               <Card className="p-8 md:p-12">
