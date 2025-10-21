@@ -72,11 +72,22 @@ export default function SiteHeader({ variant = "home" }: SiteHeaderProps) {
 
   const navItems = getNavItems()
 
+  const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (variant === "home") {
+      e.preventDefault()
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-14 items-center justify-between px-4 md:px-6">
         <div className="flex items-center">
-          <Link className="mr-6 flex items-center space-x-2" href="/">
+          <Link
+            className="mr-6 flex items-center space-x-2"
+            href="/"
+            onClick={handleLogoClick}
+          >
             <span className="font-bold">MelvinDY</span>
           </Link>
           
