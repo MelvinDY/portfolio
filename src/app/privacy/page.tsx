@@ -127,10 +127,10 @@ export default function PrivacyPage() {
                     If you have any questions, concerns, or just want to say hi, I&apos;d love to hear from you!
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <Link href="mailto:hello@example.com">
+                    <Link href="mailto:melvindarialyogiana@gmail.com">
                       <Button variant="outline" className="w-full sm:w-auto">
                         <Mail className="h-4 w-4 mr-2" />
-                        hello@example.com
+                        melvindarialyogiana@gmail.com
                       </Button>
                     </Link>
                     <Link href="/#contact">

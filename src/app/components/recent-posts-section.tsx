@@ -6,11 +6,11 @@ import { getRecentPosts } from "../lib/blog"
 
 export default function RecentPostsSection() {
   const recentPosts = getRecentPosts(2)
-  
+
   return (
-    <section className="py-12 md:py-24 lg:py-32 bg-muted/20">
+    <section className="min-h-screen flex items-center py-12 bg-muted/20 snap-start">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="flex items-center justify-between mb-12">
+        <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
             recent posts
           </h2>

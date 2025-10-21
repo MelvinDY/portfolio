@@ -81,12 +81,12 @@ function TimelineSection({ items, type }: { items: WorkExperience[] | Education[
   }
 
   return (
-    <Card className="p-6">
+    <Card className="p-4">
       <div className="relative">
         {/* Vertical Timeline Line */}
         <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border"></div>
-        
-        <div className="space-y-8">
+
+        <div className="space-y-4">
           {items.map((item) => {
             const isWork = type === "work"
             const workItem = isWork ? item as WorkExperience : null
@@ -117,8 +117,8 @@ function TimelineSection({ items, type }: { items: WorkExperience[] | Education[
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 min-w-0 pb-8">
-                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-3">
+                <div className="flex-1 min-w-0 pb-4">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-2">
                     <div>
                       <h3 className="text-lg font-semibold text-foreground mb-1">
                         {isWork ? workItem!.role : educationItem!.degree}
@@ -142,8 +142,8 @@ function TimelineSection({ items, type }: { items: WorkExperience[] | Education[
 
                   {/* Achievements */}
                   {item.achievements && item.achievements.length > 0 && (
-                    <div className="mb-4">
-                      <ul className="space-y-2">
+                    <div className="mb-2">
+                      <ul className="space-y-1">
                         {item.achievements.map((achievement, achieveIndex) => (
                           <li key={achieveIndex} className="text-muted-foreground leading-relaxed flex items-start gap-2">
                             <span className="text-primary mt-2 text-xs">•</span>
@@ -156,7 +156,7 @@ function TimelineSection({ items, type }: { items: WorkExperience[] | Education[
 
                   {/* Skills */}
                   {isWork && workItem!.skills && workItem!.skills.length > 0 && (
-                    <div className="mb-4">
+                    <div className="mb-2">
                       <div className="flex flex-wrap gap-2">
                         {workItem!.skills.map((skill) => (
                           <span
@@ -197,18 +197,14 @@ function ExperienceSection() {
   const [activeTab, setActiveTab] = useState<"education" | "work">("education")
 
   return (
-    <section className="py-12 md:py-24 lg:py-32 bg-muted/20">
+    <section className="min-h-screen bg-muted/20 flex items-center py-12 snap-start">
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-4xl mx-auto">
           {/* Section Header */}
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-4">
+          <div className="text-center mb-6">
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-3">
               Experience
             </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-8">
-              My journey as a developer, from internships to full-time roles, 
-              building experiences across fintech, education, and mobile platforms.
-            </p>
             
             {/* Toggle Buttons */}
             <div className="flex justify-center gap-2 p-1 bg-muted rounded-lg inline-flex">
@@ -244,7 +240,7 @@ function ExperienceSection() {
           </div>
 
           {/* Call to Action */}
-          <div className="text-center mt-12 pt-8 border-t">
+          <div className="text-center mt-6 pt-6 border-t">
             <p className="text-muted-foreground mb-4">
               Want to know more about my work or discuss opportunities?
             </p>
@@ -266,19 +262,16 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader variant="home" />
-      <main className="w-full">
+      <main className="w-full snap-y snap-mandatory overflow-y-scroll h-[calc(100vh-4rem)] scroll-smooth">
         {/* Hero Section with Three.js ASCII Art */}
         <ThreeJSHero />
 
         <ExperienceSection />
 
-        <section id="projects" className="py-12 md:py-24 lg:py-32">
+        <section id="projects" className="min-h-screen flex items-center py-12 snap-start">
           <div className="container mx-auto px-4 md:px-6">
-            <div className="text-center mb-12">
+            <div className="text-center mb-8">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-4">Featured Projects</h2>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                A selection of my most notable work showcasing different technologies and problem-solving approaches.
-              </p>
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto mb-12">
               <ProjectCard
@@ -313,12 +306,12 @@ export default function Page() {
           </div>
         </section>
 
-        <section className="py-12 md:py-24 lg:py-32">
+        <section className="min-h-screen flex items-center py-12 snap-start">
           <div className="container mx-auto px-4 md:px-6">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-12 text-center">
               Tech Stack
             </h2>
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-5xl mx-auto">
               <TechStack />
             </div>
           </div>
@@ -326,7 +319,7 @@ export default function Page() {
 
         <RecentPostsSection />
 
-        <section id="contact" className="py-12 md:py-24 lg:py-32">
+        <section id="contact" className="min-h-screen flex items-center py-12 snap-start">
           <div className="container mx-auto px-4 md:px-6">
             <div className="mx-auto max-w-2xl">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-12 text-center">

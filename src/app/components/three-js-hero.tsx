@@ -349,7 +349,7 @@ const ThreeJSHero = () => {
   }, [])
 
   return (
-    <div className="relative h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden bg-black">
+    <div className="relative h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden bg-black snap-start">
       {/* Three.js Canvas */}
       <div
         ref={mountRef}
@@ -449,8 +449,9 @@ const ThreeJSHero = () => {
           </div>
 
           {/* Scroll Indicator */}
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 animate-bounce"
+          <div className="absolute left-1/2 transform -translate-x-1/2 animate-bounce"
                style={{
+                 bottom: '-3rem',
                  animation: 'bounce 2s infinite, fadeInUp 1.2s ease-out forwards',
                  animationDelay: '2s',
                  opacity: 0
