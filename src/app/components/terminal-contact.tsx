@@ -56,14 +56,14 @@ const TerminalContact = () => {
           setTimeout(() => {
             setCurrentLine(prev => prev + 1)
             setDisplayedText(prev => prev + '\n')
-          }, 300)
+          }, 50)
         }
-      }, 50)
+      }, 10)
 
       return () => clearInterval(typeInterval)
     } else {
       // Show form after all lines are typed
-      setTimeout(() => setFormVisible(true), 1000)
+      setTimeout(() => setFormVisible(true), 300)
     }
   }, [currentLine])
 
