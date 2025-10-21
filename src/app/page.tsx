@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Github, Linkedin, Mail, Instagram } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import SiteHeader from "./components/site-header"
@@ -10,7 +9,7 @@ import ContactForm from "./components/contact-form"
 import ProjectCard from "./components/project-card"
 import TechStack from "./components/tech-stack"
 import RecentPostsSection from "./components/recent-posts-section"
-import AnimatedBackground from "./components/animated-background"
+import ThreeJSHero from "./components/three-js-hero"
 import { ExternalLink, MapPin, Calendar, Briefcase, GraduationCap } from "lucide-react"
 import React, { useState } from "react"
 
@@ -268,69 +267,8 @@ export default function Page() {
     <div className="min-h-screen bg-background">
       <SiteHeader variant="home" />
       <main className="w-full">
-        {/* Hero Section with Animated Background */}
-        <section id="about" className="py-12 md:py-24 lg:py-32 relative overflow-hidden">
-          <AnimatedBackground className="opacity-30" />
-          <div className="container mx-auto px-4 md:px-6 relative z-10">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-                  Full Stack Developer
-                </h1>
-                <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
-                  Building digital experiences with modern technologies. Focused on creating elegant solutions to
-                  complex problems.
-                </p>
-              </div>
-              <div className="flex space-x-4">
-                <Link href="https://github.com" target="_blank">
-                  <Button variant="outline" size="icon">
-                    <Github className="h-4 w-4" />
-                    <span className="sr-only">GitHub</span>
-                  </Button>
-                </Link>
-                <Link href="https://linkedin.com" target="_blank">
-                  <Button variant="outline" size="icon">
-                    <Linkedin className="h-4 w-4" />
-                    <span className="sr-only">LinkedIn</span>
-                  </Button>
-                </Link>
-                <Link href="https://instagram.com/your-pet-instagram" target="_blank">
-                  <Button variant="outline" size="icon">
-                    <Instagram className="h-4 w-4" />
-                    <span className="sr-only">Pet Support</span>
-                  </Button>
-                </Link>
-                <Link 
-                  href="mailto:melvindarialyogiana@gmail.com"
-                  title="Send email to melvindarialyogiana@gmail.com"
-                  onClick={(e) => {
-                    // Fallback: copy email to clipboard if mailto fails
-                    const fallback = () => {
-                      navigator.clipboard.writeText("melvindarialyogiana@gmail.com").then(() => {
-                        alert("Email address copied to clipboard: melvindarialyogiana@gmail.com");
-                      }).catch(() => {
-                        alert("Email: melvindarialyogiana@gmail.com");
-                      });
-                    };
-                    
-                    // Check if user agent supports mailto
-                    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                    if (!isMobile && !window.confirm("This will open your email client. Click OK to continue, or Cancel to copy the email address instead.")) {
-                      e.preventDefault();
-                      fallback();
-                    }
-                  }}
-                >
-                  <Button variant="outline" size="icon">
-                    <Mail className="h-4 w-4" />
-                    <span className="sr-only">Email</span>
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* Hero Section with Three.js ASCII Art */}
+        <ThreeJSHero />
 
         <ExperienceSection />
 
