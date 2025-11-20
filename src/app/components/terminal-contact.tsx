@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 
 // Terminal content
 const terminalLines = [
@@ -30,6 +30,8 @@ const terminalLines = [
 
 // Terminal Contact Page Component
 const TerminalContact = () => {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [hasStarted, setHasStarted] = useState(false)
   const [currentLine, setCurrentLine] = useState(0)
   const [displayedText, setDisplayedText] = useState('')
   const [showCursor, setShowCursor] = useState(true)
@@ -37,9 +39,34 @@ const TerminalContact = () => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
 
+  // Intersection Observer to detect when component enters viewport
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !hasStarted) {
+            setHasStarted(true)
+          }
+        })
+      },
+      { threshold: 0.2 } // Trigger when 20% of the component is visible
+    )
+
+    const currentRef = containerRef.current
+    if (currentRef) {
+      observer.observe(currentRef)
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef)
+      }
+    }
+  }, [hasStarted])
+
   // Terminal typing animation
   useEffect(() => {
-    if (currentLine < terminalLines.length) {
+    if (hasStarted && currentLine < terminalLines.length) {
       const line = terminalLines[currentLine]
       let charIndex = 0
 
@@ -61,11 +88,11 @@ const TerminalContact = () => {
       }, 10)
 
       return () => clearInterval(typeInterval)
-    } else {
+    } else if (hasStarted) {
       // Show form after all lines are typed
       setTimeout(() => setFormVisible(true), 300)
     }
-  }, [currentLine])
+  }, [currentLine, hasStarted])
 
   // Cursor blinking
   useEffect(() => {
@@ -105,7 +132,7 @@ const TerminalContact = () => {
   }
 
   return (
-    <div className="relative w-full">
+    <div ref={containerRef} className="relative w-full">
       {/* Terminal Content */}
       <div className="relative z-30 w-full h-full flex items-start justify-center p-4 md:p-8">
         <div className="w-full max-w-4xl">

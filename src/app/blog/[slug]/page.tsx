@@ -3,10 +3,12 @@ import { Card } from "@/components/ui/card"
 import { ArrowLeft, Calendar, Clock } from "lucide-react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import React, { JSX } from "react"
 import SiteHeader from "../../components/site-header"
 import { getPostById, getRelatedPosts, getAllPosts } from "../../lib/blog"
 import BlogCard from "@/app/components/blog-card"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
+import rehypeHighlight from "rehype-highlight"
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -23,162 +25,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   }
 
   const relatedPosts = getRelatedPosts(post, 2)
-
-  // Convert markdown-like content to JSX
-  const formatContent = (content: string) => {
-    const lines = content.split('\n')
-    const elements: JSX.Element[] = []
-    let i = 0
-    let inCodeBlock = false
-    let codeLines: string[] = []
-    let codeLanguage = ''
-    let inList = false
-    let listItems: string[] = []
-
-    const flushList = () => {
-      if (listItems.length > 0) {
-        elements.push(
-          <ul key={`list-${elements.length}`} className="list-disc list-inside space-y-2 mb-6 ml-4">
-            {listItems.map((item, idx) => (
-              <li key={idx} className="leading-relaxed">{item}</li>
-            ))}
-          </ul>
-        )
-        listItems = []
-        inList = false
-      }
-    }
-
-    const flushCodeBlock = () => {
-      if (codeLines.length > 0) {
-        elements.push(
-          <div key={`code-${elements.length}`} className="mb-6">
-            <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
-              <code className={`language-${codeLanguage} text-sm`}>
-                {codeLines.join('\n')}
-              </code>
-            </pre>
-          </div>
-        )
-        codeLines = []
-        codeLanguage = ''
-        inCodeBlock = false
-      }
-    }
-
-    while (i < lines.length) {
-      const line = lines[i]
-      const trimmedLine = line.trim()
-
-      // Handle code blocks
-      if (trimmedLine.startsWith('```')) {
-        if (inCodeBlock) {
-          flushCodeBlock()
-        } else {
-          flushList()
-          inCodeBlock = true
-          codeLanguage = trimmedLine.replace('```', '') || 'text'
-        }
-        i++
-        continue
-      }
-
-      if (inCodeBlock) {
-        codeLines.push(line)
-        i++
-        continue
-      }
-
-      // Handle lists
-      if (trimmedLine.startsWith('- ')) {
-        if (!inList) {
-          inList = true
-        }
-        listItems.push(trimmedLine.replace('- ', ''))
-        i++
-        continue
-      } else if (inList && trimmedLine === '') {
-        // Continue list if empty line
-        i++
-        continue
-      } else if (inList) {
-        // End of list
-        flushList()
-      }
-
-      // Handle headers
-      if (trimmedLine.startsWith('### ')) {
-        elements.push(
-          <h3 key={`h3-${i}`} className="text-xl font-semibold mt-8 mb-4 text-primary">
-            {trimmedLine.replace('### ', '')}
-          </h3>
-        )
-      } else if (trimmedLine.startsWith('## ')) {
-        elements.push(
-          <h2 key={`h2-${i}`} className="text-2xl font-semibold mt-10 mb-6 text-primary">
-            {trimmedLine.replace('## ', '')}
-          </h2>
-        )
-      } else if (trimmedLine.startsWith('# ')) {
-        elements.push(
-          <h1 key={`h1-${i}`} className="text-3xl font-bold mt-12 mb-8">
-            {trimmedLine.replace('# ', '')}
-          </h1>
-        )
-      } else if (trimmedLine === '') {
-        // Empty line - add spacing
-        elements.push(<div key={`space-${i}`} className="h-4" />)
-      } else if (trimmedLine) {
-        // Regular paragraph - handle inline formatting
-        const formatInlineContent = (text: string) => {
-          // Escape HTML entities first to prevent XSS
-          const escapeHtml = (str: string) => {
-            return str
-              .replace(/&/g, '&amp;')
-              .replace(/</g, '&lt;')
-              .replace(/>/g, '&gt;')
-              .replace(/"/g, '&quot;')
-              .replace(/'/g, '&#039;')
-          }
-
-          // Escape the entire text first
-          let escaped = escapeHtml(text)
-
-          // Now apply markdown transformations on the escaped text
-          // Handle bold **text**
-          escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-          // Handle links [text](url) - sanitize URL
-          escaped = escaped.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, linkText, url) => {
-            // Only allow http(s) URLs
-            if (url.match(/^https?:\/\//)) {
-              return `<a href="${url}" class="text-primary hover:underline" target="_blank" rel="noopener noreferrer">${linkText}</a>`
-            }
-            return match
-          })
-          // Handle inline code `code`
-          escaped = escaped.replace(/`([^`]+)`/g, '<code class="bg-muted px-1.5 py-0.5 rounded text-sm">$1</code>')
-
-          return escaped
-        }
-
-        elements.push(
-          <p
-            key={`p-${i}`}
-            className="mb-4 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: formatInlineContent(trimmedLine) }}
-          />
-        )
-      }
-
-      i++
-    }
-
-    // Flush any remaining content
-    flushList()
-    flushCodeBlock()
-
-    return elements
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -231,8 +77,15 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </header>
 
             {/* Post Content */}
-            <div className="prose prose-lg max-w-none">
-              {post.content ? formatContent(post.content) : (
+            <div className="prose prose-lg max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-li:text-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-pre:bg-muted prose-pre:p-4 prose-pre:rounded-lg">
+              {post.content ? (
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeHighlight]}
+                >
+                  {post.content}
+                </ReactMarkdown>
+              ) : (
                 <p className="text-muted-foreground">
                   {post.excerpt}
                 </p>
