@@ -45,7 +45,14 @@ const TerminalContact = () => {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting && !hasStarted) {
+            // Reset state when starting
+            setCurrentLine(0)
+            setDisplayedText('')
+            setFormVisible(false)
             setHasStarted(true)
+          } else if (!entry.isIntersecting && hasStarted) {
+            // Reset when leaving viewport to allow restart
+            setHasStarted(false)
           }
         })
       },
@@ -66,9 +73,12 @@ const TerminalContact = () => {
 
   // Terminal typing animation
   useEffect(() => {
-    if (hasStarted && currentLine < terminalLines.length) {
+    if (!hasStarted) return
+
+    if (currentLine < terminalLines.length) {
       const line = terminalLines[currentLine]
       let charIndex = 0
+      let timeoutId: NodeJS.Timeout
 
       const typeInterval = setInterval(() => {
         if (charIndex <= line.length) {
@@ -80,17 +90,21 @@ const TerminalContact = () => {
           charIndex++
         } else {
           clearInterval(typeInterval)
-          setTimeout(() => {
+          timeoutId = setTimeout(() => {
             setCurrentLine(prev => prev + 1)
             setDisplayedText(prev => prev + '\n')
           }, 50)
         }
       }, 10)
 
-      return () => clearInterval(typeInterval)
-    } else if (hasStarted) {
+      return () => {
+        clearInterval(typeInterval)
+        if (timeoutId) clearTimeout(timeoutId)
+      }
+    } else {
       // Show form after all lines are typed
-      setTimeout(() => setFormVisible(true), 300)
+      const formTimeout = setTimeout(() => setFormVisible(true), 300)
+      return () => clearTimeout(formTimeout)
     }
   }, [currentLine, hasStarted])
 
