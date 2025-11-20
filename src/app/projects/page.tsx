@@ -34,6 +34,7 @@ export default function ProjectsPage() {
                     title={project.title}
                     description={project.description}
                     image={project.image}
+                    images={project.images}
                     link={project.link}
                     tags={project.tags}
                   />
@@ -51,6 +52,7 @@ export default function ProjectsPage() {
                     title={project.title}
                     description={project.description}
                     image={project.image}
+                    images={project.images}
                     link={project.link}
                     tags={project.tags}
                   />
