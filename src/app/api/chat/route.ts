@@ -110,6 +110,18 @@ Key Features:
 
 Tech Stack: Next.js 15, TypeScript, Three.js, MDX, OpenAI, React Markdown, Tailwind CSS
 
+### Stall Wars
+Repository: https://github.com/MelvinDY/Stall_Wars
+Golden Rubbish Bin Award winner at Terrible Ideas Hackathon. A chaotic two-player arcade game built in 48 hours by a team of 3 developers.
+
+Key Features:
+- Four competitive minigames: Rhythm Game (WASD vs UHJK), Toilet RPS, Two-Player Snake, Toilet Pong
+- localStorage persistence for player names and game results
+- Local multiplayer competitive gameplay
+- Toilet paper as the ultimate prize theme
+
+Tech Stack: React, JavaScript, Vite, React Router DOM, CSS
+
 ### UNSW Capstone Project (COMP3900)
 Team-based software engineering capstone project developed in a team of 5 students following agile methodologies and industry best practices.
 

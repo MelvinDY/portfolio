@@ -30,6 +30,14 @@ export const projects: Project[] = [
     featured: true
   },
   {
+    id: "stall-wars",
+    title: "Stall Wars",
+    description: "Golden Rubbish Bin Award winner at Terrible Ideas Hackathon. A chaotic two-player arcade game with toilet-themed minigames including rhythm game, toilet RPS, competitive snake, and toilet pong. Built in 48 hours.",
+    image: "/placeholder.svg?height=400&width=600",
+    link: "https://github.com/MelvinDY/Stall_Wars",
+    tags: ["React", "JavaScript", "Vite", "Hackathon", "Game Dev"]
+  },
+  {
     id: "portfolio",
     title: "Portfolio Website",
     description: "Modern portfolio website built with Next.js 15, featuring MDX blog support, AI chatbot integration, Three.js animations, and dark mode. You're looking at it!",
