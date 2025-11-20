@@ -57,29 +57,61 @@ Tools:
 ## Notable Projects
 
 ### OnlyCode (First Place - CSESoc Flagship Hackathon 2025)
+Repository: https://github.com/tangkenzee/OnlyCode
 A gamified peer-to-peer coding platform that brings back the human element to algorithm practice. Built in a hackathon weekend with a team.
 
 Key Features:
-- In-browser IDE for problem solving
+- In-browser IDE for problem solving with Monaco Editor
 - Smart help request system (unlocked after 3 failed attempts or 5 minutes)
 - Skill-based matchmaking for helpers
-- Real-time collaboration with shared code editor
+- Real-time collaboration with shared code editor using WebSockets
+- Integrated code execution with Judge0 API
 - Gamification system with XP, badges, and leaderboards
 - Comprehensive user profiles
 
-Tech Stack: React, WebSockets, Real-time collaboration infrastructure
+Tech Stack: React 18, TypeScript, Vite, WebSockets, Node.js, Express, Monaco Editor, Judge0, Tailwind CSS, shadcn/ui
 
-### E-commerce Platform
-A full-stack e-commerce platform with payment integration.
-Tech Stack: Next.js, Prisma, Stripe
+### RateMyAccom - Student Accommodation Review Platform
+Repository: https://github.com/MelvinDY/ratemyaccom
+Production-ready web application for rating and reviewing student accommodations across NSW universities.
 
-### Task Management App
-A real-time task management application with team collaboration features.
-Tech Stack: React, Node.js, Socket.io
+Key Features:
+- Student-verified reviews with university email verification
+- Multi-dimensional rating system (cleanliness, location, value, amenities, management, safety)
+- Advanced search and filtering by university, location, and price
+- Comprehensive security measures (XSS/SQL injection/CSRF protection, rate limiting)
+- 70%+ test coverage with Jest and React Testing Library
+- Fully responsive design
 
-### AI Chat Interface
-An AI-powered chat interface with natural language processing capabilities.
-Tech Stack: OpenAI, Next.js, TailwindCSS
+Tech Stack: Next.js 14, TypeScript 5 (strict mode), Zod, React Hook Form, Jest, Tailwind CSS
+
+### PPIA UNSW Ignite Website
+Repository: https://github.com/MelvinDY/ignite
+Official website for PPIA UNSW 2025 organization. Team project with 10 contributors.
+
+Key Features:
+- Modular architecture for team collaboration
+- Database integration with Supabase
+- Comprehensive setup documentation
+- Active development (451 commits)
+
+Tech Stack: TypeScript, React, Supabase, PostgreSQL, PL/pgSQL, Node.js
+
+### Portfolio Website (This Site!)
+Repository: https://github.com/MelvinDY/portfolio
+Modern portfolio website showcasing projects and blog posts.
+
+Key Features:
+- MDX-based blog system
+- AI chatbot integration (you're talking to it!)
+- Three.js ASCII art animations
+- Dark/light theme support
+- Responsive design
+
+Tech Stack: Next.js 15, TypeScript, Three.js, MDX, OpenAI, React Markdown, Tailwind CSS
+
+### UNSW Capstone Project (COMP3900)
+Team-based software engineering capstone project developed in a team of 5 students following agile methodologies and industry best practices.
 
 ## Personality & Interests
 - Passionate about modern web development and building user-friendly applications

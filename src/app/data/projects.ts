@@ -3,54 +3,46 @@ import { Project } from "../types/project"
 
 export const projects: Project[] = [
   {
-    id: "ecommerce-platform",
-    title: "E-commerce Platform",
-    description: "A full-stack e-commerce platform built with Next.js, Prisma, and Stripe integration.",
+    id: "onlycode",
+    title: "OnlyCode",
+    description: "First Place Winner at CSESoc Flagship Hackathon 2025. A gamified peer-to-peer coding platform with real-time collaboration, skill-based matchmaking, and integrated code execution.",
     image: "/placeholder.svg?height=400&width=600",
-    link: "https://github.com/MelvinDY",
-    tags: ["Next.js", "Prisma", "Stripe"],
+    link: "https://github.com/tangkenzee/OnlyCode",
+    tags: ["React", "TypeScript", "WebSocket", "Monaco Editor", "Vite", "Express", "Judge0"],
     featured: true
   },
   {
-    id: "task-management",
-    title: "Task Management App",
-    description: "A real-time task management application with team collaboration features.",
+    id: "ratemyaccom",
+    title: "RateMyAccom",
+    description: "Production-ready student accommodation review platform with university email verification, multi-dimensional ratings, and comprehensive security measures including XSS/CSRF protection and rate limiting.",
     image: "/placeholder.svg?height=400&width=600",
-    link: "https://github.com/MelvinDY",
-    tags: ["React", "Node.js", "Socket.io"],
+    link: "https://github.com/MelvinDY/ratemyaccom",
+    tags: ["Next.js 14", "TypeScript", "Zod", "React Hook Form", "Jest", "TailwindCSS"],
     featured: true
   },
   {
-    id: "ai-chat",
-    title: "AI Chat Interface",
-    description: "An AI-powered chat interface with natural language processing capabilities.",
+    id: "ignite",
+    title: "PPIA UNSW Ignite Website",
+    description: "Official website for PPIA UNSW 2025 organization. Team project with 10 contributors featuring modular architecture, database integration, and comprehensive documentation.",
     image: "/placeholder.svg?height=400&width=600",
-    link: "https://github.com/MelvinDY",
-    tags: ["OpenAI", "Next.js", "TailwindCSS"],
+    link: "https://github.com/MelvinDY/ignite",
+    tags: ["TypeScript", "React", "Supabase", "PostgreSQL", "Node.js"],
     featured: true
   },
   {
-    id: "weather-app",
-    title: "Weather Dashboard",
-    description: "A responsive weather dashboard with location-based forecasts and interactive maps.",
+    id: "portfolio",
+    title: "Portfolio Website",
+    description: "Modern portfolio website built with Next.js 15, featuring MDX blog support, AI chatbot integration, Three.js animations, and dark mode. You're looking at it!",
     image: "/placeholder.svg?height=400&width=600",
-    link: "https://github.com/MelvinDY",
-    tags: ["React", "API Integration", "Charts"]
+    link: "https://github.com/MelvinDY/portfolio",
+    tags: ["Next.js 15", "TypeScript", "Three.js", "MDX", "OpenAI", "TailwindCSS"]
   },
   {
-    id: "portfolio-v1",
-    title: "Portfolio Website v1",
-    description: "My first portfolio website built with vanilla HTML, CSS, and JavaScript.",
+    id: "capstone-project",
+    title: "UNSW Capstone Project",
+    description: "Software engineering capstone project (COMP3900) developed in a team of 5 students. Full-stack application following agile methodologies and industry best practices.",
     image: "/placeholder.svg?height=400&width=600",
-    link: "https://github.com/MelvinDY",
-    tags: ["HTML", "CSS", "JavaScript"]
-  },
-  {
-    id: "blog-engine",
-    title: "Custom Blog Engine",
-    description: "A lightweight blog engine with markdown support and admin dashboard.",
-    image: "/placeholder.svg?height=400&width=600",
-    link: "https://github.com/MelvinDY",
-    tags: ["Node.js", "Express", "MongoDB"]
+    link: "https://github.com/unsw-cse-comp99-3900/capstone-project-25t3-3900-w18a-cherry",
+    tags: ["Team Project", "Agile", "Full-Stack", "Software Engineering"]
   }
 ]
