@@ -8,8 +8,11 @@ import RecentPostsSection from "./components/recent-posts-section"
 import ThreeJSHero from "./components/three-js-hero"
 import ExperienceSection from "./components/experience-section"
 import ContactLink from "./components/contact-link"
+import { projects } from "./data/projects"
 
 export default function Page() {
+  const featuredProjects = projects.filter(p => p.featured)
+
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader variant="home" />
@@ -25,27 +28,16 @@ export default function Page() {
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-4">Featured Projects</h2>
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto mb-12">
-              <ProjectCard
-                title="E-commerce Platform"
-                description="A full-stack e-commerce platform built with Next.js, Prisma, and Stripe integration."
-                image="/placeholder.svg?height=400&width=600"
-                link="https://github.com/MelvinDY"
-                tags={["Next.js", "Prisma", "Stripe"]}
-              />
-              <ProjectCard
-                title="Task Management App"
-                description="A real-time task management application with team collaboration features."
-                image="/placeholder.svg?height=400&width=600"
-                link="https://github.com/MelvinDY"
-                tags={["React", "Node.js", "Socket.io"]}
-              />
-              <ProjectCard
-                title="AI Chat Interface"
-                description="An AI-powered chat interface with natural language processing capabilities."
-                image="/placeholder.svg?height=400&width=600"
-                link="https://github.com/MelvinDY"
-                tags={["OpenAI", "Next.js", "TailwindCSS"]}
-              />
+              {featuredProjects.map((project) => (
+                <ProjectCard
+                  key={project.id}
+                  title={project.title}
+                  description={project.description}
+                  image={project.image}
+                  link={project.link}
+                  tags={project.tags}
+                />
+              ))}
             </div>
             <div className="text-center">
               <Link href="/projects">
