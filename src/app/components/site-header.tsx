@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { useTheme } from "next-themes"
 import Link from "next/link"
 import { useEffect, useState } from "react"
-import { Moon, Sun } from "lucide-react"
+import { Moon, Sun, Home, User, FileText, Mail, Rocket, Hand, BookOpen, Laptop } from "lucide-react"
 
 interface SiteHeaderProps {
   variant?: "home" | "about" | "blog" | "projects"
@@ -25,31 +25,31 @@ export default function SiteHeader({ variant = "home" }: SiteHeaderProps) {
 
   // Navigation items for different pages
   const homeNavItems = [
-    { href: "/about", label: "About", emoji: "👨‍💻", title: "About Me" },
-    { href: "/projects", label: "Projects", emoji: "🚀", title: "Projects" },
-    { href: "/blog", label: "Blog", emoji: "📝", title: "Blog" },
-    { href: "#contact", label: "Contact", emoji: "📧", title: "Contact" }
+    { href: "/about", label: "About", icon: User, title: "About Me" },
+    { href: "/projects", label: "Projects", icon: Rocket, title: "Projects" },
+    { href: "/blog", label: "Blog", icon: FileText, title: "Blog" },
+    { href: "#contact", label: "Contact", icon: Mail, title: "Contact" }
   ]
 
   const aboutNavItems = [
-    { href: "#hero", label: "About", emoji: "👋", title: "About" },
-    { href: "#story", label: "My Story", emoji: "📖", title: "My Story" },
-    { href: "#tech", label: "Tech Stack", emoji: "💻", title: "Tech Stack" },
-    { href: "#contact", label: "Contact", emoji: "📧", title: "Contact" }
+    { href: "#hero", label: "About", icon: Hand, title: "About" },
+    { href: "#story", label: "My Story", icon: BookOpen, title: "My Story" },
+    { href: "#tech", label: "Tech Stack", icon: Laptop, title: "Tech Stack" },
+    { href: "#contact", label: "Contact", icon: Mail, title: "Contact" }
   ]
 
   const blogNavItems = [
-    { href: "/", label: "Home", emoji: "🏠", title: "Home" },
-    { href: "/about", label: "About", emoji: "👨‍💻", title: "About" },
-    { href: "/projects", label: "Projects", emoji: "🚀", title: "Projects" },
-    { href: "#contact", label: "Contact", emoji: "📧", title: "Contact" }
+    { href: "/", label: "Home", icon: Home, title: "Home" },
+    { href: "/about", label: "About", icon: User, title: "About" },
+    { href: "/projects", label: "Projects", icon: Rocket, title: "Projects" },
+    { href: "#contact", label: "Contact", icon: Mail, title: "Contact" }
   ]
 
   const projectsNavItems = [
-    { href: "/", label: "Home", emoji: "🏠", title: "Home" },
-    { href: "/about", label: "About", emoji: "👨‍💻", title: "About" },
-    { href: "/blog", label: "Blog", emoji: "📝", title: "Blog" },
-    { href: "#contact", label: "Contact", emoji: "📧", title: "Contact" }
+    { href: "/", label: "Home", icon: Home, title: "Home" },
+    { href: "/about", label: "About", icon: User, title: "About" },
+    { href: "/blog", label: "Blog", icon: FileText, title: "Blog" },
+    { href: "#contact", label: "Contact", icon: Mail, title: "Contact" }
   ]
 
   const getNavItems = () => {
@@ -103,18 +103,21 @@ export default function SiteHeader({ variant = "home" }: SiteHeaderProps) {
             ))}
           </nav>
 
-          {/* Mobile Emoji Navigation */}
+          {/* Mobile Icon Navigation */}
           <nav className="flex md:hidden items-center space-x-3 text-lg">
-            {navItems.map((item) => (
-              <Link 
-                key={item.href}
-                href={item.href} 
-                className="p-2 hover:bg-accent rounded-md transition-colors"
-                title={item.title}
-              >
-                {item.emoji}
-              </Link>
-            ))}
+            {navItems.map((item) => {
+              const Icon = item.icon
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="p-2 hover:bg-accent rounded-md transition-colors"
+                  title={item.title}
+                >
+                  <Icon className="h-5 w-5" />
+                </Link>
+              )
+            })}
           </nav>
         </div>
         
