@@ -23,14 +23,15 @@ body {
 }
 
 /* Mobile-friendly viewport height utility */
+/* Header is h-14 (3.5rem = 56px) + border-b (1px) = 57px */
 .h-screen-safe {
   height: 100vh;
   height: 100dvh;
 }
 
 .h-main-safe {
-  height: calc(100vh - 3.5rem);
-  height: calc(100dvh - 3.5rem);
+  height: calc(100vh - 57px);
+  height: calc(100dvh - 57px);
 }
 
 /* Custom scrollbar styling (optional) */
