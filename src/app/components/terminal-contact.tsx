@@ -1,74 +1,60 @@
 "use client"
 
 import React, { useEffect, useState, useRef } from 'react'
+import { Mail, Github, Linkedin, Instagram } from 'lucide-react'
 
-// Terminal content
+// Terminal content (shortened for compact display)
 const terminalLines = [
   "$ whoami",
-  "melvin@portfolio:~$ contact_info --get-in-touch",
+  "melvin@portfolio:~$ contact_info",
   "",
-  "Loading contact information...",
+  "Loading...",
   "Connection established ✓",
   "",
-  "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-  "│ CONTACT INTERFACE v2.1.0                     │",
-  "│ Status: ONLINE ● Ready to receive messages   │",
-  "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-  "",
-  "Available communication channels:",
-  "",
-  "├── email: melvindarialyogiana@gmail.com",
-  "├── github: github.com/MelvinDY",
-  "├── linkedin: linkedin.com/in/melvin-yogiana",
-  "└── instagram: @melvindarialyogiana",
-  "",
-  "Response time: Usually within 24 hours",
-  "Preferred topics: Web dev, CS projects, opportunities",
-  "",
-  "Type 'send' to compose a message..."
+  "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+  "│ CONTACT INTERFACE v2.1.0    │",
+  "│ Status: ONLINE ●            │",
+  "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
 ]
 
-// Terminal Contact Page Component
+const contactLinks = [
+  { icon: Mail, label: "email", value: "melvindarialyogiana@gmail.com", href: "mailto:melvindarialyogiana@gmail.com" },
+  { icon: Github, label: "github", value: "MelvinDY", href: "https://github.com/MelvinDY" },
+  { icon: Linkedin, label: "linkedin", value: "melvin-yogiana", href: "https://linkedin.com/in/melvin-yogiana" },
+  { icon: Instagram, label: "instagram", value: "@melvindarialyogiana", href: "https://instagram.com/melvindarialyogiana" },
+]
+
 const TerminalContact = () => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [hasStarted, setHasStarted] = useState(false)
   const [currentLine, setCurrentLine] = useState(0)
   const [displayedText, setDisplayedText] = useState('')
   const [showCursor, setShowCursor] = useState(true)
-  const [formVisible, setFormVisible] = useState(false)
+  const [showLinks, setShowLinks] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
 
-  // Intersection Observer to detect when component enters viewport
+  // Intersection Observer
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting && !hasStarted) {
-            // Reset state when starting
             setCurrentLine(0)
             setDisplayedText('')
-            setFormVisible(false)
+            setShowLinks(false)
             setHasStarted(true)
           } else if (!entry.isIntersecting && hasStarted) {
-            // Reset when leaving viewport to allow restart
             setHasStarted(false)
           }
         })
       },
-      { threshold: 0.2 } // Trigger when 20% of the component is visible
+      { threshold: 0.2 }
     )
 
     const currentRef = containerRef.current
-    if (currentRef) {
-      observer.observe(currentRef)
-    }
-
-    return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef)
-      }
-    }
+    if (currentRef) observer.observe(currentRef)
+    return () => { if (currentRef) observer.unobserve(currentRef) }
   }, [hasStarted])
 
   // Terminal typing animation
@@ -93,26 +79,23 @@ const TerminalContact = () => {
           timeoutId = setTimeout(() => {
             setCurrentLine(prev => prev + 1)
             setDisplayedText(prev => prev + '\n')
-          }, 20)
+          }, 15)
         }
-      }, 3)
+      }, 2)
 
       return () => {
         clearInterval(typeInterval)
         if (timeoutId) clearTimeout(timeoutId)
       }
     } else {
-      // Show form after all lines are typed
-      const formTimeout = setTimeout(() => setFormVisible(true), 150)
-      return () => clearTimeout(formTimeout)
+      const linksTimeout = setTimeout(() => setShowLinks(true), 100)
+      return () => clearTimeout(linksTimeout)
     }
   }, [currentLine, hasStarted])
 
   // Cursor blinking
   useEffect(() => {
-    const cursorInterval = setInterval(() => {
-      setShowCursor(prev => !prev)
-    }, 500)
+    const cursorInterval = setInterval(() => setShowCursor(prev => !prev), 500)
     return () => clearInterval(cursorInterval)
   }, [])
 
@@ -141,139 +124,157 @@ const TerminalContact = () => {
     }
   }
 
-  const handleClear = () => {
-    setFormData({ name: '', email: '', message: '' })
-  }
-
   return (
-    <div ref={containerRef} className="relative w-full max-w-4xl mx-auto px-4 md:px-6">
-      {/* Terminal Window with Glass Effect */}
-      <div className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-background/90 to-background/70 backdrop-blur-xl border border-white/10 shadow-2xl transition-all duration-500 hover:shadow-primary/5">
-        {/* Gradient overlay for glass effect */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+    <div ref={containerRef} className="relative w-full max-w-6xl mx-auto">
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Left Column - Terminal */}
+        <div className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-background/90 to-background/70 backdrop-blur-xl border border-white/10 shadow-2xl transition-all duration-500 hover:shadow-primary/5">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-        {/* Terminal Header */}
-        <div className="relative bg-muted/50 backdrop-blur-sm border-b border-white/10 px-4 py-3 flex items-center">
-          <div className="flex space-x-2">
-            <div className="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-500 transition-colors"></div>
-            <div className="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-500 transition-colors"></div>
-            <div className="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-500 transition-colors"></div>
-          </div>
-          <div className="flex-1 text-center">
-            <span className="text-muted-foreground font-mono text-sm">melvin@portfolio-contact</span>
-          </div>
-        </div>
-
-        {/* Terminal Body */}
-        <div className="relative p-6 font-mono text-foreground text-sm leading-relaxed min-h-[480px]">
-          <pre className="whitespace-pre-wrap text-muted-foreground">
-            {displayedText}
-            {showCursor && currentLine < terminalLines.length && (
-              <span className="bg-primary text-primary-foreground">█</span>
-            )}
-          </pre>
-
-          {/* Contact Form */}
-          {formVisible && (
-            <div className="mt-8 animate-fade-in">
-              <div className="text-foreground mb-6">
-                $ compose_message --interactive
-              </div>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <div className="text-muted-foreground mb-1.5 text-xs uppercase tracking-wider">name:</div>
-                  <div className="flex items-center">
-                    <span className="text-primary mr-2">{'>'}</span>
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                      required
-                      className="flex-1 bg-transparent border-0 border-b border-border/50 text-foreground font-mono focus:border-primary focus:outline-none p-0 pb-1 transition-colors"
-                      placeholder="john_doe"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <div className="text-muted-foreground mb-1.5 text-xs uppercase tracking-wider">email:</div>
-                  <div className="flex items-center">
-                    <span className="text-primary mr-2">{'>'}</span>
-                    <input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                      required
-                      className="flex-1 bg-transparent border-0 border-b border-border/50 text-foreground font-mono focus:border-primary focus:outline-none p-0 pb-1 transition-colors"
-                      placeholder="john@example.com"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <div className="text-muted-foreground mb-1.5 text-xs uppercase tracking-wider">message:</div>
-                  <div className="flex items-start">
-                    <span className="text-primary mr-2 mt-2">{'>'}</span>
-                    <textarea
-                      rows={4}
-                      value={formData.message}
-                      onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                      required
-                      className="flex-1 bg-muted/30 backdrop-blur-sm border border-border/50 rounded-lg text-foreground font-mono focus:border-primary focus:outline-none p-3 resize-none transition-colors"
-                      placeholder="your message here..."
-                    />
-                  </div>
-                </div>
-
-                {status === 'success' && (
-                  <div className="text-green-500 font-mono text-sm py-2">
-                    [✓] message_sent: transmission successful
-                  </div>
-                )}
-                {status === 'error' && (
-                  <div className="text-red-500 font-mono text-sm py-2">
-                    [✗] error: transmission_failed - retry recommended
-                  </div>
-                )}
-
-                <div className="flex flex-wrap gap-3 pt-2">
-                  <button
-                    type="submit"
-                    disabled={status === 'loading'}
-                    className="border border-primary text-primary hover:bg-primary hover:text-primary-foreground px-5 py-2 rounded-lg font-mono transition-all duration-200 disabled:opacity-50 text-sm hover:shadow-lg hover:shadow-primary/20"
-                  >
-                    {status === 'loading' ? '[ sending... ]' : '[ send ]'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleClear}
-                    className="border border-border/50 text-muted-foreground hover:text-foreground hover:border-border px-5 py-2 rounded-lg font-mono transition-all duration-200 text-sm"
-                  >
-                    [ clear ]
-                  </button>
-                </div>
-              </form>
+          {/* Terminal Header */}
+          <div className="relative bg-muted/50 backdrop-blur-sm border-b border-white/10 px-4 py-2.5 flex items-center">
+            <div className="flex space-x-2">
+              <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+              <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
             </div>
-          )}
+            <div className="flex-1 text-center">
+              <span className="text-muted-foreground font-mono text-xs">contact-info</span>
+            </div>
+          </div>
+
+          {/* Terminal Body */}
+          <div className="relative p-5 font-mono text-xs leading-relaxed">
+            <pre className="whitespace-pre-wrap text-muted-foreground">
+              {displayedText}
+              {showCursor && currentLine < terminalLines.length && (
+                <span className="bg-primary text-primary-foreground">█</span>
+              )}
+            </pre>
+
+            {/* Contact Links */}
+            {showLinks && (
+              <div className="mt-4 space-y-2 animate-fade-in">
+                {contactLinks.map((link, index) => {
+                  const Icon = link.icon
+                  return (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/10 transition-colors group/link"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <Icon className="w-4 h-4 text-primary" />
+                      <span className="text-muted-foreground">{link.label}:</span>
+                      <span className="text-foreground group-hover/link:text-primary transition-colors">{link.value}</span>
+                    </a>
+                  )
+                })}
+                <div className="pt-2 text-muted-foreground/60 text-[10px]">
+                  Response time: ~24 hours
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         </div>
 
-        {/* Bottom gradient accent */}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        {/* Right Column - Contact Form */}
+        <div className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-background/90 to-background/70 backdrop-blur-xl border border-white/10 shadow-2xl transition-all duration-500 hover:shadow-primary/5">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+          {/* Form Header */}
+          <div className="relative bg-muted/50 backdrop-blur-sm border-b border-white/10 px-4 py-2.5 flex items-center">
+            <div className="flex space-x-2">
+              <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+              <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
+            </div>
+            <div className="flex-1 text-center">
+              <span className="text-muted-foreground font-mono text-xs">compose-message</span>
+            </div>
+          </div>
+
+          {/* Form Body */}
+          <div className="relative p-5">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="text-muted-foreground mb-1.5 text-xs uppercase tracking-wider block font-mono">name</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  required
+                  className="w-full bg-muted/30 border border-border/50 rounded-lg text-foreground font-mono text-sm focus:border-primary focus:outline-none p-2.5 transition-colors"
+                  placeholder="john_doe"
+                />
+              </div>
+              <div>
+                <label className="text-muted-foreground mb-1.5 text-xs uppercase tracking-wider block font-mono">email</label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  required
+                  className="w-full bg-muted/30 border border-border/50 rounded-lg text-foreground font-mono text-sm focus:border-primary focus:outline-none p-2.5 transition-colors"
+                  placeholder="john@example.com"
+                />
+              </div>
+              <div>
+                <label className="text-muted-foreground mb-1.5 text-xs uppercase tracking-wider block font-mono">message</label>
+                <textarea
+                  rows={3}
+                  value={formData.message}
+                  onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+                  required
+                  className="w-full bg-muted/30 border border-border/50 rounded-lg text-foreground font-mono text-sm focus:border-primary focus:outline-none p-2.5 resize-none transition-colors"
+                  placeholder="your message here..."
+                />
+              </div>
+
+              {status === 'success' && (
+                <div className="text-green-500 font-mono text-xs py-1">
+                  [✓] message_sent: transmission successful
+                </div>
+              )}
+              {status === 'error' && (
+                <div className="text-red-500 font-mono text-xs py-1">
+                  [✗] error: transmission_failed - retry recommended
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-1">
+                <button
+                  type="submit"
+                  disabled={status === 'loading'}
+                  className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2.5 rounded-lg font-mono transition-all duration-200 disabled:opacity-50 text-sm hover:shadow-lg hover:shadow-primary/20"
+                >
+                  {status === 'loading' ? 'sending...' : 'send message'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ name: '', email: '', message: '' })}
+                  className="border border-border/50 text-muted-foreground hover:text-foreground hover:border-border px-4 py-2.5 rounded-lg font-mono transition-all duration-200 text-sm"
+                >
+                  clear
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        </div>
       </div>
 
       <style jsx>{`
         @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
         }
-
-        .animate-fade-in {
-          animation: fade-in 0.8s ease-out forwards;
-        }
+        .animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
       `}</style>
     </div>
   )
