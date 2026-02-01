@@ -90,8 +90,24 @@ export default function Page() {
 
         <RecentPostsSection />
 
-        <section id="contact" className="min-h-screen flex items-center py-12 snap-start">
-          <TerminalContact />
+        <section id="contact" className="min-h-screen flex items-center py-16 snap-start relative overflow-hidden">
+          {/* Background gradient accents */}
+          <div className="absolute top-1/3 -right-1/4 w-1/2 h-1/2 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-1/3 -left-1/4 w-1/2 h-1/2 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="container mx-auto px-4 md:px-6 relative">
+            {/* Header */}
+            <div className="text-center mb-12">
+              <p className="text-sm font-medium text-primary mb-2 tracking-wide uppercase">
+                Get in Touch
+              </p>
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
+                Contact
+              </h2>
+            </div>
+
+            <TerminalContact />
+          </div>
         </section>
 
         {/* Footer inside scroll container */}
