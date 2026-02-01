@@ -16,7 +16,7 @@ export default function Page() {
   return (
     <div className="h-screen overflow-hidden bg-background">
       <SiteHeader variant="home" />
-      <main className="w-full snap-y snap-mandatory overflow-y-scroll h-main-safe scroll-smooth">
+      <main className="w-full snap-y snap-mandatory overflow-y-scroll h-main-safe scroll-smooth bg-background">
         {/* Hero Section */}
         <Hero />
 
