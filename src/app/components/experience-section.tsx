@@ -29,14 +29,45 @@ interface Education {
   links?: { label: string; url: string }[]
 }
 
-const workExperience: WorkExperience[] = []
+const workExperience: WorkExperience[] = [
+  {
+    id: "atlassian",
+    company: "UNSW × Atlassian Client Project",
+    role: "Software Developer",
+    period: "Sep 2025 – Dec 2025",
+    location: "Sydney, Australia",
+    logo: "/atlassian.svg",
+    achievements: [
+      "Led development of enterprise Q&A system as top contributor (121 commits), delivering a secure real-time audience interaction platform for Atlassian town halls with controlled access and data integrity safeguards",
+      "Designed and implemented 3-layer end-to-end testing infrastructure (API, integration, UI) with automated CI pipeline, establishing quality assurance controls to detect defects and ensure system reliability before production deployment",
+      "Built backend services with SQL database schema design, implementing structured data validation and access controls across resolvers and API endpoints to ensure data consistency and prevent unauthorized operations",
+      "Developed moderator dashboard with role-based permissions, question management with audit trail tracking, and session facilitation controls for corporate governance compliance"
+    ],
+    skills: ["TypeScript", "React", "GraphQL", "SQL", "CI/CD", "Testing"]
+  },
+  {
+    id: "ppia",
+    company: "PPIA UNSW – IT Team",
+    role: "Frontend Lead",
+    period: "Aug 2025 – Nov 2025",
+    location: "Sydney, Australia",
+    logo: "/ppia.png",
+    achievements: [
+      "Led a 10-person cross-functional team, establishing structured Agile governance with daily standups, weekly sprint reviews, and documented workflows that improved delivery predictability and reduced blockers",
+      "Drove stakeholder alignment through bi-weekly demos with PPIA board members, translating user feedback into 15+ feature enhancements while ensuring compliance with organizational requirements",
+      "Mentored 4 junior developers on code review processes, Git workflows, and development standards, improving overall code quality and adherence to team-defined best practices",
+      "Architected component-based frontend system enabling parallel development by 3 sub-teams without integration conflicts, demonstrating structured change management principles"
+    ],
+    skills: ["React", "Next.js", "Agile", "Team Leadership", "Code Review"]
+  }
+]
 
 const education: Education[] = [
   {
     id: "UNSW",
-    institution: "University of New South Wales",
-    degree: "Bachelor of Science in Computer Science",
-    period: "Dec 2023 - Dec 2025",
+    institution: "University of New South Wales (UNSW)",
+    degree: "Bachelor of Science in Computer Science | GPA: 3.00/4.00",
+    period: "2023 – 2025",
     location: "Sydney, Australia",
     logo: "/UNSW.png",
     achievements: [
@@ -48,6 +79,15 @@ const education: Education[] = [
         url: "https://onlycode.tech"
       }
     ]
+  },
+  {
+    id: "UNSW-College",
+    institution: "UNSW College",
+    degree: "Diploma in Computer Science",
+    period: "2022 – 2023",
+    location: "Sydney, Australia",
+    logo: "/UNSW.png",
+    achievements: []
   }
 ]
 
