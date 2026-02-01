@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { Briefcase, GraduationCap } from "lucide-react"
+import { Briefcase, GraduationCap, ArrowRight } from "lucide-react"
 import React, { useState } from "react"
 import TimelineSection from "./timeline-section"
 
@@ -95,40 +95,49 @@ export default function ExperienceSection() {
   const [activeTab, setActiveTab] = useState<"education" | "work">("education")
 
   return (
-    <section className="min-h-screen bg-muted/20 flex items-center py-12 snap-start">
+    <section className="min-h-screen flex items-center py-16 snap-start">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           {/* Section Header */}
-          <div className="text-center mb-6">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl mb-3">
+          <div className="text-center mb-12">
+            <p className="text-sm font-medium text-primary mb-2 tracking-wide uppercase">
+              Background
+            </p>
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
               Experience
             </h2>
+          </div>
 
-            {/* Toggle Buttons */}
-            <div className="flex justify-center gap-2 p-1 bg-muted rounded-lg inline-flex">
-              <Button
-                variant={activeTab === "education" ? "default" : "ghost"}
-                size="sm"
+          {/* Tab Switcher */}
+          <div className="flex justify-center mb-10">
+            <div className="inline-flex items-center p-1 rounded-full bg-muted/50 border border-border/50">
+              <button
                 onClick={() => setActiveTab("education")}
-                className="flex items-center gap-2"
+                className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  activeTab === "education"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
               >
                 <GraduationCap className="h-4 w-4" />
                 Education
-              </Button>
-              <Button
-                variant={activeTab === "work" ? "default" : "ghost"}
-                size="sm"
+              </button>
+              <button
                 onClick={() => setActiveTab("work")}
-                className="flex items-center gap-2"
+                className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  activeTab === "work"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
               >
                 <Briefcase className="h-4 w-4" />
-                Work Experience
-              </Button>
+                Work
+              </button>
             </div>
           </div>
 
-          {/* Content Based on Active Tab */}
-          <div>
+          {/* Content */}
+          <div className="min-h-[400px]">
             {activeTab === "work" && (
               <TimelineSection items={workExperience} type="work" />
             )}
@@ -138,17 +147,16 @@ export default function ExperienceSection() {
           </div>
 
           {/* Call to Action */}
-          <div className="text-center mt-6 pt-6 border-t">
-            <p className="text-muted-foreground mb-4">
-              Want to know more about my work or discuss opportunities?
+          <div className="text-center mt-12 pt-8 border-t border-border/50">
+            <p className="text-muted-foreground mb-5 text-sm">
+              Interested in working together?
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/about">
-                <Button variant="outline">
-                  Learn More About Me
-                </Button>
-              </Link>
-            </div>
+            <Link href="/about">
+              <Button variant="outline" className="group">
+                Learn More About Me
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
