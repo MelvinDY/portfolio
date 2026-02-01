@@ -5,7 +5,7 @@ import TerminalContact from "./components/terminal-contact"
 import ProjectCard from "./components/project-card"
 import TechStack from "./components/tech-stack"
 import RecentPostsSection from "./components/recent-posts-section"
-import ThreeJSHero from "./components/three-js-hero"
+import Hero from "./components/hero"
 import ExperienceSection from "./components/experience-section"
 import ContactLink from "./components/contact-link"
 import { projects } from "./data/projects"
@@ -17,8 +17,8 @@ export default function Page() {
     <div className="min-h-screen bg-background">
       <SiteHeader variant="home" />
       <main className="w-full snap-y snap-mandatory overflow-y-scroll h-[calc(100vh-4rem)] scroll-smooth">
-        {/* Hero Section with Three.js ASCII Art */}
-        <ThreeJSHero />
+        {/* Hero Section */}
+        <Hero />
 
         <ExperienceSection />
 
@@ -34,6 +34,7 @@ export default function Page() {
                   title={project.title}
                   description={project.description}
                   image={project.image}
+                  images={project.images}
                   link={project.link}
                   tags={project.tags}
                 />

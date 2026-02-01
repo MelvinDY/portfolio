@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ArrowLeft, Mail } from "lucide-react"
+import { ArrowLeft, Mail, Globe } from "lucide-react"
 import Link from "next/link"
 
 export default function PrivacyPage() {
@@ -51,17 +51,23 @@ export default function PrivacyPage() {
                 
                 <div className="space-y-4 ml-4">
                   <div>
-                    <h3 className="text-lg font-medium mb-2">📧 Contact Form Messages</h3>
+                    <h3 className="text-lg font-medium mb-2 flex items-center gap-2">
+                      <Mail className="h-5 w-5" />
+                      Contact Form Messages
+                    </h3>
                     <p className="leading-relaxed text-muted-foreground">
-                      When you reach out via the contact form, I receive your name, email, and message. 
+                      When you reach out via the contact form, I receive your name, email, and message.
                       This info is only used to respond to you—no spam, no newsletters unless you specifically ask for them.
                     </p>
                   </div>
                   
                   <div>
-                    <h3 className="text-lg font-medium mb-2">🌐 Basic Website Analytics</h3>
+                    <h3 className="text-lg font-medium mb-2 flex items-center gap-2">
+                      <Globe className="h-5 w-5" />
+                      Basic Website Analytics
+                    </h3>
                     <p className="leading-relaxed text-muted-foreground">
-                      I might use basic analytics to see how many people visit the site and which pages are popular. 
+                      I might use basic analytics to see how many people visit the site and which pages are popular.
                       Nothing personal—just general website performance stuff.
                     </p>
                   </div>
