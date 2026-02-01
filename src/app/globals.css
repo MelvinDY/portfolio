@@ -3,6 +3,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Mobile viewport height fix */
+:root {
+  --vh: 1vh;
+}
+
 /* Ensure smooth scrolling works properly */
 * {
   scroll-behavior: smooth;
@@ -10,11 +15,22 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 4rem; /* Account for sticky header */
+  scroll-padding-top: 3.5rem; /* Account for sticky header h-14 */
 }
 
 body {
   scroll-behavior: smooth;
+}
+
+/* Mobile-friendly viewport height utility */
+.h-screen-safe {
+  height: 100vh;
+  height: 100dvh;
+}
+
+.h-main-safe {
+  height: calc(100vh - 3.5rem);
+  height: calc(100dvh - 3.5rem);
 }
 
 /* Custom scrollbar styling (optional) */
