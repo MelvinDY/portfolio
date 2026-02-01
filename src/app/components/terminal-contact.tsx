@@ -183,83 +183,93 @@ const TerminalContact = () => {
         </div>
 
         {/* Right Column - Contact Form */}
-        <div className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-background/90 to-background/70 backdrop-blur-xl border border-white/10 shadow-2xl transition-all duration-500 hover:shadow-primary/5">
+        <div className="group relative rounded-2xl overflow-hidden bg-gradient-to-br from-background/90 to-background/70 backdrop-blur-xl border border-white/10 shadow-2xl transition-all duration-500 hover:shadow-primary/5 flex flex-col">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-          {/* Form Header */}
-          <div className="relative bg-muted/50 backdrop-blur-sm border-b border-white/10 px-4 py-2.5 flex items-center">
-            <div className="flex space-x-2">
-              <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
-              <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-              <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
-            </div>
-            <div className="flex-1 text-center">
-              <span className="text-muted-foreground font-mono text-xs">compose-message</span>
-            </div>
-          </div>
-
           {/* Form Body */}
-          <div className="relative p-5">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="text-muted-foreground mb-1.5 text-xs uppercase tracking-wider block font-mono">name</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  required
-                  className="w-full bg-muted/30 border border-border/50 rounded-lg text-foreground font-mono text-sm focus:border-primary focus:outline-none p-2.5 transition-colors"
-                  placeholder="john_doe"
-                />
-              </div>
-              <div>
-                <label className="text-muted-foreground mb-1.5 text-xs uppercase tracking-wider block font-mono">email</label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  required
-                  className="w-full bg-muted/30 border border-border/50 rounded-lg text-foreground font-mono text-sm focus:border-primary focus:outline-none p-2.5 transition-colors"
-                  placeholder="john@example.com"
-                />
-              </div>
-              <div>
-                <label className="text-muted-foreground mb-1.5 text-xs uppercase tracking-wider block font-mono">message</label>
-                <textarea
-                  rows={3}
-                  value={formData.message}
-                  onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                  required
-                  className="w-full bg-muted/30 border border-border/50 rounded-lg text-foreground font-mono text-sm focus:border-primary focus:outline-none p-2.5 resize-none transition-colors"
-                  placeholder="your message here..."
-                />
+          <div className="relative p-6 flex-1 flex flex-col">
+            <div className="mb-5">
+              <h3 className="text-lg font-semibold text-foreground">Send a Message</h3>
+              <p className="text-muted-foreground text-sm mt-1">I&apos;ll get back to you within 24 hours</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4 flex-1 flex flex-col">
+              <div className="space-y-4 flex-1">
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    required
+                    className="peer w-full bg-transparent border-0 border-b-2 border-border/50 text-foreground text-sm focus:border-primary focus:outline-none py-2 placeholder-transparent transition-colors"
+                    placeholder="Name"
+                    id="contact-name"
+                  />
+                  <label
+                    htmlFor="contact-name"
+                    className="absolute left-0 -top-2.5 text-xs text-muted-foreground transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-sm peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary"
+                  >
+                    Name
+                  </label>
+                </div>
+
+                <div className="relative">
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                    required
+                    className="peer w-full bg-transparent border-0 border-b-2 border-border/50 text-foreground text-sm focus:border-primary focus:outline-none py-2 placeholder-transparent transition-colors"
+                    placeholder="Email"
+                    id="contact-email"
+                  />
+                  <label
+                    htmlFor="contact-email"
+                    className="absolute left-0 -top-2.5 text-xs text-muted-foreground transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-sm peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary"
+                  >
+                    Email
+                  </label>
+                </div>
+
+                <div className="relative pt-2">
+                  <textarea
+                    rows={4}
+                    value={formData.message}
+                    onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+                    required
+                    className="w-full bg-muted/20 border border-border/30 rounded-xl text-foreground text-sm focus:border-primary focus:outline-none p-3 resize-none transition-colors"
+                    placeholder="Write your message..."
+                  />
+                </div>
               </div>
 
               {status === 'success' && (
-                <div className="text-green-500 font-mono text-xs py-1">
-                  [✓] message_sent: transmission successful
+                <div className="flex items-center gap-2 text-green-500 text-sm py-1">
+                  <div className="w-2 h-2 rounded-full bg-green-500" />
+                  Message sent successfully!
                 </div>
               )}
               {status === 'error' && (
-                <div className="text-red-500 font-mono text-xs py-1">
-                  [✗] error: transmission_failed - retry recommended
+                <div className="flex items-center gap-2 text-red-500 text-sm py-1">
+                  <div className="w-2 h-2 rounded-full bg-red-500" />
+                  Failed to send. Please try again.
                 </div>
               )}
 
-              <div className="flex gap-3 pt-1">
+              <div className="flex gap-3 mt-auto">
                 <button
                   type="submit"
                   disabled={status === 'loading'}
-                  className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2.5 rounded-lg font-mono transition-all duration-200 disabled:opacity-50 text-sm hover:shadow-lg hover:shadow-primary/20"
+                  className="flex-1 bg-foreground text-background hover:bg-foreground/90 px-5 py-3 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 text-sm"
                 >
-                  {status === 'loading' ? 'sending...' : 'send message'}
+                  {status === 'loading' ? 'Sending...' : 'Send Message'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setFormData({ name: '', email: '', message: '' })}
-                  className="border border-border/50 text-muted-foreground hover:text-foreground hover:border-border px-4 py-2.5 rounded-lg font-mono transition-all duration-200 text-sm"
+                  className="px-5 py-3 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-200 text-sm"
                 >
-                  clear
+                  Clear
                 </button>
               </div>
             </form>
