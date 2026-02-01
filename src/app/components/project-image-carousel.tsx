@@ -3,7 +3,6 @@
 import Image from "next/image"
 import { useEffect, useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import ProjectCardAnimation from "./project-card-animation"
 
 interface ProjectImageCarouselProps {
   images: string[]
@@ -52,9 +51,13 @@ export default function ProjectImageCarousel({
     setCurrentIndex(index)
   }
 
-  // If no real images, show animation
+  // If no real images, show simple placeholder
   if (!hasRealImages) {
-    return <ProjectCardAnimation />
+    return (
+      <div className="relative aspect-video w-full overflow-hidden bg-gradient-to-br from-muted/50 to-muted/30 flex items-center justify-center">
+        <div className="text-muted-foreground/50 text-sm font-medium">No preview available</div>
+      </div>
+    )
   }
 
   // If only one image, render it without navigation controls
