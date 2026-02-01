@@ -93,9 +93,9 @@ const TerminalContact = () => {
           timeoutId = setTimeout(() => {
             setCurrentLine(prev => prev + 1)
             setDisplayedText(prev => prev + '\n')
-          }, 50)
+          }, 20)
         }
-      }, 10)
+      }, 3)
 
       return () => {
         clearInterval(typeInterval)
@@ -103,7 +103,7 @@ const TerminalContact = () => {
       }
     } else {
       // Show form after all lines are typed
-      const formTimeout = setTimeout(() => setFormVisible(true), 300)
+      const formTimeout = setTimeout(() => setFormVisible(true), 150)
       return () => clearTimeout(formTimeout)
     }
   }, [currentLine, hasStarted])
