@@ -65,6 +65,7 @@ export default function TimelineSection({ items, type }: { items: WorkExperience
                       width={32}
                       height={32}
                       className="object-contain"
+                      unoptimized={item.logo.endsWith('.svg')}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.style.display = 'none';
