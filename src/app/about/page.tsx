@@ -257,7 +257,7 @@ export default function AboutPage() {
                     </Button>
 
                     <Button variant="outline" size="lg" asChild className="rounded-xl border-white/10 bg-background/50 backdrop-blur-sm hover:bg-primary/10 hover:border-primary/50 transition-all">
-                      <Link href="/resume.pdf" target="_blank">
+                      <Link href="/melvin_yogiana_cv.pdf" target="_blank">
                         <FileText className="h-4 w-4 mr-2" />
                         View Resume
                       </Link>

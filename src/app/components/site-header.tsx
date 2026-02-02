@@ -135,9 +135,11 @@ export default function SiteHeader({ variant = "home" }: SiteHeaderProps) {
           {/* Main action button - Desktop only */}
           <div className="hidden md:block">
             {variant === "home" ? (
-              <Button variant="outline">
-                Resume
-              </Button>
+              <Link href="/melvin_yogiana_cv.pdf" target="_blank">
+                <Button variant="outline">
+                  Resume
+                </Button>
+              </Link>
             ) : (
               <Link href="/">
                 <Button variant="outline" size="sm">
@@ -180,9 +182,11 @@ export default function SiteHeader({ variant = "home" }: SiteHeaderProps) {
             {/* Mobile action button */}
             <div className="pt-2 mt-2 border-t">
               {variant === "home" ? (
-                <Button variant="outline" className="w-full" onClick={handleNavClick}>
-                  Resume
-                </Button>
+                <Link href="/melvin_yogiana_cv.pdf" target="_blank" onClick={handleNavClick}>
+                  <Button variant="outline" className="w-full">
+                    Resume
+                  </Button>
+                </Link>
               ) : (
                 <Link href="/" onClick={handleNavClick}>
                   <Button variant="outline" size="sm" className="w-full">
