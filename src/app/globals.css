@@ -628,7 +628,7 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #34343e; }
 .te-home .hero { min-height: 100svh; display: flex; flex-direction: column; justify-content: center; padding-top: 90px; padding-bottom: 60px; }
 .te-home .hero-inner { width: 100%; }
 .te-home .hero-name { margin: 18px 0 0; }
-.te-home .hero-name .outline { color: transparent; -webkit-text-stroke: 1.5px var(--ink); }
+.te-home .hero-name .outline { color: transparent; -webkit-text-stroke: 1.5px var(--ink); outline: none; }
 .te-home .hero-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: clamp(32px, 6vw, 88px); align-items: end; margin-top: clamp(36px, 6vw, 72px); }
 .te-home .role-line { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 22px; }
 .te-home .role-i { font-size: 14px; color: var(--ink-faint); letter-spacing: 0.02em; }
@@ -710,7 +710,7 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #34343e; }
 }
 
 .te-home .contact-head { font-size: clamp(44px, 8vw, 110px); margin-top: 22px; }
-.te-home .contact-head .outline { color: transparent; -webkit-text-stroke: 1.5px var(--acid); }
+.te-home .contact-head .outline { color: transparent; -webkit-text-stroke: 1.5px var(--acid); outline: none; }
 .te-home .contact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: clamp(44px,6vw,72px); }
 .te-home .contact-card { display: flex; flex-direction: column; gap: 10px; border: 1px solid var(--line); border-radius: 16px; padding: 28px 26px; background: var(--surface); transition: transform .4s var(--ease), border-color .4s, background .4s; }
 .te-home .contact-card:hover { transform: translateY(-5px); border-color: var(--acid); background: var(--surface-2); }
@@ -753,7 +753,7 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #34343e; }
 .te-home .crumb a:hover { color: var(--acid); }
 .te-home .crumb .now { color: var(--ink); }
 .te-home .subhero h1 { font-size: clamp(48px, 9vw, 128px); font-weight: 600; letter-spacing: -0.035em; line-height: 0.9; margin: 0; }
-.te-home .subhero h1 .outline { color: transparent; -webkit-text-stroke: 1.5px var(--ink); }
+.te-home .subhero h1 .outline { color: transparent; -webkit-text-stroke: 1.5px var(--ink); outline: none; }
 .te-home .subhero-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 30px; flex-wrap: wrap; margin-top: 34px; }
 .te-home .subhero-foot .lead { margin: 0; }
 .te-home .subhero-meta { display: flex; gap: 36px; }
@@ -783,7 +783,7 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #34343e; }
 .te-home .case-domain { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--acid); margin-bottom: 22px; display: inline-flex; gap: 12px; align-items: center; }
 .te-home .case-hook { font-size: clamp(34px, 5.4vw, 76px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.02; margin: 0; max-width: 18ch; }
 .te-home .case-hook .hl { color: var(--acid); }
-.te-home .case-hook .ol { color: transparent; -webkit-text-stroke: 1.4px var(--ink); }
+.te-home .case-hook .ol { color: transparent; -webkit-text-stroke: 1.4px var(--ink); outline: none; }
 .te-home .case-sub { font-family: var(--font-serif); font-size: clamp(18px, 2vw, 24px); line-height: 1.5; color: var(--ink-dim); max-width: 60ch; margin: 30px 0 0; font-weight: 300; }
 .te-home .case-meta { display: grid; grid-template-columns: repeat(4, auto); gap: clamp(24px, 4vw, 56px); margin-top: clamp(40px, 5vw, 64px); }
 .te-home .case-meta .cm .l { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 8px; }
@@ -931,7 +931,7 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #34343e; }
 @media (max-width:680px){ .te-home .facts{ grid-template-columns:1fr 1fr; } }
 
 /* ===== BLOG INDEX ===== */
-.te-home .blog-hero .display .outline { color:transparent; -webkit-text-stroke:1.5px var(--ink); }
+.te-home .blog-hero .display .outline { color:transparent; -webkit-text-stroke:1.5px var(--ink); outline:none; }
 .te-home .blog-hero { padding: clamp(120px,16vw,188px) 0 clamp(36px,5vw,56px); }
 .te-home .blog-hero .crumb { display:flex; align-items:center; gap:10px; font-family:var(--font-mono); font-size:12px; color:var(--ink-faint); letter-spacing:.06em; margin-bottom:26px; }
 .te-home .blog-hero .crumb a { color:var(--ink-faint); transition:color .25s; }
