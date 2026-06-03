@@ -3,15 +3,12 @@
 import Link from 'next/link'
 import { useTeEffects } from './lib/use-te-effects'
 import TeHeader from './components/te-header'
-import UtmBanner from './components/utm-banner'
-
 export default function HomePage() {
   useTeEffects()
 
   return (
     <div className="te-home">
       <TeHeader />
-      <UtmBanner />
 
       <main>
         {/* HERO */}
