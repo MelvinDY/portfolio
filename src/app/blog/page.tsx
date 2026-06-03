@@ -7,6 +7,16 @@ import { useTeEffects } from '../lib/use-te-effects'
 
 const POSTS = [
   {
+    href: '/blog/unihack-2026-peersuade',
+    text: 'peersuade unihack 2026 debate game ai voters political disengagement hackathon most fun idea best design voice real-time multiplayer',
+    tags: 'hackathon,software-engineering',
+    date: 'Mar 2026',
+    rt: '5 min read',
+    title: 'Peersuade: How We Won UNIHACK 2026 with a Debate Game About Nothing',
+    excerpt: "We built a real-time 1v1 debate game where AI voters judge a fictional Australian election. It won Most Fun Idea and an Honorable Mention for Best Design at Australia's largest student hackathon.",
+    tagLabels: ['Hackathon', 'Software Engineering'],
+  },
+  {
     href: '/blog/onlycode-hackathon',
     text: 'building onlycode peer-to-peer coding platform hackathon experience gamified collaboration edtech websockets real-time',
     tags: 'hackathon,software-engineering',

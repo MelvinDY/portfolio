@@ -1,0 +1,65 @@
+---
+title: "Peersuade: How We Won UNIHACK 2026 with a Debate Game About Nothing"
+excerpt: "We built a real-time 1v1 debate game where AI voters judge a fictional Australian election. It won Most Fun Idea and an Honorable Mention for Best Design at Australia's largest student hackathon. Here's how it happened."
+date: "March 2026"
+readTime: "5 min read"
+tags: ["Hackathon", "Software Engineering"]
+---
+
+# Peersuade: How We Won UNIHACK 2026 with a Debate Game About Nothing
+
+UNIHACK is Australia's largest student hackathon — 1,000+ participants, 183 project submissions, and a weekend to build something worth caring about. We walked in with a loose idea, and walked out with a prize nobody expected us to win.
+
+## The Idea
+
+Youth political disengagement is genuinely a problem. 55% of Gen Z voters feel like political systems don't care about their voices. Traditional political debate is jargon-heavy, inaccessible, and — let's be honest — pretty boring to watch.
+
+So we asked a stupid question: what if political debate was a party game?
+
+That became **Peersuade** — a real-time browser-based 1v1 debate game where two players compete to win a fictional Australian election. You get a candidate profile, a randomised policy topic, and five AI-simulated voters judging your every argument. There's also an OBJECTION button to interrupt your opponent and steal the floor, because of course there is.
+
+It's Jackbox meets parliamentary debate meets whatever fever dream produces AI voter personalities.
+
+## My Piece of It
+
+I was responsible for the audio and voice systems — getting live speech into the app in real time and turning it into text the AI voters could actually judge.
+
+That meant wiring together Agora RTC for the live audio streams and Groq Whisper for speech-to-text transcription. Both tools are fast, but making them play nicely together under debate conditions — people interrupting each other, latency pressure, live rounds — was its own challenge. When it worked, it felt like magic. When it didn't, it felt like chaos.
+
+Getting speech-to-text into a multiplayer game with server-authoritative state and sub-second sync requirements is the kind of problem that sounds small until you're three hours in at 2am.
+
+## What We Built With
+
+- **Frontend:** Next.js 15, React 19, Tailwind CSS v4
+- **Realtime multiplayer:** Socket.io over Express.js
+- **Voice:** Agora RTC + Groq Whisper (speech-to-text)
+- **AI judging:** Gemini Flash
+- **Language:** TypeScript throughout
+
+The stack came together quickly because everyone on the team had strong opinions and was willing to commit. Six people — Giselle, Danar, Alyssa, Andy, Zitian, and me — each owning a clear slice. No stepping on toes, no ego about decisions. That kind of dynamic is rare and makes everything faster.
+
+## The Part That Made It Real
+
+The AI voters have distinct personalities. They give reasoning for their verdicts. They're opinionated and occasionally absurd. That was the detail that turned a functional prototype into something that made people laugh and lean in.
+
+When we demoed it, the reaction wasn't "cool tech" — it was "wait let me actually play this." That's the best possible response.
+
+## What the Judges Said
+
+Judge Erick Teowarang, giving us Most Fun Idea, said Peersuade combined *"politics, talking into the void, and being judged by algorithms written by multi-billion dollar companies."* He called the AI voters' arbitrary decision-making *"too close to home"* and said it was *"a very fun game."*
+
+Judge Luke Prior gave us the Honorable Mention for Best Design, recognising it *"for its innovative concept and pleasing execution."*
+
+Winning both is something I didn't plan for. The Most Fun Idea award was new at UNIHACK 2026 — we were its inaugural winners. That felt meaningful in a way I hadn't anticipated.
+
+## What I Took From It
+
+Hackathons punish perfectionism. You don't have time to polish everything, so you have to choose what matters and ruthlessly protect it. For Peersuade, the AI voter personality system and the live voice debate mechanic were non-negotiable. Everything else could be rough.
+
+Getting real-time voice working in a competitive multiplayer context taught me more about latency, synchronisation, and audio pipeline architecture than any course has. That kind of compressed, high-stakes learning is something I keep coming back to hackathons for.
+
+Also: fun is underrated as a design goal. The projects people remember aren't always the ones solving the hardest problems. Sometimes they're the ones that make people forget they're in a competition and just want to play.
+
+You can try Peersuade at [politics-game.vercel.app](https://politics-game.vercel.app).
+
+— Melvin
