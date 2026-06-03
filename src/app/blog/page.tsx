@@ -7,6 +7,16 @@ import { useTeEffects } from '../lib/use-te-effects'
 
 const POSTS = [
   {
+    href: '/blog/claude-design-review',
+    text: 'claude design anthropic labs rapid frontend prototyping wireframe ai design tool opus 4.7',
+    tags: 'software-engineering',
+    date: 'Jun 2026',
+    rt: '4 min read',
+    title: "Claude Design Is the Fastest Way I've Found to Go From Idea to Frontend",
+    excerpt: "Anthropic's new Claude Design product genuinely changes how fast you can build UI. I used it to prototype the hero section of this portfolio. Here's what works, what doesn't, and where I still reach for the keyboard.",
+    tagLabels: ['Software Engineering'],
+  },
+  {
     href: '/blog/google-data-analytics-review',
     text: 'google data analytics professional certificate review bigquery sql tableau r capstone beginner coursera',
     tags: 'data-analysis',
