@@ -238,6 +238,7 @@ export default function AboutPage() {
               <Link href="/projects/software">Software Projects</Link>
               <Link href="/blog">Blog</Link>
               <Link href="/#awards">Awards</Link>
+              <Link href="/stats">Site Analytics ↗</Link>
             </div>
             <div className="foot-col">
               <h4>Elsewhere</h4>
