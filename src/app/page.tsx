@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useTeEffects } from './lib/use-te-effects'
 import TeHeader from './components/te-header'
+import UtmBanner from './components/utm-banner'
 
 export default function HomePage() {
   useTeEffects()
@@ -10,6 +11,7 @@ export default function HomePage() {
   return (
     <div className="te-home">
       <TeHeader />
+      <UtmBanner />
 
       <main>
         {/* HERO */}
@@ -257,6 +259,7 @@ export default function HomePage() {
               <Link href="/projects/software">Software Projects</Link>
               <Link href="/blog">Blog</Link>
               <Link href="/about">About</Link>
+              <Link href="/stats">Site Analytics ↗</Link>
             </div>
             <div className="foot-col">
               <h4>Elsewhere</h4>
