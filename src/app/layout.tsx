@@ -6,6 +6,7 @@ import Script from "next/script"
 import "./globals.css"
 import type React from "react"
 import AiChatbox from "./components/ai-chatbox"
+import UtmBanner from "./components/utm-banner"
 
 const inter = Inter({ subsets: ["latin"] })
 const jetbrainsMono = JetBrains_Mono({
@@ -41,6 +42,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}
           <AiChatbox />
+          <UtmBanner />
         </ThemeProvider>
         {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
           <Script
