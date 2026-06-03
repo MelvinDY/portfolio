@@ -9,42 +9,41 @@ const POSTS = [
   {
     href: '/blog/onlycode-hackathon',
     text: 'building onlycode peer-to-peer coding platform hackathon experience gamified collaboration edtech websockets real-time',
-    tags: 'hackathon,react,real-time,websockets,collaboration,edtech',
+    tags: 'hackathon,software-engineering',
     date: 'Jan 23, 2025',
     rt: '6 min read',
     title: 'Building OnlyCode: A Peer-to-Peer Coding Platform Hackathon Experience',
     excerpt: 'My experience building OnlyCode, a gamified peer-to-peer coding platform that brings back the human element to algorithm practice, during an intense hackathon weekend.',
-    tagLabels: ['Hackathon', 'React', 'Real-time', 'WebSockets', 'EdTech'],
+    tagLabels: ['Hackathon', 'Software Engineering'],
   },
   {
     href: '/blog/portfolio-live',
     text: 'my portfolio is live here is what i learned next.js shadcn ui tailwindcss web development blog system',
-    tags: 'next.js,portfolio,shadcn ui,tailwindcss,web development',
+    tags: 'software-engineering',
     date: 'Dec 15, 2024',
     rt: '4 min read',
     title: "My Portfolio is Live: Here's What I Learned",
     excerpt: 'After building this portfolio from scratch with Next.js and shadcn/ui, here are the key lessons I learned about modern web development and what\'s coming next.',
-    tagLabels: ['Next.js', 'Portfolio', 'Shadcn UI', 'TailwindCSS', 'Web Development'],
+    tagLabels: ['Software Engineering'],
   },
   {
     href: '/blog/hello-world',
     text: 'hello world testing new blog system next.js typescript markdown rendering',
-    tags: 'blog,hello world,next.js,testing',
+    tags: 'software-engineering',
     date: 'Dec 1, 2024',
     rt: '2 min read',
     title: 'Hello World!',
     excerpt: 'Testing out my new blog system built with Next.js and TypeScript. Time to see if all those components and helper functions actually work!',
-    tagLabels: ['Blog', 'Hello World', 'Next.js', 'Testing'],
+    tagLabels: ['Software Engineering'],
   },
 ]
 
 const TAG_BUTTONS = [
   { label: 'All', value: 'all' },
+  { label: 'Data Analysis', value: 'data-analysis' },
+  { label: 'Software Engineering', value: 'software-engineering' },
+  { label: 'Data Engineering', value: 'data-engineering' },
   { label: 'Hackathon', value: 'hackathon' },
-  { label: 'Next.js', value: 'next.js' },
-  { label: 'React', value: 'react' },
-  { label: 'Web Dev', value: 'web development' },
-  { label: 'Real-time', value: 'real-time' },
 ]
 
 export default function BlogPage() {
