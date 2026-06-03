@@ -2,8 +2,9 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
 import type { Metadata } from "next"
 import { Inter, JetBrains_Mono, Space_Grotesk, Newsreader } from "next/font/google"
+import Script from "next/script"
 import "./globals.css"
-import type React from "react" // Import React
+import type React from "react"
 import AiChatbox from "./components/ai-chatbox"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -41,6 +42,14 @@ export default function RootLayout({
           {children}
           <AiChatbox />
         </ThemeProvider>
+        {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
+          <Script
+            async
+            src="https://cloud.umami.is/script.js"
+            data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
+            strategy="afterInteractive"
+          />
+        )}
       </body>
     </html>
   )
