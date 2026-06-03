@@ -216,7 +216,7 @@ export default function HomePage() {
               </li>
               <li className="award" data-reveal>
                 <span className="aw-yr mono">2025</span>
-                <div className="aw-main"><h4>Golden Rubbish Bin Award</h4><p className="dim">Terrible Ideas Hackathon · Stall Wars · the prize nobody plans for</p></div>
+                <div className="aw-main"><h4>Golden Rubbish Bin Award — Most Absurd Idea with Best Execution</h4><p className="dim">Terrible Ideas Hackathon · Stall Wars · the prize nobody plans for</p></div>
                 <span className="aw-tag mono">🗑 Legend</span>
               </li>
             </ul>
