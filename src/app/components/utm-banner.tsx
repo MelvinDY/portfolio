@@ -1,6 +1,6 @@
 "use client"
 
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, usePathname } from 'next/navigation'
 import { useEffect, useRef, useState, Suspense } from 'react'
 
 const STORAGE_KEY = 'utm_banner_dismissed_v1'
@@ -105,6 +105,7 @@ const CSS = `
 
 function BannerInner() {
   const searchParams = useSearchParams()
+  const pathname = usePathname()
   const [source, setSource] = useState<string | null>(null)
   const [hiding, setHiding] = useState(false)
   const bannerRef = useRef<HTMLDivElement>(null)
@@ -157,7 +158,7 @@ function BannerInner() {
           <button className="utm-close" aria-label="Dismiss" onClick={dismiss}>✕</button>
         </div>
         <p className="utm-msg">{v.message}</p>
-        {v.cta && (
+        {v.cta && pathname !== v.cta.href && (
           <a className="utm-cta" href={v.cta.href} onClick={dismiss}>
             {v.cta.text}
           </a>
