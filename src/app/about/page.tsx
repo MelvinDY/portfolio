@@ -2,11 +2,13 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { useState } from 'react'
 import TeHeader from '../components/te-header'
 import { useTeEffects } from '../lib/use-te-effects'
 
 export default function AboutPage() {
   useTeEffects()
+  const [tab, setTab] = useState<'work' | 'edu'>('work')
 
   return (
     <div className="te-home">
@@ -71,65 +73,117 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* TIMELINE */}
+        {/* JOURNEY */}
         <section className="ab-sect">
           <div className="wrap">
-            <div className="section-head" style={{ marginBottom: 'clamp(28px,4vw,48px)' }}>
+            <div className="section-head">
               <div>
                 <span className="kicker" data-reveal>03 — The path so far</span>
-                <h2 className="section-title mt-s" data-reveal data-reveal-delay="1">A short timeline</h2>
+                <h2 className="section-title mt-s" data-reveal data-reveal-delay="1">Experience &amp; education</h2>
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }} data-reveal data-reveal-delay="2">
+                <button className={`tagbtn${tab === 'work' ? ' on' : ''}`} onClick={() => setTab('work')}>Work</button>
+                <button className={`tagbtn${tab === 'edu' ? ' on' : ''}`} onClick={() => setTab('edu')}>Education</button>
               </div>
             </div>
-            <div className="timeline">
-              <div className="tl-item" data-reveal>
-                <div className="tl-year">2026</div>
-                <div className="tl-body">
-                  <h4>UNIHACK 2026 — Most Fun Idea &amp; Best Design</h4>
-                  <p>Took home two categories for <strong>Peersuade</strong>, a real-time persuasion game. Judged on exactly the two things I care about most: fun and craft.</p>
-                  <span className="tl-tag">🏆 Double win</span>
+
+            {tab === 'work' && (
+              <div className="timeline">
+                <div className="tl-item">
+                  <div className="tl-year">2026</div>
+                  <div className="tl-body">
+                    <h4>Foresight Analytics — Data Analyst &amp; Automation Engineer Intern</h4>
+                    <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--ink-faint)', marginBottom: '12px' }}>May 2026 – Present · Sydney, AU</p>
+                    <p>Building automation workflows with <strong>n8n</strong> to streamline internal data operations for a boutique investment intelligence firm serving 50+ Australian asset managers.</p>
+                    <p>Supporting data analytics pipelines using Excel, Azure SQL, and Databricks — working across investment diligence, ratings research, and ESG datasets.</p>
+                    <p>Conducting market and product research to inform analytical frameworks and data strategy within a DataOps-driven environment.</p>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '14px' }}>
+                      {['n8n', 'Azure SQL', 'Databricks', 'Excel', 'Research', 'DataOps'].map(s => (
+                        <span key={s} className="tag">{s}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="tl-item">
+                  <div className="tl-year">2025</div>
+                  <div className="tl-body">
+                    <h4>UNSW × Atlassian — Software Developer</h4>
+                    <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--ink-faint)', marginBottom: '12px' }}>Sep 2025 – Dec 2025 · Sydney, AU</p>
+                    <p>Led development of enterprise Q&amp;A system as top contributor (121 commits), delivering a secure real-time audience interaction platform for Atlassian town halls.</p>
+                    <p>Designed and implemented 3-layer end-to-end testing infrastructure (API, integration, UI) with automated CI pipeline.</p>
+                    <p>Built backend services with SQL schema design, implementing structured data validation and access controls across resolvers and API endpoints.</p>
+                    <p>Developed moderator dashboard with role-based permissions, audit trail tracking, and session facilitation controls.</p>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '14px' }}>
+                      {['TypeScript', 'React', 'GraphQL', 'SQL', 'CI/CD', 'Testing'].map(s => (
+                        <span key={s} className="tag">{s}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="tl-item">
+                  <div className="tl-year">2025</div>
+                  <div className="tl-body">
+                    <h4>PPIA UNSW — Frontend Lead</h4>
+                    <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--ink-faint)', marginBottom: '12px' }}>Aug 2025 – Nov 2025 · Sydney, AU</p>
+                    <p>Led a 10-person cross-functional team with structured Agile governance, daily standups, sprint reviews, and documented workflows.</p>
+                    <p>Drove stakeholder alignment through bi-weekly demos with PPIA board, translating feedback into 15+ feature enhancements.</p>
+                    <p>Mentored 4 junior developers on code review, Git workflows, and development standards.</p>
+                    <p>Architected a component-based frontend enabling parallel development by 3 sub-teams without integration conflicts.</p>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '14px' }}>
+                      {['React', 'Next.js', 'Agile', 'Team Leadership', 'Code Review'].map(s => (
+                        <span key={s} className="tag">{s}</span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="tl-item" data-reveal>
-                <div className="tl-year">2025</div>
-                <div className="tl-body">
-                  <h4>First Place — CSESoc Flagship Hackathon</h4>
-                  <p>Won first place building <strong>OnlyCode</strong>, a gamified peer-to-peer coding platform with real-time collaboration and skill-based matchmaking.</p>
-                  <span className="tl-tag">🥇 Winner</span>
+            )}
+
+            {tab === 'edu' && (
+              <div className="timeline">
+                <div className="tl-item">
+                  <div className="tl-year">2026</div>
+                  <div className="tl-body">
+                    <h4>Self-directed — Data &amp; Cloud Engineering</h4>
+                    <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--ink-faint)', marginBottom: '12px' }}>2026 – Present · DataCamp · Microsoft · Databricks</p>
+                    <p>Deepening expertise in data analytics, analytics engineering, and data engineering through structured coursework on DataCamp.</p>
+                    <p>Actively preparing for <strong>Microsoft Azure</strong> and <strong>Databricks</strong> certifications to formalise cloud and lakehouse skills used on the job.</p>
+                    <span className="tl-tag">📚 In progress</span>
+                  </div>
+                </div>
+                <div className="tl-item">
+                  <div className="tl-year">2023</div>
+                  <div className="tl-body">
+                    <h4>University of New South Wales (UNSW)</h4>
+                    <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--ink-faint)', marginBottom: '12px' }}>Bachelor of Science — Computer Science · GPA 3.00 / 4.00 · 2023 – 2025</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', margin: '4px 0 14px' }}>
+                      <div>
+                        <div style={{ fontWeight: 600, color: 'var(--ink)', fontSize: '14px', marginBottom: '3px' }}>🥇 First Place — CSESoc Flagship Hackathon 2025</div>
+                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--ink-faint)' }}>OnlyCode · gamified peer-to-peer coding platform with real-time collaboration and skill-based matchmaking</div>
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 600, color: 'var(--ink)', fontSize: '14px', marginBottom: '3px' }}>🏆 UNIHACK 2026 — Most Fun Idea &amp; Best Design</div>
+                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--ink-faint)' }}>Peersuade · real-time persuasion game · two category wins</div>
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 600, color: 'var(--ink)', fontSize: '14px', marginBottom: '3px' }}>🗑 Terrible Ideas Hackathon — Most Absurd Idea with Best Execution</div>
+                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--ink-faint)' }}>Stall Wars · chaotic toilet-themed two-player arcade game · 48 hours</div>
+                      </div>
+                    </div>
+                    <span className="tl-tag">🎓 Graduated Dec 2025</span>
+                  </div>
+                </div>
+                <div className="tl-item">
+                  <div className="tl-year">2022</div>
+                  <div className="tl-body">
+                    <h4>UNSW College</h4>
+                    <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--ink-faint)', marginBottom: '12px' }}>Diploma in Computer Science · 2022 – 2023 · Sydney, AU</p>
+                    <p>★ UNSW International Student Award — recognised for academic work and contribution to the UNSW community as an international student.</p>
+                    <span className="tl-tag">✓ Completed</span>
+                  </div>
                 </div>
               </div>
-              <div className="tl-item" data-reveal>
-                <div className="tl-year">2025</div>
-                <div className="tl-body">
-                  <h4>PPIA UNSW — Built &amp; shipped Ignite</h4>
-                  <p>Helped build the official platform for the Indonesian student community with a team of ten, on a modular architecture meant to outlive us.</p>
-                  <span className="tl-tag">👥 Team of 10</span>
-                </div>
-              </div>
-              <div className="tl-item" data-reveal>
-                <div className="tl-year">2025</div>
-                <div className="tl-body">
-                  <h4>UNSW International Student Award</h4>
-                  <p>Recognised for academic work and contribution to the UNSW community as an international student.</p>
-                  <span className="tl-tag">★ Honour</span>
-                </div>
-              </div>
-              <div className="tl-item" data-reveal>
-                <div className="tl-year">2024</div>
-                <div className="tl-body">
-                  <h4>Golden Rubbish Bin Award — Terrible Ideas Hackathon</h4>
-                  <p>Built <strong>Stall Wars</strong>, a chaotic toilet-themed two-player arcade game, in 48 hours. Won the prize nobody plans for and everybody remembers.</p>
-                  <span className="tl-tag">🗑 Legend</span>
-                </div>
-              </div>
-              <div className="tl-item" data-reveal>
-                <div className="tl-year">2023</div>
-                <div className="tl-body">
-                  <h4>Started at UNSW — Computer Science</h4>
-                  <p>Moved to Sydney and began the degree that turned a curiosity about code into a habit of shipping.</p>
-                  <span className="tl-tag">🎓 Began</span>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </section>
 
