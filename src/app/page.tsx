@@ -24,7 +24,7 @@ export default function HomePage() {
               <div className="hero-lead" data-reveal data-reveal-delay="2">
                 <div className="role-line">
                   <span className="role-i mono">I build &amp; analyse —</span>
-                  <span className="role mono" data-rotator='["Data Analyst","Analytics Engineer","Full-Stack Developer"]'>
+                  <span className="role mono" data-rotator='["Data Analyst","Analytics Engineer","Full-Stack Dev"]'>
                     Data Analyst
                   </span>
                 </div>
