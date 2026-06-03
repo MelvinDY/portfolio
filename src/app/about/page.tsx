@@ -1,10 +1,10 @@
 "use client"
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { useState } from 'react'
 import TeHeader from '../components/te-header'
 import { useTeEffects } from '../lib/use-te-effects'
+import HoloPhotoCard from '../components/holo-photo-card'
 
 export default function AboutPage() {
   useTeEffects()
@@ -35,10 +35,7 @@ export default function AboutPage() {
                   <a className="btn" href="mailto:melvindarialyogiana@gmail.com" data-magnetic>Email <span className="arrow">↗</span></a>
                 </div>
               </div>
-              <div className="photo-frame" data-reveal data-reveal-delay="2">
-                <Image src="/melvin.jpg" alt="Melvin Yogiana" fill style={{ objectFit: 'cover' }} />
-                <span className="photo-tag">Sydney, AU · 2026</span>
-              </div>
+              <HoloPhotoCard />
             </div>
           </div>
         </section>
