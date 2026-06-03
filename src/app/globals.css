@@ -930,6 +930,80 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #34343e; }
 .te-home .facts .f .fl { font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); margin-top:8px; }
 @media (max-width:680px){ .te-home .facts{ grid-template-columns:1fr 1fr; } }
 
+/* ===== HOLO PHOTO CARD ===== */
+.holo-photo {
+  position: relative;
+  border-radius: 18px;
+  aspect-ratio: 3/4;
+  background: var(--surface);
+  perspective: 800px;
+  cursor: pointer;
+}
+.holo-photo__inner {
+  --rotate-x: 0deg;
+  --rotate-y: 0deg;
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--line-2);
+  transform: rotateX(var(--rotate-y)) rotateY(var(--rotate-x));
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.03, 0.98, 0.52, 0.99);
+}
+.holo-photo__shine {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.4s ease, background-position 0.12s ease;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgb(255,119,115) calc(5% * 1),
+      rgb(255,237,95)  calc(5% * 2),
+      rgb(168,255,95)  calc(5% * 3),
+      rgb(131,255,247) calc(5% * 4),
+      rgb(120,148,255) calc(5% * 5),
+      rgb(216,117,255) calc(5% * 6),
+      rgb(255,119,115) calc(5% * 7)
+    ),
+    repeating-linear-gradient(
+      133deg,
+      #0e152e 0%,
+      hsl(180,10%,60%) 3.8%,
+      hsl(180,29%,66%) 4.5%,
+      hsl(180,10%,60%) 5.2%,
+      #0e152e 10%,
+      #0e152e 12%
+    );
+  background-blend-mode: exclusion;
+  background-size: 400% 100%;
+  background-position: 50% 50%;
+  mix-blend-mode: color-dodge;
+  filter: brightness(0.66) contrast(1.33) saturate(2);
+}
+.holo-photo__glare {
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: radial-gradient(
+    farthest-corner circle at var(--pointer-x) var(--pointer-y),
+    rgba(255,255,255,0.8) 10%,
+    rgba(255,255,255,0.65) 20%,
+    rgba(0,0,0,0.5) 90%
+  );
+  mix-blend-mode: overlay;
+}
+
 /* ===== BLOG INDEX ===== */
 .te-home .blog-hero .display .outline { color:transparent; -webkit-text-stroke:1.5px var(--ink); outline:none; }
 .te-home .blog-hero { padding: clamp(120px,16vw,188px) 0 clamp(36px,5vw,56px); }
