@@ -186,6 +186,7 @@ export default function BlogPage() {
               <Link href="/projects/data">Data Projects</Link>
               <Link href="/projects/software">Software Projects</Link>
               <Link href="/about">About</Link>
+              <Link href="/stats">Site Analytics ↗</Link>
             </div>
             <div className="foot-col">
               <h4>Elsewhere</h4>
