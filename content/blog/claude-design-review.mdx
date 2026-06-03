@@ -1,0 +1,57 @@
+---
+title: "Claude Design Is the Fastest Way I've Found to Go From Idea to Frontend"
+excerpt: "Anthropic's new Claude Design product genuinely changes how fast you can build UI. I used it to prototype the hero section of this portfolio. Here's what works, what doesn't, and where I still reach for the keyboard."
+date: "June 2026"
+readTime: "4 min read"
+tags: ["Software Engineering"]
+---
+
+# Claude Design Is the Fastest Way I've Found to Go From Idea to Frontend
+
+Anthropic launched Claude Design in April 2026 as part of Anthropic Labs — a collaborative visual creation tool powered by Claude Opus 4.7. The pitch is simple: describe what you want, get a design back, iterate, export to code or Canva or wherever you need it. It's aimed at both designers who want to explore faster and non-designers who have an idea but no way to visualise it.
+
+I've been using it. Here's my actual take.
+
+## Where It's Genuinely Great
+
+The speed-to-first-draft is unlike anything I've used before. For rapid frontend prototyping specifically — hero sections, landing layouts, card components — Claude Design is fast in a way that matters. Not "fast for an AI" fast. Just fast.
+
+The hero section of this portfolio is a good example. I had a rough idea: dark terminal-editorial aesthetic, large display type, a panel with a live code animation on the right. Describing that in Claude Design and getting something workable took minutes, not hours. The output wasn't pixel-perfect, but it was close enough to be useful — something I could react to and iterate from rather than staring at a blank Figma canvas.
+
+That compression of the ideation-to-something-tangible gap is real. Anyone who's sat down to design from scratch knows how much time goes into just getting a first reference point. Claude Design handles that part well.
+
+It also understands context. If you give it a screenshot of your existing UI or reference your design system, it picks up on the visual language and stays consistent. That's not a small thing when you're trying to keep a whole site coherent.
+
+## Where It Falls Short
+
+### Wireframe-to-Image Conversion
+
+If you upload a hand-drawn wireframe or a rough sketch and ask Claude Design to turn it into a polished PNG or SVG — be ready for it to get it wrong and cost you a lot of tokens doing so.
+
+In my experience, the conversion struggles with spatial reasoning on rough inputs. Elements end up in the wrong place, proportions shift, things that were clearly labeled get reinterpreted. Each round of correction burns tokens without reliably converging on what you actually wanted. I've abandoned the wireframe upload flow entirely for anything more complex than a simple layout.
+
+The irony is that this is probably the most useful workflow for non-designers — sketch something on paper, upload it, get a real design back. It's where the tool has the highest potential and currently does the worst job.
+
+### Small Tweaks Are Expensive
+
+The second frustration: updating small things costs a disproportionate amount of time and tokens. Change the font size on one element, adjust the spacing between two components, swap a colour — these feel like they should be fast. In practice, each minor correction triggers a full regeneration pass, and you're never quite sure if the change you asked for is the only thing that moved.
+
+For anything beyond a rough draft, I've found myself pivoting away from the Claude Design interface entirely and just editing the exported HTML directly. It's faster, it's precise, and I'm not burning context on re-explaining the same design constraints for the third time in a session.
+
+This isn't a dealbreaker — it's a workflow limitation you learn to work around. But it means Claude Design is most valuable at the start of a project, not the end.
+
+## How I Actually Use It Now
+
+The mental model that works for me: Claude Design is a starting gun, not a finish line.
+
+I use it to generate a first draft — something with the right rough shape and visual direction. Then I export to HTML and take over from there. The tool gets me 60% of the way in 10% of the time it would take me to build from scratch. The last 40% I do myself because it's faster and more precise than prompting my way through micro-adjustments.
+
+If Anthropic can improve the small-edit experience — true targeted changes without full regeneration, or something like inline CSS tweaks you can make without re-prompting — the tool becomes significantly more useful across the full design-to-ship workflow, not just the early stages.
+
+## Worth Using?
+
+Yes. For rapid prototyping, early-stage ideation, and getting a visual reference point before you build — Claude Design is the best tool I've found for that specific job.
+
+Just know where it hands off to you. The last mile is still yours.
+
+— Melvin
