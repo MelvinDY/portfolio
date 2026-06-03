@@ -7,6 +7,16 @@ import { useTeEffects } from '../lib/use-te-effects'
 
 const POSTS = [
   {
+    href: '/blog/google-data-analytics-review',
+    text: 'google data analytics professional certificate review bigquery sql tableau r capstone beginner coursera',
+    tags: 'data-analysis',
+    date: 'Jun 2026',
+    rt: '4 min read',
+    title: 'Honest Review: Google Data Analytics Professional Certificate',
+    excerpt: "I completed it in 3 months. The BigQuery section is genuinely great, the SQL modules are painfully slow if you already know what you're doing, and it's exactly what it says it is — a course for beginners.",
+    tagLabels: ['Data Analysis'],
+  },
+  {
     href: '/blog/unihack-2026-peersuade',
     text: 'peersuade unihack 2026 debate game ai voters political disengagement hackathon most fun idea best design voice real-time multiplayer',
     tags: 'hackathon,software-engineering',
