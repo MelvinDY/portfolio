@@ -2,28 +2,14 @@
 
 import Link from 'next/link'
 import { useTeEffects } from './lib/use-te-effects'
+import TeHeader from './components/te-header'
 
 export default function HomePage() {
   useTeEffects()
 
   return (
     <div className="te-home">
-      <header className="site-head">
-        <div className="wrap">
-          <Link className="brand" href="/">
-            <span className="dot" />
-            <b>MELVIN</b><span className="slash">/</span><span className="dim">m3lv1n</span>
-          </Link>
-          <nav className="nav">
-            <Link href="/projects/data">Data</Link>
-            <Link href="/projects/software">Software</Link>
-            <Link href="/blog" className="hide-sm">Blog</Link>
-            <Link href="/about" className="hide-sm">About</Link>
-            <span className="sep" />
-            <Link href="#contact" className="acid-text">Contact</Link>
-          </nav>
-        </div>
-      </header>
+      <TeHeader />
 
       <main>
         {/* HERO */}
