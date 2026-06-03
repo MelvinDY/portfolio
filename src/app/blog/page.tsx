@@ -7,6 +7,16 @@ import { useTeEffects } from '../lib/use-te-effects'
 
 const POSTS = [
   {
+    href: '/blog/bg3-swords-bard-control-martial',
+    text: 'baldur gate 3 bg3 swords bard college of swords control martial build guide 10/1/1 fighter wizard multiclass slashing flourish arcane acuity command confusion hold person',
+    tags: 'random',
+    date: 'Jun 2026',
+    rt: '10 min read',
+    title: "The BG3 Build That Made Me Feel Like a Villain: Swords Bard 10/1/1",
+    excerpt: "I've been playing the Control Martial Swords Bard in Baldur's Gate 3 and it's genuinely the most satisfying build I've run. Full caster. Competitive martial. Paralyses everything.",
+    tagLabels: ['Random'],
+  },
+  {
     href: '/blog/claude-design-review',
     text: 'claude design anthropic labs rapid frontend prototyping wireframe ai design tool opus 4.7',
     tags: 'software-engineering',
@@ -74,6 +84,7 @@ const TAG_BUTTONS = [
   { label: 'Software Engineering', value: 'software-engineering' },
   { label: 'Data Engineering', value: 'data-engineering' },
   { label: 'Hackathon', value: 'hackathon' },
+  { label: 'Random', value: 'random' },
 ]
 
 export default function BlogPage() {
