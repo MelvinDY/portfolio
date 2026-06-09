@@ -50,8 +50,10 @@ export default function SoftwareProjectsPage() {
                   <span className="tag">React</span><span className="tag">TypeScript</span><span className="tag">WebSocket</span><span className="tag">Node.js</span><span className="tag">Tailwind</span>
                 </div>
                 <div className="scard-links">
-                  <a className="solid" href="https://github.com/MelvinDY" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-                  <a href="https://github.com/MelvinDY" target="_blank" rel="noopener noreferrer">Devpost ↗</a>
+                  <a className="solid" href="https://politics-game.vercel.app/" target="_blank" rel="noopener noreferrer">Live Demo ↗</a>
+                  <a href="https://github.com/MelvinDY" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+                  <a href="https://devpost.com/software/peersuade" target="_blank" rel="noopener noreferrer">Devpost ↗</a>
+                  <a href="https://medium.com/unihack-blog/unihack-2026-the-full-list-of-winners-and-honorable-mentions-a68e8b120dc3" target="_blank" rel="noopener noreferrer">Winners ↗</a>
                 </div>
               </div>
 
