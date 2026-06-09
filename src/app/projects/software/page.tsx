@@ -99,7 +99,8 @@ export default function SoftwareProjectsPage() {
                   <span className="tag">Next.js 14</span><span className="tag">TypeScript</span><span className="tag">Zod</span><span className="tag">React Hook Form</span><span className="tag">Jest</span>
                 </div>
                 <div className="scard-links">
-                  <a className="solid" href="https://github.com/MelvinDY/ratemyaccom" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+                  <a className="solid" href="https://ratemyaccom-beryl.vercel.app/" target="_blank" rel="noopener noreferrer">Live Demo ↗</a>
+                  <a href="https://github.com/MelvinDY/ratemyaccom" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
                 </div>
               </div>
 
