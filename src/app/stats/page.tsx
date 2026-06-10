@@ -150,7 +150,18 @@ export default function StatsPage() {
 
         {!loading && data && !data.configured && <SetupGuide />}
 
-        {!loading && data?.configured && data.stats && (
+        {!loading && data?.configured && data.error && (
+          <div style={{ maxWidth: 520, margin: '0 auto', padding: '80px 24px', textAlign: 'center' }}>
+            <div style={{ fontFamily: 'monospace', fontSize: 11, letterSpacing: '0.1em', color: '#f87171', marginBottom: 16 }}>
+              ANALYTICS UNAVAILABLE
+            </div>
+            <p style={{ color: DIM, lineHeight: 1.7, fontSize: 14 }}>
+              Couldn&apos;t reach the analytics backend right now. Live data will return once the connection is restored.
+            </p>
+          </div>
+        )}
+
+        {!loading && data?.configured && data.stats && !data.error && (
           <>
             {/* Hero line */}
             <div style={{ marginBottom: 40 }}>
