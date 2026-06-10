@@ -40,6 +40,11 @@ export default function TeHero() {
     const el = scope.current
     if (!el) return
 
+    // always open the story at act i — don't let the browser restore a
+    // mid-pin scroll position on reload
+    window.history.scrollRestoration = 'manual'
+    window.scrollTo(0, 0)
+
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       el.classList.add('h3-static')
       return
@@ -53,8 +58,8 @@ export default function TeHero() {
         .from('.h3-tick', { scale: 0, opacity: 0, duration: 0.6, stagger: 0.06 }, 0)
         .from('.h3-hud > span', { y: -12, opacity: 0, duration: 0.6, stagger: 0.08 }, 0.1)
         .from('.h3-pre', { opacity: 0, y: 14, duration: 0.6 }, 0.25)
-        .from('.h3-n1 .h3-ch', { yPercent: 115, duration: 1.05, stagger: 0.045 }, 0.35)
-        .from('.h3-n2 .h3-ch', { yPercent: 115, duration: 1.05, stagger: 0.045 }, 0.5)
+        .from('.h3-n1 .h3-ch', { yPercent: 140, duration: 1.05, stagger: 0.045 }, 0.35)
+        .from('.h3-n2 .h3-ch', { yPercent: 140, duration: 1.05, stagger: 0.045 }, 0.5)
         .from('.h3-sub', { opacity: 0, letterSpacing: '0.6em', duration: 0.9 }, 1.0)
         .from('.h3-frag', { opacity: 0, duration: 1.2, stagger: 0.08 }, 0.8)
         .from('.h3-rail', { scaleY: 0, transformOrigin: 'top', duration: 1 }, 0.9)
@@ -149,7 +154,7 @@ export default function TeHero() {
           <p className="h3-pre mono">[ a portfolio in three acts — sydney, au ]</p>
           <h1 className="h3-name" aria-label="Melvin Yogiana">
             <span className="h3-nline" aria-hidden="true"><span className="h3-nword h3-n1">{chars('Melvin')}</span></span>
-            <span className="h3-nline" aria-hidden="true">
+            <span className="h3-nline h3-nline-b" aria-hidden="true">
               <span className="h3-nword h3-n2">{chars('Yogiana')}<span className="h3-ch h3-dot">.</span></span>
             </span>
           </h1>
@@ -177,19 +182,19 @@ export default function TeHero() {
         <div className="h3-scene h3-c">
           <p className="h3-dirk mono">[ the index ]</p>
           <nav className="h3-dir" aria-label="Quick links">
-            <Link className="h3-drow" href="/projects/data">
+            <Link className="h3-drow" href="/projects/data" data-cursor="open ↗">
               <span className="h3-dno mono">№ 01</span>
               <span className="h3-dt">Data Projects</span>
               <span className="h3-dm mono">4 case studies</span>
               <span className="h3-darr">↗</span>
             </Link>
-            <Link className="h3-drow" href="/projects/software">
+            <Link className="h3-drow" href="/projects/software" data-cursor="open ↗">
               <span className="h3-dno mono">№ 02</span>
               <span className="h3-dt">Software Projects</span>
               <span className="h3-dm mono">4 builds</span>
               <span className="h3-darr">↗</span>
             </Link>
-            <a className="h3-drow" href="#contact">
+            <a className="h3-drow" href="#contact" data-cursor="go ↓">
               <span className="h3-dno mono">№ 03</span>
               <span className="h3-dt">Contact</span>
               <span className="h3-dm mono">say hello</span>
