@@ -23,7 +23,7 @@ interface StatsData {
   countries?: Array<{ x: string; y: number }>
 }
 
-const ACID = '#ccff4d'
+const ACID = '#ff5e1f'
 const DIM = '#9c9ca6'
 const SURFACE = '#121217'
 const LINE_COLOR = 'rgba(255,255,255,0.09)'
@@ -37,7 +37,7 @@ function StatCard({ label, value, prev }: { label: string; value: number; prev: 
       <div style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 11, letterSpacing: '0.1em', color: DIM, marginBottom: 8, textTransform: 'uppercase' }}>
         {label}
       </div>
-      <div style={{ fontSize: 32, fontWeight: 700, fontFamily: 'var(--font-space-grotesk, system-ui)', color: '#ECE9E1', lineHeight: 1 }}>
+      <div style={{ fontSize: 32, fontWeight: 700, fontFamily: 'var(--font-space-grotesk, system-ui)', color: '#F2EAE0', lineHeight: 1 }}>
         {value.toLocaleString()}
       </div>
       {delta !== null && (
@@ -55,17 +55,17 @@ function SetupGuide() {
       <div style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 11, letterSpacing: '0.1em', color: ACID, marginBottom: 16 }}>
         SETUP REQUIRED
       </div>
-      <h2 style={{ fontSize: 28, fontWeight: 700, color: '#ECE9E1', marginBottom: 16 }}>Connect Umami Analytics</h2>
+      <h2 style={{ fontSize: 28, fontWeight: 700, color: '#F2EAE0', marginBottom: 16 }}>Connect Umami Analytics</h2>
       <p style={{ color: DIM, lineHeight: 1.7, marginBottom: 32, fontSize: 15 }}>
         This page pulls live data from Umami — an open-source, privacy-friendly analytics platform. No cookies, no GDPR consent banners needed.
       </p>
       <ol style={{ color: DIM, lineHeight: 2, fontSize: 14, paddingLeft: 20, marginBottom: 32 }}>
         <li>Sign up free at <span style={{ color: ACID, fontFamily: 'monospace' }}>umami.is</span></li>
-        <li>Add your website and copy the <strong style={{ color: '#ECE9E1' }}>Website ID</strong></li>
-        <li>Generate an <strong style={{ color: '#ECE9E1' }}>API Key</strong> in Settings → API Keys</li>
+        <li>Add your website and copy the <strong style={{ color: '#F2EAE0' }}>Website ID</strong></li>
+        <li>Generate an <strong style={{ color: '#F2EAE0' }}>API Key</strong> in Settings → API Keys</li>
         <li>Add to your <code style={{ background: SURFACE, padding: '1px 6px', borderRadius: 3, color: ACID }}>{"`.env.local`"}</code>:</li>
       </ol>
-      <pre style={{ background: SURFACE, border: `1px solid ${LINE_COLOR}`, borderRadius: 4, padding: '16px 20px', fontFamily: 'monospace', fontSize: 13, color: '#ECE9E1', overflowX: 'auto', marginBottom: 32 }}>
+      <pre style={{ background: SURFACE, border: `1px solid ${LINE_COLOR}`, borderRadius: 4, padding: '16px 20px', fontFamily: 'monospace', fontSize: 13, color: '#F2EAE0', overflowX: 'auto', marginBottom: 32 }}>
 {`NEXT_PUBLIC_UMAMI_WEBSITE_ID=your-website-id
 UMAMI_API_KEY=your-api-key
 UMAMI_WEBSITE_ID=your-website-id`}
@@ -80,7 +80,7 @@ UMAMI_WEBSITE_ID=your-website-id`}
 function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number }>; label?: string }) {
   if (!active || !payload?.length) return null
   return (
-    <div style={{ background: '#1a1a22', border: `1px solid ${LINE_COLOR}`, borderRadius: 4, padding: '8px 14px', fontFamily: 'monospace', fontSize: 12, color: '#ECE9E1' }}>
+    <div style={{ background: '#1a1a22', border: `1px solid ${LINE_COLOR}`, borderRadius: 4, padding: '8px 14px', fontFamily: 'monospace', fontSize: 12, color: '#F2EAE0' }}>
       <div style={{ color: DIM, marginBottom: 4 }}>{label}</div>
       <div style={{ color: ACID }}>{payload[0].value.toLocaleString()} views</div>
     </div>
@@ -116,7 +116,7 @@ export default function StatsPage() {
     page: {
       minHeight: '100vh',
       background: '#09090b',
-      color: '#ECE9E1',
+      color: '#F2EAE0',
       fontFamily: 'var(--font-space-grotesk, system-ui, sans-serif)',
     } as React.CSSProperties,
     wrap: {
@@ -131,7 +131,7 @@ export default function StatsPage() {
       {/* Header */}
       <header style={{ borderBottom: `1px solid ${LINE_COLOR}`, position: 'sticky', top: 0, background: '#09090b', zIndex: 50 }}>
         <div style={{ ...styles.wrap, display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56 }}>
-          <Link href="/" style={{ fontWeight: 700, color: '#ECE9E1', textDecoration: 'none', fontSize: 15 }}>
+          <Link href="/" style={{ fontWeight: 700, color: '#F2EAE0', textDecoration: 'none', fontSize: 15 }}>
             ← MelvinDY
           </Link>
           <span style={{ fontFamily: 'monospace', fontSize: 11, letterSpacing: '0.1em', color: DIM, textTransform: 'uppercase' }}>
@@ -254,7 +254,7 @@ export default function StatsPage() {
                       />
                       <Bar dataKey="y" radius={[0, 2, 2, 0]}>
                         {data.pages.map((_, i) => (
-                          <Cell key={i} fill={i === 0 ? ACID : `rgba(204,255,77,${0.6 - i * 0.06})`} />
+                          <Cell key={i} fill={i === 0 ? ACID : `rgba(255,94,31,${0.6 - i * 0.06})`} />
                         ))}
                       </Bar>
                     </BarChart>
@@ -287,7 +287,7 @@ export default function StatsPage() {
                       <Tooltip
                         content={({ active, payload }) =>
                           active && payload?.length ? (
-                            <div style={{ background: '#1a1a22', border: `1px solid ${LINE_COLOR}`, borderRadius: 4, padding: '6px 12px', fontFamily: 'monospace', fontSize: 12, color: '#ECE9E1' }}>
+                            <div style={{ background: '#1a1a22', border: `1px solid ${LINE_COLOR}`, borderRadius: 4, padding: '6px 12px', fontFamily: 'monospace', fontSize: 12, color: '#F2EAE0' }}>
                               <div style={{ color: DIM }}>{shortReferrer(payload[0].name as string)}</div>
                               <div style={{ color: ACID }}>{payload[0].value} sessions</div>
                             </div>
@@ -301,7 +301,7 @@ export default function StatsPage() {
                       <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
                         <span style={{ width: 8, height: 8, borderRadius: '50%', background: REFERRER_COLORS[i % REFERRER_COLORS.length], flexShrink: 0 }} />
                         <span style={{ color: DIM, fontFamily: 'monospace', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{shortReferrer(r.x)}</span>
-                        <span style={{ color: '#ECE9E1', fontFamily: 'monospace' }}>{r.y}</span>
+                        <span style={{ color: '#F2EAE0', fontFamily: 'monospace' }}>{r.y}</span>
                       </div>
                     ))}
                   </div>
@@ -322,10 +322,10 @@ export default function StatsPage() {
                         <div key={i}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, fontSize: 12, fontFamily: 'monospace' }}>
                             <span style={{ color: DIM }}>{c.x}</span>
-                            <span style={{ color: '#ECE9E1' }}>{c.y}</span>
+                            <span style={{ color: '#F2EAE0' }}>{c.y}</span>
                           </div>
                           <div style={{ height: 3, background: 'rgba(255,255,255,0.08)', borderRadius: 2 }}>
-                            <div style={{ height: '100%', width: `${pct}%`, background: i === 0 ? ACID : `rgba(204,255,77,${0.55 - i * 0.06})`, borderRadius: 2 }} />
+                            <div style={{ height: '100%', width: `${pct}%`, background: i === 0 ? ACID : `rgba(255,94,31,${0.55 - i * 0.06})`, borderRadius: 2 }} />
                           </div>
                         </div>
                       )

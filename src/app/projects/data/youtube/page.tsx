@@ -75,8 +75,8 @@ export default function YouTubePage() {
                 <svg className="linechart" viewBox="0 0 720 290" preserveAspectRatio="none" role="img" aria-label="View velocity decay curve">
                   <defs>
                     <linearGradient id="yt" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#ccff4d" stopOpacity="0.28" />
-                      <stop offset="100%" stopColor="#ccff4d" stopOpacity="0" />
+                      <stop offset="0%" stopColor="#ff5e1f" stopOpacity="0.28" />
+                      <stop offset="100%" stopColor="#ff5e1f" stopOpacity="0" />
                     </linearGradient>
                   </defs>
                   <line className="grid" x1="60" y1="55" x2="700" y2="55" /><line className="grid" x1="60" y1="130" x2="700" y2="130" /><line className="grid" x1="60" y1="205" x2="700" y2="205" />
