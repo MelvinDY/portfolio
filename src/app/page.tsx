@@ -5,6 +5,7 @@ import { useTeEffects } from './lib/use-te-effects'
 import { useHomeGsap } from './lib/use-home-gsap'
 import TeHeader from './components/te-header'
 import TeHero from './components/te-hero'
+import TeCursor from './components/te-cursor'
 
 type InkWord = { t: string; acid?: boolean }
 
@@ -49,6 +50,7 @@ export default function HomePage() {
 
   return (
     <div className="te-home">
+      <TeCursor />
       <TeHeader />
 
       <main>
@@ -108,14 +110,14 @@ export default function HomePage() {
             <div className="wrap">
               <SecHead no="02" name="work" meta="//read sideways" />
             </div>
-            <div className="hz-track">
+            <div className="hz-track" data-cursor="read →">
               <article className="hz-panel hz-intro">
                 <p className="hz-kick">[ the spread ]</p>
                 <h3 className="hz-state">Two desks,<br /><em>one brain.</em></h3>
                 <p className="hz-note">One desk asks the questions, the other ships the answers. Keep scrolling — the shelf reads sideways.</p>
                 <span className="hz-cue mono">scroll on →</span>
               </article>
-              <Link className="hz-panel wk-card" href="/projects/data">
+              <Link className="hz-panel wk-card" href="/projects/data" data-cursor="open ↗">
                 <div className="wk-top mono">
                   <span className="acid-text">[ /data ]</span>
                   <span>4 case studies</span>
@@ -124,7 +126,7 @@ export default function HomePage() {
                 <p>Dashboards, pricing wars, trending-video forensics and a revenue pipeline — each written as a data story, not a README.</p>
                 <span className="cardlink mono">enter the data desk <span className="arrow">↗</span></span>
               </Link>
-              <Link className="hz-panel wk-card" href="/projects/software">
+              <Link className="hz-panel wk-card" href="/projects/software" data-cursor="open ↗">
                 <div className="wk-top mono">
                   <span className="acid-text">[ /software ]</span>
                   <span>4 builds</span>
@@ -133,7 +135,7 @@ export default function HomePage() {
                 <p>Networking platforms, an award-winning hackathon app, an AI Q&amp;A helper and a student-housing review site. Stacks &amp; source included.</p>
                 <span className="cardlink mono">see what i&apos;ve built <span className="arrow">↗</span></span>
               </Link>
-              <Link className="hz-panel hz-end" href="/blog">
+              <Link className="hz-panel hz-end" href="/blog" data-cursor="read ↗">
                 <p className="hz-kick">[ field notes ]</p>
                 <h3 className="hz-state">I also <em>write</em><br />about it.</h3>
                 <p className="hz-note">Build logs, data stories and the occasional hackathon post-mortem.</p>
@@ -202,17 +204,17 @@ export default function HomePage() {
               Sydney — and always up for a good problem. Pick a channel.
             </p>
             <div className="ct-grid" data-rise-group>
-              <a className="ct-card" href="mailto:melvindarialyogiana@gmail.com" data-copy="melvindarialyogiana@gmail.com">
+              <a className="ct-card" href="mailto:melvindarialyogiana@gmail.com" data-copy="melvindarialyogiana@gmail.com" data-cursor="copy">
                 <span className="ct-lab">[ email ]</span>
                 <span className="ct-val" data-copy-label>melvindarialyogiana@gmail.com</span>
                 <span className="ct-note mono">click to copy</span>
               </a>
-              <a className="ct-card" href="https://github.com/MelvinDY" target="_blank" rel="noopener noreferrer">
+              <a className="ct-card" href="https://github.com/MelvinDY" target="_blank" rel="noopener noreferrer" data-cursor="open ↗">
                 <span className="ct-lab">[ github ]</span>
                 <span className="ct-val">@MelvinDY</span>
                 <span className="ct-note mono">repositories ↗</span>
               </a>
-              <a className="ct-card" href="https://www.linkedin.com/in/melvin-yogiana/" target="_blank" rel="noopener noreferrer">
+              <a className="ct-card" href="https://www.linkedin.com/in/melvin-yogiana/" target="_blank" rel="noopener noreferrer" data-cursor="open ↗">
                 <span className="ct-lab">[ linkedin ]</span>
                 <span className="ct-val">in/melvin-yogiana</span>
                 <span className="ct-note mono">let&apos;s connect ↗</span>
