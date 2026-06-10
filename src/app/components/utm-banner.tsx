@@ -32,7 +32,7 @@ const CSS = `
     max-width: calc(100vw - 56px);
     background: #09090b;
     border: 1px solid rgba(255,255,255,0.11);
-    border-top: 2px solid #ccff4d;
+    border-top: 2px solid #ff5e1f;
     transform: translateY(calc(100% + 56px));
     transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
     will-change: transform;
@@ -61,7 +61,7 @@ const CSS = `
     font-weight: 500;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: #ccff4d;
+    color: #ff5e1f;
   }
   .utm-close {
     background: none;
@@ -91,7 +91,7 @@ const CSS = `
   .utm-cta {
     font-family: 'JetBrains Mono', ui-monospace, monospace;
     font-size: 11.5px;
-    color: #ccff4d;
+    color: #ff5e1f;
     letter-spacing: 0.04em;
     text-decoration: none;
     transition: opacity 0.2s;

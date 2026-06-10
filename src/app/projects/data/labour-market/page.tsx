@@ -112,8 +112,8 @@ export default function LabourMarketPage() {
                 <svg className="linechart" viewBox="0 0 720 290" preserveAspectRatio="none" role="img" aria-label="Total employed persons over time">
                   <defs>
                     <linearGradient id="la" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#ccff4d" stopOpacity="0.28" />
-                      <stop offset="100%" stopColor="#ccff4d" stopOpacity="0" />
+                      <stop offset="0%" stopColor="#ff5e1f" stopOpacity="0.28" />
+                      <stop offset="100%" stopColor="#ff5e1f" stopOpacity="0" />
                     </linearGradient>
                   </defs>
                   <line className="grid" x1="60" y1="40" x2="700" y2="40" /><line className="grid" x1="60" y1="115" x2="700" y2="115" /><line className="grid" x1="60" y1="190" x2="700" y2="190" /><line className="grid" x1="60" y1="260" x2="700" y2="260" />
