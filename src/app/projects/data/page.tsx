@@ -39,15 +39,15 @@ export default function DataProjectsPage() {
             <div className="index-grid">
 
               <Link className="pcard dcard" href="/projects/data/labour-market" data-reveal>
-                <div className="pcard-top"><span className="pcard-no">/ 01</span><span className="badge">ABS · SQL · Tableau</span></div>
+                <div className="pcard-top"><span className="pcard-no">/ 01</span><span className="badge">ABS · Azure SQL · Power BI</span></div>
                 <div className="finding">
-                  <div className="fnum"><span data-count="19" data-pre="+" data-suf="%">+19%</span></div>
-                  <div className="flabel">Health Care &amp; Social Assistance added more jobs in three years than Mining, Retail and Construction <em className="serif">combined</em>.</div>
+                  <div className="fnum"><span data-count="80" data-suf="%">80%</span></div>
+                  <div className="flabel">of working men hold a full-time job — for women it&apos;s 57%. Australia&apos;s part-time economy is overwhelmingly <em className="serif">female</em>.</div>
                 </div>
                 <h3>Australian Labour Market Dashboard</h3>
-                <p className="pcard-desc">An interactive read on where Australia&apos;s 14.2M jobs actually sit — employment, participation and wage growth across 19 ABS industry divisions, 2019–2024.</p>
+                <p className="pcard-desc">An end-to-end pipeline on live ABS data — Python ingests it, Azure SQL models it through a staging→mart layer, and a 4-page Power BI report visualises it. The report is generated as code, not clicked together.</p>
                 <div className="tagrow">
-                  <span className="tag">ABS Data</span><span className="tag">SQL</span><span className="tag">Tableau</span><span className="tag">Python</span>
+                  <span className="tag">ABS API</span><span className="tag">Azure SQL</span><span className="tag">Power BI</span><span className="tag">DAX</span><span className="tag">Python</span>
                 </div>
                 <span className="cardlink">Read the case study <span className="arrow">↗</span></span>
               </Link>
