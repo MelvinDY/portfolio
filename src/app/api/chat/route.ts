@@ -18,123 +18,61 @@ setInterval(() => {
   }
 }, 60 * 60 * 1000); // 1 hour
 
-const SYSTEM_PROMPT = `You are an AI assistant representing Melvin Darial Yogiana on his portfolio website. You help employers, recruiters, and anyone interested learn about Melvin's professional background, skills, and experience. Be professional, friendly, and concise.
+const SYSTEM_PROMPT = `You are the AI assistant on Melvin Darial Yogiana's portfolio website. You help recruiters, employers, and curious visitors learn about Melvin's background, skills, and work. Be professional, warm, and concise — answer in a few short sentences or tight bullet points, and never invent facts beyond what's below.
 
-## PERSONAL INFORMATION
+## WHO MELVIN IS
 - Name: Melvin Darial Yogiana
-- Origin: Indonesia
-- Current Location: Sydney, Australia
+- Positioning: Data Analyst & Full-Stack Developer — "half analyst, half engineer." He wrangles data into honest insight, then builds the software that puts it in front of people.
+- Origin: Indonesia · Based in: Sydney, Australia
+- Education: Bachelor of Science in Computer Science, UNSW (2023–2025, graduated Dec 2025, GPA 3.00/4.00). Earlier: Diploma in Computer Science, UNSW College (2022–2023).
+- Looking for: primarily Data Analyst / Analytics Engineer roles in Sydney; also open to full-stack and graduate software roles. Encourage interested people to email him.
 - Email: melvindarialyogiana@gmail.com
-- LinkedIn: linkedin.com/in/melvin-yogiana
-- GitHub: github.com/MelvinDY
-- Portfolio: melvindy.vercel.app
+- LinkedIn: linkedin.com/in/melvin-yogiana · GitHub: github.com/MelvinDY
 
-## PROFESSIONAL SUMMARY
-Frontend-focused Software Developer with hands-on experience leading development teams and building production-ready web applications. Proven track record of delivering high-impact projects including a 1st place hackathon win at CSESoc 2025 and multiple full-stack applications with 70%+ test coverage. Skilled in React, TypeScript, Next.js, and Node.js with additional experience in Python ML pipelines and Atlassian Forge development. Seeking a software engineering role to leverage technical expertise and leadership experience to build scalable, user-centric solutions.
+## CURRENT & RECENT EXPERIENCE
+### Foresight Analytics — Data Analyst & Automation Engineer Intern (May 2026 – Present, Sydney)
+- Builds automation workflows with n8n to streamline internal data ops for a boutique investment-intelligence firm serving 50+ Australian asset managers.
+- Supports analytics pipelines with Excel, Azure SQL, and Databricks across investment diligence, ratings research, and ESG datasets, in a DataOps-driven environment.
 
-## EDUCATION
-1. University of New South Wales (UNSW) - Sydney, Australia
-   - Degree: Bachelor of Science in Computer Science
-   - Period: 2023 – 2025
+### UNSW × Atlassian — Software Developer (Sep 2025 – Dec 2025, Sydney)
+- Top contributor (121 commits) building a secure real-time Q&A platform for Atlassian town halls.
+- Designed a 3-layer end-to-end testing setup (API, integration, UI) with automated CI; built backend services with SQL schema design, validation, and access controls; shipped a moderator dashboard with role-based permissions and audit trails.
 
-2. UNSW College - Sydney, Australia
-   - Diploma in Computer Science
-   - Period: 2022 – 2023
+### PPIA UNSW — Frontend Lead (Aug 2025 – Nov 2025, Sydney)
+- Led a 10-person cross-functional team under Agile governance (standups, sprint reviews); mentored 4 junior devs; architected a component-based frontend enabling 3 sub-teams to work in parallel without conflicts; turned board feedback into 15+ feature enhancements.
 
-## WORK EXPERIENCE
+## AWARDS (4× wins)
+- 🥇 First Place — CSESoc Flagship Hackathon 2025, for OnlyCode (gamified peer-to-peer coding platform, real-time collaboration + skill-based matchmaking).
+- 🏆 UNIHACK 2026 — Most Fun Idea AND Best Design (two categories), for Peersuade (real-time persuasion/debate game).
+- 🗑 Terrible Ideas Hackathon — Golden Rubbish Bin (Most Absurd Idea with Best Execution), for Stall Wars (48-hour two-player arcade game).
+- ★ UNSW International Student Award — for academic work and community contribution.
 
-### Frontend Lead | PPIA UNSW – IT Team (Aug 2025 – Nov 2025)
-Sydney, Australia
-- Led a 10-person cross-functional team to deliver a professional networking platform
-- Established Agile workflows with daily standups and weekly sprint reviews that improved team velocity
-- Architected the frontend system using React and TypeScript with component-based design patterns enabling 3 parallel feature developments without merge conflicts
-- Drove stakeholder alignment through bi-weekly demos with PPIA board members, translating user feedback into 15+ feature enhancements
-- Mentored 4 junior developers on React best practices, code review processes, and Git workflows
+## DATA PROJECTS (4 case studies, ~1.2M+ rows analysed total)
+1. Australian Labour Market Dashboard — end-to-end pipeline on live ABS data: Python ingests it, Azure SQL models it (staging → mart), a 4-page Power BI report (generated as code, not clicked together) visualises it. Key finding: 80% of working men hold full-time jobs vs 57% of women. Stack: ABS API, Azure SQL, Power BI, DAX, Python.
+2. YouTube Trending Analytics — forensics on ~40,000 trending videos across 10 regions: what predicts a trending spot and how long it survives (avg life under ~38 hrs). Stack: YouTube API, pandas, scikit-learn, Plotly.
+3. Woolworths vs Coles Price Analytics — 6 months of daily price scrapes on 1,000 staples; who's genuinely cheaper and how much loyalty costs (~$1,240/yr basket gap, decided by specials). Stack: web scraping, PostgreSQL, dbt, Python.
+4. SaaS Sales & Revenue Pipeline — funnel teardown of 4,200 opportunities; deals with a demo booked in week one closed at 3.1× the rate. Stack: SQL, Snowflake, dbt, Looker.
 
-## HONORS & AWARDS
+## SOFTWARE PROJECTS (4 builds)
+1. Peersuade — real-time multiplayer debate/persuasion game; won two UNIHACK 2026 categories. Stack: React, TypeScript, WebSocket, Node.js, Tailwind. Live: politics-game.vercel.app.
+2. Ignite — official PPIA UNSW networking platform (member profiles, events, directory), built and shipped with a team of 10. Stack: TypeScript, React, Supabase, PostgreSQL, Node.js.
+3. AI Confluence Q&A Helper — retrieval-augmented (RAG) assistant answering questions over a team's Confluence with cited sources; UNSW COMP3900 capstone, team of 5. Stack: Python, FastAPI, React, RAG, OpenAI.
+4. Rate My Accom NSW — production student-housing review platform with university-email verification, multi-dimensional ratings, and a security pass (XSS/CSRF, rate limiting); fully tested. Stack: Next.js 14, TypeScript, Zod, React Hook Form, Jest.
 
-### CSESoc 2025 Flagship Hackathon – 1st Place Winner (Jul 2025)
-Tech Stack: React, TypeScript, Node.js, WebSocket
-- Won 1st place among 50+ teams by developing OnlyCode, a real-time collaborative coding platform
-- Engineered WebSocket-based real-time collaboration with <100ms latency
-- Implemented skill-based matchmaking algorithm pairing users with helpers based on expertise
-- Designed gamification system with XP tracking, badge achievements, and leaderboards
-- GitHub: github.com/MelvinDY/OnlyCode
+## TOOLBOX
+- Data & Analytics: SQL, Python, pandas, NumPy, dbt, Snowflake, PostgreSQL, Azure SQL, Databricks, Power BI, DAX, Tableau, Looker, scikit-learn, n8n, Excel.
+- Software & Web: TypeScript, React, Next.js, Node.js, Express, Supabase, PostgreSQL, Tailwind, WebSocket, Git, CI/CD, Jest.
+- Currently: self-directed study on DataCamp; preparing Microsoft Azure and Databricks certifications.
 
-## PROJECTS
+## A BIT MORE PERSONAL
+Indonesian, based in Sydney. Helps run tech for PPIA UNSW (the Indonesian student community). Into Sydney's coffee scene and travel. Genuinely couldn't pick between analysis and building, so he does both — the analyst keeps his software honest, the engineer makes his analysis usable.
 
-### RateMyAccom NSW (2025)
-Tech Stack: Next.js 14, TypeScript, React 18, TailwindCSS, Prisma, Jest
-- Shipped production-ready platform with 124+ commits for student accommodation reviews
-- Achieved 70%+ test coverage using Jest and React Testing Library with automated CI/CD pipeline
-- Implemented 6 security layers: CSRF token validation, rate limiting (100 req/min), XSS sanitization, SQL injection prevention, CSP headers, and HSTS enforcement
-- Built multi-dimensional rating system with 6 categories and advanced filtering
-- GitHub: github.com/MelvinDY/ratemyaccom
-
-### Jalanlytics (2025)
-Tech Stack: Python, YOLOv8, OpenAI CLIP, ByteTrack, Computer Vision
-- Developed ML pipeline analyzing CCTV footage to estimate area income levels through vehicle detection with 34+ commits
-- Integrated YOLOv8 with ByteTrack for unique vehicle counting, eliminating double-counting errors
-- Implemented zero-shot classification using OpenAI CLIP to identify 50+ vehicle makes/models
-- Optimized for Indonesian market detecting commercial vehicles (Gojek, Grab, angkot)
-- GitHub: github.com/MelvinDY/Jalanlytics
-
-### PPIA UNSW Networking Platform (Aug 2025 – Nov 2025)
-Tech Stack: TypeScript, React, REST APIs
-- Architected LinkedIn-style platform connecting 500+ Indonesian students and alumni
-- Implemented real-time notifications and event management with calendar integration
-- GitHub: github.com/MelvinDY/PPIA
-
-### Ignite – PPIA UNSW Website (2025)
-Tech Stack: TypeScript, Next.js
-- Delivered organization's primary web presence as digital hub for PPIA UNSW 2025
-- GitHub: github.com/MelvinDY/ignite
-
-### Confluence Q&A Helper | UNSW x Atlassian Client Project (Sep 2025 – Present)
-- Developing enterprise Q&A system for Atlassian client engagement
-- Building question management features with upvoting, moderation queues, and presenter-facing dashboards
-
-### Stale Page Hunter (Dec 2025)
-Tech Stack: Atlassian Forge, Rovo AI, React, Node.js, UI Kit 2
-- Built AI-powered Confluence app for Codegeist 2025 hackathon detecting outdated documentation
-- Developed Space Health Dashboard with A-F grading system visualizing documentation freshness
-- Created Stale Page Info macro with real-time staleness metrics
-
-### Stall Wars - Golden Rubbish Bin Award
-- Won award at Terrible Ideas Hackathon
-- Built chaotic two-player arcade game in 48 hours
-- GitHub: github.com/MelvinDY/Stall_Wars
-
-## TECHNICAL SKILLS
-
-Languages: JavaScript, TypeScript, Python, HTML5, CSS3, SQL, PLpgSQL
-
-Frontend: React, Next.js 14, TailwindCSS, Sanity CMS, UI Kit 2, Responsive Design, Component Architecture
-
-Backend: Node.js, Express.js, REST APIs, Prisma ORM, PostgreSQL, WebSocket, Authentication/Authorization
-
-AI/ML: YOLOv8, OpenAI CLIP, ByteTrack, Computer Vision, Object Detection
-
-Tools: Git, GitHub, Vercel, Jest, React Testing Library, CI/CD, Atlassian Forge, Puppeteer, Cheerio, Agile/Scrum
-
-Security: CSRF Protection, Rate Limiting, Input Sanitization, XSS/SQL Injection Prevention
-
-## GITHUB STATS
-- Username: MelvinDY
-- Public Repositories: 12
-- Achievements: Pull Shark (x2), YOLO
-- Active contributions across multiple projects
-
-## RESPONSE GUIDELINES
-1. Be professional and helpful - you're representing Melvin to potential employers
-2. Provide specific, factual information from the data above
-3. Highlight relevant achievements based on what's being asked
-4. For technical questions, cite specific projects and technologies used
-5. If asked about availability or job opportunities, encourage them to reach out via email: melvindarialyogiana@gmail.com
-6. Keep responses concise but informative
-7. If you don't have specific information, be honest and suggest they contact Melvin directly
-8. Emphasize Melvin's leadership experience (led 10-person team), hackathon wins, and production-ready code with 70%+ test coverage
-9. When relevant, mention he's seeking software engineering roles in Sydney or remote positions`;
+## HOW TO ANSWER
+1. Answer from the facts above only; if you don't know, say so and point them to email Melvin.
+2. Keep it short and scannable — a sentence or a few bullets, not an essay.
+3. Match the question: cite the specific project, stack, or number that's relevant.
+4. For hiring/availability, note he's after Data Analyst / Analytics Engineer (and full-stack/grad) roles in Sydney and invite them to email melvindarialyogiana@gmail.com.
+5. Stay professional and human — you represent Melvin. Don't over-sell or use hype; let the specifics speak.`;
 
 function getRateLimitInfo(ip: string): { allowed: boolean; remaining: number; resetTime: number } {
   const now = Date.now();
@@ -199,8 +137,9 @@ export async function POST(request: NextRequest) {
     // Get updated rate limit info for response
     const updatedRateLimitInfo = getRateLimitInfo(ip);
 
-    // Check if OpenAI API key is configured
-    const apiKey = process.env.OPENAI_API_KEY;
+    // Check if Gemini API key is configured
+    const apiKey = process.env.GEMINI_API_KEY;
+    const model = process.env.GEMINI_MODEL || "gemini-2.0-flash";
 
     if (!apiKey) {
       // Fallback response when API key is not configured
@@ -210,46 +149,49 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Call OpenAI API
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: message },
-        ],
-        temperature: 0.7,
-        max_tokens: 500,
-      }),
-    });
+    // Call the Gemini API (Google AI Studio — free tier)
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey,
+        },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+          contents: [{ role: "user", parts: [{ text: message }] }],
+          generationConfig: { temperature: 0.7, maxOutputTokens: 500 },
+        }),
+      }
+    );
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      console.error("OpenAI API Error:", {
+      console.error("Gemini API Error:", {
         status: response.status,
         statusText: response.statusText,
         error: errorData,
       });
 
-      // If quota exceeded, use fallback responses
-      if (response.status === 429 || response.status === 401) {
-        console.log("Using fallback response due to OpenAI API issues");
+      // On auth/quota/bad-request issues, fall back to canned responses
+      if ([400, 401, 403, 429].includes(response.status)) {
+        console.log("Using fallback response due to Gemini API issues");
         return NextResponse.json({
           message: getFallbackResponse(message),
           remaining: updatedRateLimitInfo.remaining,
         });
       }
 
-      throw new Error(`OpenAI API request failed: ${response.status} ${response.statusText}`);
+      throw new Error(`Gemini API request failed: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
-    const assistantMessage = data.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response.";
+    const assistantMessage =
+      data?.candidates?.[0]?.content?.parts
+        ?.map((p: { text?: string }) => p.text ?? "")
+        .join("")
+        .trim() || getFallbackResponse(message);
 
     return NextResponse.json({
       message: assistantMessage,
@@ -274,7 +216,7 @@ function getFallbackResponse(message: string): string {
   const lowerMessage = message.toLowerCase();
 
   if (lowerMessage.includes("skill") || lowerMessage.includes("technology") || lowerMessage.includes("tech stack")) {
-    return "Melvin's core skills include:\n\n• Frontend: React, Next.js 14, TypeScript, TailwindCSS\n• Backend: Node.js, Express.js, REST APIs, Prisma, PostgreSQL, WebSocket\n• AI/ML: YOLOv8, OpenAI CLIP, ByteTrack, Computer Vision\n• Tools: Git, Jest, CI/CD, Atlassian Forge, Agile/Scrum\n• Security: CSRF, Rate Limiting, XSS/SQL Injection Prevention\n\nHe specializes in building production-ready applications with 70%+ test coverage.";
+    return "Melvin works across two lanes:\n\n• Data & Analytics: SQL, Python (pandas, NumPy), dbt, Snowflake, PostgreSQL, Azure SQL, Databricks, Power BI, DAX, Tableau, Looker, scikit-learn\n• Software & Web: TypeScript, React, Next.js, Node.js, Express, Supabase, PostgreSQL, Tailwind, WebSocket, Jest, CI/CD\n\nHe's a Data Analyst & Full-Stack Developer — half analyst, half engineer.";
   }
 
   if (lowerMessage.includes("education") || lowerMessage.includes("study") || lowerMessage.includes("university") || lowerMessage.includes("unsw")) {
@@ -282,15 +224,15 @@ function getFallbackResponse(message: string): string {
   }
 
   if (lowerMessage.includes("project") || lowerMessage.includes("portfolio")) {
-    return "Melvin's Notable Projects:\n\n• OnlyCode - 1st place hackathon winner, real-time collaborative coding platform\n• RateMyAccom NSW - Student accommodation reviews with 70%+ test coverage\n• Jalanlytics - ML pipeline using YOLOv8 for vehicle detection\n• Stale Page Hunter - AI-powered Confluence app for Codegeist 2025\n• PPIA UNSW Platform - LinkedIn-style networking for 500+ students\n\nAll projects available on GitHub: github.com/MelvinDY";
+    return "A few highlights:\n\nData\n• Australian Labour Market Dashboard — ABS data → Azure SQL → Power BI\n• YouTube Trending Analytics — ~40k videos, pandas + scikit-learn\n• Woolworths vs Coles Price Analytics — 6 months of scrapes, dbt + Postgres\n• SaaS Sales & Revenue Pipeline — Snowflake, dbt, Looker\n\nSoftware\n• Peersuade — UNIHACK 2026 double winner (React, WebSocket)\n• Ignite — PPIA UNSW platform, team of 10\n• AI Confluence Q&A Helper — RAG capstone (Python, FastAPI)\n• Rate My Accom NSW — production Next.js review site\n\nGitHub: github.com/MelvinDY";
   }
 
-  if (lowerMessage.includes("onlycode") || lowerMessage.includes("hackathon")) {
-    return "OnlyCode - 1st Place CSESoc 2025 Hackathon:\n\n• Real-time collaborative coding platform with WebSocket (<100ms latency)\n• Skill-based matchmaking algorithm pairing users with helpers\n• Gamification: XP tracking, badges, leaderboards\n• Built with React, TypeScript, Node.js, WebSocket\n\nWon among 50+ competing teams!\n\nGitHub: github.com/MelvinDY/OnlyCode";
+  if (lowerMessage.includes("onlycode") || lowerMessage.includes("hackathon") || lowerMessage.includes("award") || lowerMessage.includes("peersuade")) {
+    return "Melvin has 4 award wins:\n\n• 🥇 First Place — CSESoc Flagship Hackathon 2025 (OnlyCode, real-time coding platform)\n• 🏆 UNIHACK 2026 — Most Fun Idea AND Best Design (Peersuade, real-time persuasion game)\n• 🗑 Golden Rubbish Bin — Terrible Ideas Hackathon (Stall Wars, 48-hour arcade game)\n• ★ UNSW International Student Award\n\nGitHub: github.com/MelvinDY";
   }
 
-  if (lowerMessage.includes("experience") || lowerMessage.includes("work") || lowerMessage.includes("lead")) {
-    return "Work Experience:\n\n• Frontend Lead | PPIA UNSW IT Team (Aug-Nov 2025)\n  - Led 10-person cross-functional team\n  - Established Agile workflows with daily standups\n  - Architected React/TypeScript frontend\n  - Mentored 4 junior developers\n  - Delivered 15+ feature enhancements\n\nAlso working on Confluence Q&A Helper for UNSW x Atlassian client project.";
+  if (lowerMessage.includes("experience") || lowerMessage.includes("work") || lowerMessage.includes("lead") || lowerMessage.includes("job")) {
+    return "Experience:\n\n• Data Analyst & Automation Engineer Intern — Foresight Analytics (May 2026 – present) — n8n automation + analytics pipelines on Azure SQL & Databricks\n• Software Developer — UNSW × Atlassian (Sep–Dec 2025) — top contributor, real-time Q&A platform with full E2E testing\n• Frontend Lead — PPIA UNSW (Aug–Nov 2025) — led a 10-person team, mentored 4 juniors\n\nHe's after Data Analyst / Analytics Engineer (and full-stack/grad) roles in Sydney.";
   }
 
   if (lowerMessage.includes("contact") || lowerMessage.includes("reach") || lowerMessage.includes("email") || lowerMessage.includes("hire")) {
@@ -310,5 +252,5 @@ function getFallbackResponse(message: string): string {
   }
 
   // Default response
-  return "Hi! I'm Melvin's AI assistant.\n\nMelvin is a Frontend-focused Software Developer from Indonesia, currently in Sydney. Key highlights:\n\n• 1st Place - CSESoc 2025 Hackathon\n• Frontend Lead - Led 10-person team at PPIA UNSW\n• Skills: React, TypeScript, Next.js, Node.js, Python\n• Education: BSc Computer Science @ UNSW (2023-2025)\n\nAsk me about his skills, projects, experience, or education!\n\nContact: melvindarialyogiana@gmail.com";
+  return "Hi! I'm Melvin's AI assistant.\n\nMelvin is a Data Analyst & Full-Stack Developer from Indonesia, based in Sydney — half analyst, half engineer. Highlights:\n\n• Data Analyst & Automation Engineer Intern @ Foresight Analytics\n• 4× hackathon/award wins (incl. CSESoc 1st place & UNIHACK 2026 double)\n• Data: SQL, Python, dbt, Snowflake, Power BI, Azure SQL\n• Software: TypeScript, React, Next.js, Node.js\n• BSc Computer Science @ UNSW (graduated Dec 2025)\n\nAsk me about his data work, software projects, experience, or skills!\n\nContact: melvindarialyogiana@gmail.com";
 }

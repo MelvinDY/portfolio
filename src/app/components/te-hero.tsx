@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useLayoutEffect, useRef, type CSSProperties } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import Link from 'next/link'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -16,15 +16,6 @@ const MANIFESTO: { t: string; acid?: boolean }[] = [
   { t: 'decisions', acid: true }, { t: 'out.' },
   { t: 'Ideas' }, { t: 'in' }, { t: '—' },
   { t: 'shipped' }, { t: 'products', acid: true }, { t: 'out.' },
-]
-
-const FRAGS: { txt: string; style: CSSProperties; depth: number; acid?: boolean }[] = [
-  { txt: 'fig. 01 — a chart that lands', style: { top: '21%', left: '5%' }, depth: 0.5 },
-  { txt: '“make it obvious”', style: { top: '66%', left: '11%' }, depth: 1.15, acid: true },
-  { txt: 'appendix b — five hackathons', style: { top: '29%', right: '7%' }, depth: 0.8 },
-  { txt: 'p. 26 — graduation', style: { top: '72%', right: '13%' }, depth: 0.6, acid: true },
-  { txt: '1.2M rows, annotated', style: { top: '47%', left: '3%' }, depth: 1.3 },
-  { txt: 'est. unsw — computer science', style: { top: '55%', right: '3%' }, depth: 0.95 },
 ]
 
 const chars = (word: string) =>
@@ -61,7 +52,6 @@ export default function TeHero() {
         .from('.h3-n1 .h3-ch', { yPercent: 140, duration: 1.05, stagger: 0.045 }, 0.35)
         .from('.h3-n2 .h3-ch', { yPercent: 140, duration: 1.05, stagger: 0.045 }, 0.5)
         .from('.h3-sub', { opacity: 0, letterSpacing: '0.6em', duration: 0.9 }, 1.0)
-        .from('.h3-frag', { opacity: 0, duration: 1.2, stagger: 0.08 }, 0.8)
         .from('.h3-rail', { scaleY: 0, transformOrigin: 'top', duration: 1 }, 0.9)
 
       // SCROLL SCRUB — hero pins while the three acts play
@@ -97,7 +87,6 @@ export default function TeHero() {
         // continuous instruments across the whole pin
         .fromTo('.h3-scan', { top: '10%' }, { top: '90%', duration: 10 }, 0)
         .fromTo('.h3-rail-dot', { top: '0%' }, { top: '98%', duration: 10 }, 0)
-        .to('.h3-frag', { yPercent: (i, t) => -90 * parseFloat((t as HTMLElement).dataset.depth || '1'), duration: 10 }, 0)
         // hold the directory settled before unpinning
         .to({}, { duration: 1.2 })
 
@@ -128,18 +117,6 @@ export default function TeHero() {
       <i className="h3-tick br" aria-hidden="true" />
       <div className="h3-rail" aria-hidden="true"><i className="h3-rail-dot" /></div>
 
-      {FRAGS.map((f) => (
-        <span
-          key={f.txt}
-          className={`h3-frag${f.acid ? ' acid' : ''}`}
-          style={f.style}
-          data-depth={f.depth}
-          aria-hidden="true"
-        >
-          {f.txt}
-        </span>
-      ))}
-
       {/* folio */}
       <div className="h3-hud mono" aria-hidden="true">
         <span className="h3-hud-tl">Melvin Yogiana — Portfolio</span>
@@ -151,7 +128,7 @@ export default function TeHero() {
       <div className="h3-stage">
         {/* act i — the name */}
         <div className="h3-scene h3-a">
-          <p className="h3-pre mono">[ a portfolio in three acts — sydney, au ]</p>
+          <p className="h3-pre mono">[ data analyst · full-stack dev — sydney, au ]</p>
           <h1 className="h3-name" aria-label="Melvin Yogiana">
             <span className="h3-nline" aria-hidden="true"><span className="h3-nword h3-n1">{chars('Melvin')}</span></span>
             <span className="h3-nline h3-nline-b" aria-hidden="true">

@@ -1370,62 +1370,134 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 .te-home .te-cursor.on .tc-label { opacity: 1; max-width: 220px; }
 
 /* ============================================================
-   VINTAGE CRT TERMINAL — AI assistant
+   AI ASSISTANT — ⌘K command palette
    ============================================================ */
 
-.crt-window {
-  background: #0d0805;
-  border: 1px solid rgba(255,140,60,0.4);
+/* trigger chip (bottom-right) */
+.cmdk-trigger {
+  position: fixed; bottom: 24px; right: 24px; z-index: 60;
+  display: inline-flex; align-items: center; gap: 9px;
+  height: 40px; padding: 0 14px;
   border-radius: 10px;
-  box-shadow: 0 24px 80px -24px rgba(0,0,0,0.85), 0 0 0 4px #1a120c, 0 0 32px rgba(255,110,40,0.12);
+  background: #14100e; color: #cabfb4;
+  border: 1px solid rgba(255,236,218,0.16);
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.6);
+  font-size: 13px; cursor: pointer;
+  transition: transform .2s, border-color .2s, color .2s, box-shadow .2s, opacity .2s;
+}
+.cmdk-trigger:hover {
+  transform: translateY(-2px); color: #F2EAE0;
+  border-color: rgba(255,94,31,0.5);
+  box-shadow: 0 14px 34px -12px rgba(0,0,0,0.7), 0 0 22px -8px rgba(255,94,31,0.4);
+}
+.cmdk-trigger.is-hidden { opacity: 0; pointer-events: none; }
+.cmdk-kbd {
+  font-family: var(--font-mono, monospace); font-size: 11px; font-weight: 600;
+  color: #ff9a5a; background: rgba(255,94,31,0.12);
+  border: 1px solid rgba(255,94,31,0.28); border-radius: 5px;
+  padding: 2px 6px; line-height: 1;
+}
+
+/* overlay */
+.cmdk-overlay {
+  position: fixed; inset: 0; z-index: 70;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: clamp(16px, 12vh, 150px) 16px 16px;
+  background: rgba(8,6,4,0.55);
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  transition: opacity .2s ease;
+}
+.cmdk-overlay[data-open="false"] { opacity: 0; pointer-events: none; visibility: hidden; }
+.cmdk-overlay[data-open="true"] { opacity: 1; }
+
+/* palette */
+.cmdk {
+  width: 100%; max-width: 560px; max-height: min(70vh, 560px);
+  display: flex; flex-direction: column;
+  background: #16110e;
+  border: 1px solid rgba(255,236,218,0.14);
+  border-radius: 16px;
+  box-shadow: 0 40px 100px -24px rgba(0,0,0,0.8);
   overflow: hidden;
+  transform-origin: top center;
+  transition: transform .24s cubic-bezier(.22,1,.36,1), opacity .2s ease;
 }
-/* scanlines */
-.crt-window::before {
-  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 3;
-  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.22) 0 1px, transparent 1px 3px);
+.cmdk-overlay[data-open="false"] .cmdk { transform: translateY(-12px) scale(.97); opacity: 0; }
+
+/* input row */
+.cmdk-row { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid rgba(255,236,218,0.10); }
+.cmdk-row-ico { color: #ff7a3c; display: inline-flex; flex-shrink: 0; }
+.cmdk-input { flex: 1; min-width: 0; background: transparent; border: none; outline: none; color: #F2EAE0; font-size: 16px; }
+.cmdk-input::placeholder { color: #6e6358; }
+.cmdk-input:disabled { opacity: .6; }
+.cmdk-esc {
+  font-family: var(--font-mono, monospace); font-size: 10.5px; letter-spacing: .08em;
+  color: #6e6358; border: 1px solid rgba(255,236,218,0.14); border-radius: 5px;
+  padding: 3px 6px; flex-shrink: 0;
 }
-/* vignette + flicker */
-.crt-window::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 4;
-  background: radial-gradient(120% 100% at 50% 50%, transparent 62%, rgba(0,0,0,0.5));
-  animation: crt-flicker 4s linear infinite;
+
+/* body */
+.cmdk-body { flex: 1; overflow-y: auto; padding: 10px; }
+.cmdk-hint {
+  padding: 8px 12px 6px; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+  color: #6e6358; font-family: var(--font-mono, monospace);
 }
-.crt-on { animation: crt-power-on 0.5s cubic-bezier(0.22, 1, 0.36, 1); transform-origin: 85% 100%; }
-@keyframes crt-power-on {
-  0% { transform: scaleY(0.02) scaleX(0.6); filter: brightness(4); }
-  55% { transform: scaleY(1) scaleX(1); }
-  100% { filter: brightness(1); }
+
+/* suggestion rows */
+.cmdk-sug {
+  display: flex; align-items: center; gap: 11px; width: 100%; text-align: left;
+  padding: 11px 12px; border-radius: 10px; color: #cabfb4; font-size: 14px;
+  background: transparent; border: 1px solid transparent; cursor: pointer;
+  transition: background .12s, color .12s, border-color .12s;
 }
-@keyframes crt-flicker {
-  0%, 91%, 94%, 98%, 100% { opacity: 1; }
-  92% { opacity: 0.82; }
-  96% { opacity: 0.93; }
+.cmdk-sug:hover, .cmdk-sug[data-active="true"] {
+  background: rgba(255,94,31,0.10); color: #F2EAE0; border-color: rgba(255,94,31,0.22);
 }
-.crt-text { color: #ffb377; text-shadow: 0 0 8px rgba(255,140,60,0.35); }
-.crt-dim { color: rgba(255,179,119,0.55); }
-.crt-bright { color: #ffd9b3; text-shadow: 0 0 8px rgba(255,160,80,0.5); }
-.crt-acc { color: #ff5e1f; text-shadow: 0 0 8px rgba(255,94,31,0.5); }
-.crt-link { transition: color 0.2s, text-shadow 0.2s; }
-.crt-link:hover { color: #ff5e1f; text-shadow: 0 0 10px rgba(255,94,31,0.6); }
-.crt-cursor {
-  display: inline-block; width: 0.6em; height: 1em;
-  background: #ffb377; vertical-align: -0.15em;
-  box-shadow: 0 0 8px rgba(255,140,60,0.6);
-  animation: crt-blink 1s steps(1) infinite;
+.cmdk-sug-ico { color: #ff7a3c; opacity: .85; display: inline-flex; flex-shrink: 0; }
+.cmdk-sug-arrow { margin-left: auto; color: #6e6358; font-family: var(--font-mono, monospace); font-size: 12px; }
+.cmdk-sug[data-active="true"] .cmdk-sug-arrow { color: #ff9a5a; }
+
+/* conversation */
+.cmdk-conv { display: flex; flex-direction: column; gap: 18px; padding: 8px 12px 6px; }
+.cmdk-q { display: flex; gap: 8px; align-items: baseline; color: #F2EAE0; font-size: 14.5px; font-weight: 500; }
+.cmdk-q-mark { color: #ff7a3c; font-family: var(--font-mono, monospace); flex-shrink: 0; }
+.cmdk-a {
+  color: #cabfb4; font-size: 14px; line-height: 1.62;
+  white-space: pre-wrap; overflow-wrap: anywhere;
+  padding-left: 16px; border-left: 2px solid rgba(255,94,31,0.28);
 }
-@keyframes crt-blink { 50% { opacity: 0; } }
-.crt-btn {
-  background: #0d0805;
-  border: 1px solid rgba(255,140,60,0.4);
-  box-shadow: 0 8px 30px -10px rgba(0,0,0,0.7), 0 0 18px rgba(255,110,40,0.15);
+
+/* typing */
+.cmdk-typing { display: inline-flex; gap: 4px; align-items: center; padding-left: 16px; }
+.cmdk-dot { width: 6px; height: 6px; border-radius: 50%; background: #9a8f84; animation: cmdk-bounce 1.2s infinite ease-in-out; }
+.cmdk-dot:nth-child(2) { animation-delay: .15s; }
+.cmdk-dot:nth-child(3) { animation-delay: .3s; }
+@keyframes cmdk-bounce { 0%, 60%, 100% { transform: translateY(0); opacity: .5; } 30% { transform: translateY(-4px); opacity: 1; } }
+
+/* footer */
+.cmdk-foot {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 16px; border-top: 1px solid rgba(255,236,218,0.10);
+  font-size: 11px; color: #6e6358;
 }
-.crt-btn:hover { border-color: #ff5e1f; box-shadow: 0 0 24px rgba(255,94,31,0.3); }
-.crt-screen::-webkit-scrollbar { width: 8px; }
-.crt-screen::-webkit-scrollbar-thumb { background: #3a2417; border-radius: 4px; }
-.crt-screen::-webkit-scrollbar-track { background: transparent; }
+.cmdk-foot-keys { display: flex; gap: 14px; align-items: center; }
+.cmdk-foot-keys span { display: inline-flex; align-items: center; gap: 5px; }
+.cmdk-foot kbd {
+  font-family: var(--font-mono, monospace); font-size: 10px; color: #9a8f84;
+  border: 1px solid rgba(255,236,218,0.14); border-radius: 4px; padding: 1px 5px;
+}
+
+/* scrollbar */
+.cmdk-body::-webkit-scrollbar { width: 8px; }
+.cmdk-body::-webkit-scrollbar-thumb { background: rgba(255,236,218,0.14); border-radius: 4px; }
+.cmdk-body::-webkit-scrollbar-track { background: transparent; }
+
+@media (max-width: 480px) {
+  .cmdk-trigger { right: 14px; bottom: 14px; }
+  .cmdk-overlay { padding: 70px 12px 12px; }
+  .cmdk-foot-keys span:not(:last-child) { display: none; }
+}
 @media (prefers-reduced-motion: reduce) {
-  .crt-on { animation: none; }
-  .crt-window::after { animation: none; }
-  .crt-cursor { animation: none; }
+  .cmdk, .cmdk-overlay, .cmdk-trigger { transition: opacity .2s ease; }
+  .cmdk-dot { animation: none; }
 }

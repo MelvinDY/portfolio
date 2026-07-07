@@ -1,226 +1,246 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
-interface Message {
-  role: "user" | "assistant";
-  content: string;
+interface Exchange {
+  q: string;
+  a: string;
 }
 
-const BOOT_LINES = [
-  "MELVIN-OS v2.6 — terminal bios 06.2026",
-  "memory check ............. 640K OK",
-  "mounting /portfolio ...... OK",
-  "loading personality ...... OK",
-  "dialing mainframe ........ CONNECTED",
-  "quota daemon ............. 5 questions / day",
+const SUGGESTIONS = [
+  "What's his data stack?",
+  "Tell me about his experience",
+  "What are his best projects?",
+  "What awards has he won?",
+  "How can I reach him?",
 ];
-
-const WELCOME =
-  "Hi! I'm Melvin's AI assistant.\n\nI can help you learn about:\n• Work Experience & Leadership\n• Technical Skills & Stack\n• Projects & Achievements\n• Education @ UNSW\n• Contact & Availability\n\nHow can I help you today?";
 
 export default function AiChatbox() {
   const [isOpen, setIsOpen] = useState(false);
-  const [bootStep, setBootStep] = useState(0);
-  const [booted, setBooted] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: WELCOME },
-  ]);
   const [input, setInput] = useState("");
+  const [exchanges, setExchanges] = useState<Exchange[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [remainingQuestions, setRemainingQuestions] = useState<number>(5);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [remaining, setRemaining] = useState<number>(5);
+  const [activeIndex, setActiveIndex] = useState(0);
+
   const inputRef = useRef<HTMLInputElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const endRef = useRef<HTMLDivElement>(null);
+
+  const showSuggestions = exchanges.length === 0 && !isLoading;
+
+  const close = useCallback(() => setIsOpen(false), []);
+  const open = useCallback(() => {
+    setIsOpen(true);
+    setActiveIndex(0);
+  }, []);
+
+  // ⌘K / Ctrl+K toggles, Esc closes
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setIsOpen((v) => !v);
+        setActiveIndex(0);
+      } else if (e.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  // focus input + lock body scroll while open
+  useEffect(() => {
+    if (isOpen) {
+      inputRef.current?.focus();
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [isOpen]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, bootStep, booted, isLoading]);
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [exchanges, isLoading]);
 
-  // boot sequence — runs once, line by line, the first time the terminal opens
-  useEffect(() => {
-    if (!isOpen || booted) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setBootStep(BOOT_LINES.length);
-      setBooted(true);
-      return;
-    }
-    if (bootStep >= BOOT_LINES.length) {
-      const t = setTimeout(() => {
-        setBooted(true);
-        inputRef.current?.focus();
-      }, 450);
-      return () => clearTimeout(t);
-    }
-    const t = setTimeout(() => setBootStep((s) => s + 1), bootStep === 0 ? 350 : 280);
-    return () => clearTimeout(t);
-  }, [isOpen, bootStep, booted]);
+  const sendMessage = async (text: string) => {
+    const question = text.trim();
+    if (!question || isLoading || remaining === 0) return;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-
-    const userMessage = input.trim();
     setInput("");
-
-    setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
+    setExchanges((prev) => [...prev, { q: question, a: "" }]);
     setIsLoading(true);
 
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: userMessage }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: question }),
       });
-
       const data = await response.json();
 
       if (!response.ok) {
         if (response.status === 429) {
-          setMessages((prev) => [
-            ...prev,
-            {
-              role: "assistant",
-              content: data.message || "Daily question limit reached.",
-            },
-          ]);
-          setRemainingQuestions(0);
+          setExchanges((prev) =>
+            prev.map((ex, i) =>
+              i === prev.length - 1
+                ? { ...ex, a: data.message || "You've reached the daily question limit. Please check back tomorrow." }
+                : ex
+            )
+          );
+          setRemaining(0);
           setIsLoading(false);
           return;
         }
         throw new Error("Failed to get response");
       }
 
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: data.message },
-      ]);
-
-      if (typeof data.remaining === "number") {
-        setRemainingQuestions(data.remaining);
-      }
+      setExchanges((prev) =>
+        prev.map((ex, i) => (i === prev.length - 1 ? { ...ex, a: data.message } : ex))
+      );
+      if (typeof data.remaining === "number") setRemaining(data.remaining);
     } catch (error) {
       console.error("Error:", error);
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: "SIGNAL LOST. Check the line and try again.",
-        },
-      ]);
+      setExchanges((prev) =>
+        prev.map((ex, i) =>
+          i === prev.length - 1
+            ? { ...ex, a: "Something went wrong reaching the assistant. Please try again." }
+            : ex
+        )
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (input.trim()) {
+      sendMessage(input);
+    } else if (showSuggestions) {
+      sendMessage(SUGGESTIONS[activeIndex]);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showSuggestions) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIndex((i) => (i + 1) % SUGGESTIONS.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIndex((i) => (i - 1 + SUGGESTIONS.length) % SUGGESTIONS.length);
+    }
+  };
+
   return (
     <>
-      {/* Floating power button */}
+      {/* Trigger chip */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="crt-btn fixed bottom-6 right-6 z-50 h-12 px-4 rounded-lg font-mono text-[13px] tracking-widest transition-all duration-300 flex items-center gap-1.5"
-        aria-label="Toggle AI terminal"
+        onClick={open}
+        className={`cmdk-trigger${isOpen ? " is-hidden" : ""}`}
+        aria-label="Ask the AI assistant (Ctrl or Cmd + K)"
       >
-        {isOpen ? (
-          <span className="crt-acc">[×]</span>
-        ) : (
-          <>
-            <span className="crt-text">AI</span>
-            <span className="crt-cursor" />
-          </>
-        )}
+        <span className="cmdk-kbd">⌘K</span>
+        Ask AI
       </button>
 
-      {/* Terminal window */}
-      {isOpen && (
-        <div className="crt-window crt-on fixed bottom-24 right-6 z-50 w-[360px] h-[500px] flex flex-col font-mono">
-          {/* Title bar */}
-          <div className="relative z-[5] flex items-center justify-between px-4 py-2.5 border-b border-[rgba(255,140,60,0.25)] bg-[rgba(255,120,40,0.05)]">
-            <span className="crt-acc text-[11px] tracking-[0.18em]">MELVIN-OS ▸ TTY1</span>
-            <div className="flex items-center gap-3 text-[10px]">
-              <span className="crt-dim">
-                QUOTA <span className={remainingQuestions > 0 ? "crt-text" : "crt-acc"}>{remainingQuestions}/5</span>
-              </span>
-              <button onClick={() => setIsOpen(false)} className="crt-text crt-link text-[12px]" aria-label="Close">
-                [×]
-              </button>
-            </div>
-          </div>
-
-          {/* Screen */}
-          <div className="crt-screen relative z-[2] flex-1 overflow-y-auto px-4 py-3 text-[12px] leading-relaxed">
-            {/* boot scrollback */}
-            <div className="space-y-0.5 mb-3">
-              {BOOT_LINES.slice(0, bootStep).map((line, i) => (
-                <div key={i} className={i === 0 ? "crt-bright" : "crt-dim"}>{line}</div>
-              ))}
-              {!booted && bootStep > 0 && <span className="crt-cursor" />}
-              {booted && (
-                <div className="crt-acc mt-2">READY — ASK ME ABOUT MELVIN.</div>
-              )}
-            </div>
-
-            {/* conversation */}
-            {booted && (
-              <div className="space-y-4">
-                {messages.map((message, index) => (
-                  <div key={index}>
-                    {message.role === "user" ? (
-                      <div className="flex gap-2">
-                        <span className="crt-acc shrink-0">C:\&gt;</span>
-                        <span className="crt-bright">{message.content}</span>
-                      </div>
-                    ) : (
-                      <div>
-                        <div className="crt-dim text-[10px] tracking-[0.18em] mb-1">MELVIN.AI ::</div>
-                        <div className="crt-text whitespace-pre-wrap pl-3 border-l border-[rgba(255,140,60,0.25)]">
-                          {message.content}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-
-                {isLoading && (
-                  <div>
-                    <div className="crt-dim text-[10px] tracking-[0.18em] mb-1">MELVIN.AI ::</div>
-                    <div className="crt-text pl-3 border-l border-[rgba(255,140,60,0.25)]">
-                      processing<span className="crt-cursor" />
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Prompt line */}
-          <form
-            onSubmit={handleSubmit}
-            className="relative z-[5] flex items-center gap-2 px-4 py-3 border-t border-[rgba(255,140,60,0.25)] bg-[rgba(255,120,40,0.04)] text-[12px]"
-          >
-            <span className="crt-acc">C:\&gt;</span>
+      {/* Overlay + palette */}
+      <div
+        className="cmdk-overlay"
+        data-open={isOpen ? "true" : "false"}
+        aria-hidden={!isOpen}
+        onMouseDown={(e) => {
+          if (e.target === e.currentTarget) close();
+        }}
+      >
+        <div className="cmdk" role="dialog" aria-label="Ask about Melvin" aria-modal="true">
+          {/* Input row */}
+          <form className="cmdk-row" onSubmit={handleSubmit}>
+            <span className="cmdk-row-ico" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="7" />
+                <path d="M21 21l-4.3-4.3" />
+              </svg>
+            </span>
             <input
               ref={inputRef}
+              className="cmdk-input"
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={!booted ? "booting..." : remainingQuestions > 0 ? "type a question_" : "limit reached"}
-              className="crt-bright flex-1 bg-transparent focus:outline-none placeholder:text-[rgba(255,179,119,0.35)] disabled:opacity-40 disabled:cursor-not-allowed"
-              disabled={!booted || isLoading || remainingQuestions === 0}
+              onKeyDown={handleKeyDown}
+              placeholder={remaining > 0 ? "Ask about Melvin…" : "Daily limit reached — email him instead"}
+              disabled={isLoading || remaining === 0}
+              autoComplete="off"
             />
-            <button
-              type="submit"
-              disabled={!booted || isLoading || !input.trim() || remainingQuestions === 0}
-              className="crt-text crt-link text-[11px] tracking-[0.14em] disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              [↵]
-            </button>
+            <span className="cmdk-esc" aria-hidden="true">ESC</span>
           </form>
+
+          {/* Body */}
+          <div className="cmdk-body" ref={bodyRef}>
+            {showSuggestions ? (
+              <>
+                <div className="cmdk-hint">Suggested</div>
+                {SUGGESTIONS.map((s, i) => (
+                  <button
+                    key={s}
+                    type="button"
+                    className="cmdk-sug"
+                    data-active={i === activeIndex ? "true" : "false"}
+                    onMouseEnter={() => setActiveIndex(i)}
+                    onClick={() => sendMessage(s)}
+                  >
+                    <span className="cmdk-sug-ico" aria-hidden="true">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6z" />
+                      </svg>
+                    </span>
+                    {s}
+                    <span className="cmdk-sug-arrow" aria-hidden="true">↵</span>
+                  </button>
+                ))}
+              </>
+            ) : (
+              <div className="cmdk-conv">
+                {exchanges.map((ex, i) => (
+                  <div key={i}>
+                    <div className="cmdk-q">
+                      <span className="cmdk-q-mark" aria-hidden="true">›</span>
+                      <span>{ex.q}</span>
+                    </div>
+                    {ex.a ? (
+                      <div className="cmdk-a" style={{ marginTop: 8 }}>{ex.a}</div>
+                    ) : (
+                      isLoading && i === exchanges.length - 1 && (
+                        <div className="cmdk-typing" style={{ marginTop: 8 }} aria-label="Thinking">
+                          <span className="cmdk-dot" />
+                          <span className="cmdk-dot" />
+                          <span className="cmdk-dot" />
+                        </div>
+                      )
+                    )}
+                  </div>
+                ))}
+                <div ref={endRef} />
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="cmdk-foot">
+            <div className="cmdk-foot-keys">
+              <span><kbd>↑↓</kbd> navigate</span>
+              <span><kbd>↵</kbd> ask</span>
+              <span><kbd>esc</kbd> close</span>
+            </div>
+            <span>{remaining} / 5 today</span>
+          </div>
         </div>
-      )}
+      </div>
     </>
   );
 }
