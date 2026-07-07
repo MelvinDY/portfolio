@@ -146,6 +146,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         message: getFallbackResponse(message),
         remaining: updatedRateLimitInfo.remaining,
+        source: "fallback:no-key",
       });
     }
 
@@ -174,28 +175,41 @@ export async function POST(request: NextRequest) {
         error: errorData,
       });
 
-      // On auth/quota/bad-request issues, fall back to canned responses
-      if ([400, 401, 403, 429].includes(response.status)) {
-        console.log("Using fallback response due to Gemini API issues");
-        return NextResponse.json({
-          message: getFallbackResponse(message),
-          remaining: updatedRateLimitInfo.remaining,
-        });
-      }
-
-      throw new Error(`Gemini API request failed: ${response.status} ${response.statusText}`);
+      // Any upstream error → canned fallback, but report why
+      return NextResponse.json({
+        message: getFallbackResponse(message),
+        remaining: updatedRateLimitInfo.remaining,
+        source: `fallback:api-${response.status}`,
+        detail:
+          (errorData as { error?: { message?: string } })?.error?.message ||
+          response.statusText,
+      });
     }
 
     const data = await response.json();
-    const assistantMessage =
+    const assistantText =
       data?.candidates?.[0]?.content?.parts
         ?.map((p: { text?: string }) => p.text ?? "")
         .join("")
-        .trim() || getFallbackResponse(message);
+        .trim() || "";
+
+    if (!assistantText) {
+      // 200 OK but no usable text (e.g. safety block or empty candidates)
+      return NextResponse.json({
+        message: getFallbackResponse(message),
+        remaining: updatedRateLimitInfo.remaining,
+        source: "fallback:no-candidates",
+        detail:
+          data?.candidates?.[0]?.finishReason ||
+          data?.promptFeedback?.blockReason ||
+          "empty",
+      });
+    }
 
     return NextResponse.json({
-      message: assistantMessage,
+      message: assistantText,
       remaining: updatedRateLimitInfo.remaining,
+      source: "gemini",
     });
   } catch (error) {
     console.error("Chat API error:", error);
@@ -207,6 +221,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       message: getFallbackResponse(message),
       remaining: rateLimitInfo.remaining,
+      source: "fallback:exception",
+      detail: error instanceof Error ? error.message : String(error),
     });
   }
 }
