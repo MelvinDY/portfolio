@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
 
 interface Exchange {
   q: string;
@@ -15,6 +15,13 @@ const SUGGESTIONS = [
   "How can I reach him?",
 ];
 
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+const prefersReduced = () =>
+  typeof window !== "undefined" &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 export default function AiChatbox() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
@@ -26,29 +33,93 @@ export default function AiChatbox() {
   const inputRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const paletteRef = useRef<HTMLDivElement>(null);
+  const animsRef = useRef<Animation[]>([]);
 
   const showSuggestions = exchanges.length === 0 && !isLoading;
 
-  const close = useCallback(() => setIsOpen(false), []);
-  const open = useCallback(() => {
-    setIsOpen(true);
-    setActiveIndex(0);
+  // FLIP morph: animate the palette between the trigger's box and its own
+  const runMorph = useCallback((dir: "in" | "out") => {
+    const pal = paletteRef.current;
+    const trig = triggerRef.current;
+    if (!pal || !trig) return Promise.resolve();
+    animsRef.current.forEach((a) => a.cancel());
+    animsRef.current = [];
+
+    const t = trig.getBoundingClientRect();
+    const p = pal.getBoundingClientRect();
+    if (!p.width || !p.height) return Promise.resolve();
+
+    // transform that maps the palette onto the trigger (origin: top-left)
+    const collapsed = {
+      transform: `translate(${t.left - p.left}px, ${t.top - p.top}px) scale(${Math.max(
+        t.width / p.width,
+        0.02
+      )}, ${Math.max(t.height / p.height, 0.02)})`,
+      borderRadius: "12px",
+    };
+    const expanded = { transform: "none", borderRadius: "16px" };
+    const timing: KeyframeAnimationOptions = {
+      duration: 340,
+      easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+      fill: "both",
+    };
+    pal.style.transformOrigin = "top left";
+
+    const shell = pal.animate(
+      dir === "in" ? [collapsed, expanded] : [expanded, collapsed],
+      timing
+    );
+    // content stays hidden while the shell is small, then fades in
+    const content = pal.querySelectorAll<HTMLElement>(
+      ".cmdk-row, .cmdk-body, .cmdk-foot"
+    );
+    const contentAnims = Array.from(content).map((el) =>
+      el.animate(
+        dir === "in"
+          ? [{ opacity: 0 }, { opacity: 0, offset: 0.45 }, { opacity: 1 }]
+          : [{ opacity: 1 }, { opacity: 0 }],
+        { duration: 340, easing: "ease", fill: "both" }
+      )
+    );
+    animsRef.current = [shell, ...contentAnims];
+    return shell.finished.catch(() => {});
   }, []);
+
+  const open = useCallback(() => {
+    setActiveIndex(0);
+    setIsOpen(true); // morph fires from the layout effect below
+  }, []);
+
+  const close = useCallback(() => {
+    if (prefersReduced()) {
+      setIsOpen(false);
+      return;
+    }
+    // reverse the morph, then unmount the overlay
+    runMorph("out").then(() => setIsOpen(false));
+  }, [runMorph]);
+
+  // play the open morph once the overlay is laid out
+  useIsomorphicLayoutEffect(() => {
+    if (isOpen && !prefersReduced()) runMorph("in");
+  }, [isOpen, runMorph]);
 
   // ⌘K / Ctrl+K toggles, Esc closes
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        setIsOpen((v) => !v);
-        setActiveIndex(0);
-      } else if (e.key === "Escape") {
-        setIsOpen(false);
+        if (isOpen) close();
+        else open();
+      } else if (e.key === "Escape" && isOpen) {
+        close();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [isOpen, open, close]);
 
   // focus input + lock body scroll while open
   useEffect(() => {
@@ -140,6 +211,7 @@ export default function AiChatbox() {
     <>
       {/* Trigger chip */}
       <button
+        ref={triggerRef}
         onClick={open}
         className={`cmdk-trigger${isOpen ? " is-hidden" : ""}`}
         aria-label="Ask the AI assistant (Ctrl or Cmd + K)"
@@ -157,7 +229,7 @@ export default function AiChatbox() {
           if (e.target === e.currentTarget) close();
         }}
       >
-        <div className="cmdk" role="dialog" aria-label="Ask about Melvin" aria-modal="true">
+        <div className="cmdk" ref={paletteRef} role="dialog" aria-label="Ask about Melvin" aria-modal="true">
           {/* Input row */}
           <form className="cmdk-row" onSubmit={handleSubmit}>
             <span className="cmdk-row-ico" aria-hidden="true">

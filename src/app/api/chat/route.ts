@@ -180,9 +180,6 @@ export async function POST(request: NextRequest) {
         message: getFallbackResponse(message),
         remaining: updatedRateLimitInfo.remaining,
         source: `fallback:api-${response.status}`,
-        detail:
-          (errorData as { error?: { message?: string } })?.error?.message ||
-          response.statusText,
       });
     }
 
@@ -199,10 +196,6 @@ export async function POST(request: NextRequest) {
         message: getFallbackResponse(message),
         remaining: updatedRateLimitInfo.remaining,
         source: "fallback:no-candidates",
-        detail:
-          data?.candidates?.[0]?.finishReason ||
-          data?.promptFeedback?.blockReason ||
-          "empty",
       });
     }
 
@@ -222,7 +215,6 @@ export async function POST(request: NextRequest) {
       message: getFallbackResponse(message),
       remaining: rateLimitInfo.remaining,
       source: "fallback:exception",
-      detail: error instanceof Error ? error.message : String(error),
     });
   }
 }
