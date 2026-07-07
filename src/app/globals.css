@@ -1419,10 +1419,12 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
   border-radius: 16px;
   box-shadow: 0 40px 100px -24px rgba(0,0,0,0.8);
   overflow: hidden;
-  transform-origin: top center;
-  transition: transform .24s cubic-bezier(.22,1,.36,1), opacity .2s ease;
+  /* transform is driven by the FLIP morph (WAAPI) in ai-chatbox.tsx;
+     origin must be top-left to match the measured rects */
+  transform-origin: top left;
+  transition: opacity .2s ease;
+  will-change: transform;
 }
-.cmdk-overlay[data-open="false"] .cmdk { transform: translateY(-12px) scale(.97); opacity: 0; }
 
 /* input row */
 .cmdk-row { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid rgba(255,236,218,0.10); }
