@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
 
     // Check if Gemini API key is configured
     const apiKey = process.env.GEMINI_API_KEY;
-    const model = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+    const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
     if (!apiKey) {
       // Fallback response when API key is not configured
@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
           contents: [{ role: "user", parts: [{ text: message }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 500 },
+          generationConfig: { temperature: 0.7, maxOutputTokens: 1024 },
         }),
       }
     );
