@@ -109,6 +109,7 @@ export default function HomePage() {
 
         {/* 02 — WORK: horizontal shelf */}
         <section className="hz" id="work">
+          <div className="hz-fade" aria-hidden="true" />
           <div className="hz-pin">
             <div className="wrap">
               <SecHead no="02" name="work" meta="//read sideways" />
