@@ -6,6 +6,7 @@ import { useHomeGsap } from './lib/use-home-gsap'
 import TeHeader from './components/te-header'
 import TeHero from './components/te-hero'
 import TeCursor from './components/te-cursor'
+import HomeTelemetry from './components/home-telemetry'
 
 type InkWord = { t: string; acid?: boolean }
 
@@ -190,10 +191,18 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 04 — CONTACT */}
+        {/* 04 — TELEMETRY */}
+        <section id="telemetry" className="sec">
+          <div className="wrap">
+            <SecHead no="04" name="telemetry" meta="//the site measures itself" />
+            <HomeTelemetry />
+          </div>
+        </section>
+
+        {/* 05 — CONTACT */}
         <section id="contact" className="sec">
           <div className="wrap">
-            <SecHead no="04" name="contact" meta="//channel open" />
+            <SecHead no="05" name="contact" meta="//channel open" />
             <h2 className="ct-head" data-lines aria-label="Let's make the data talk.">
               <span className="lr" aria-hidden="true"><span className="lr-in">Let&apos;s make</span></span>
               <span className="lr" aria-hidden="true"><span className="lr-in">the data <em className="ct-talk">talk.</em></span></span>

@@ -171,8 +171,14 @@ export default function TeHero() {
               <span className="h3-dm mono">4 builds</span>
               <span className="h3-darr">↗</span>
             </Link>
-            <a className="h3-drow" href="#contact" data-cursor="go ↓">
+            <Link className="h3-drow" href="/stats" data-cursor="open ↗">
               <span className="h3-dno mono">№ 03</span>
+              <span className="h3-dt">The Data Room</span>
+              <span className="h3-dm mono">live analytics</span>
+              <span className="h3-darr">↗</span>
+            </Link>
+            <a className="h3-drow" href="#contact" data-cursor="go ↓">
+              <span className="h3-dno mono">№ 04</span>
               <span className="h3-dt">Contact</span>
               <span className="h3-dm mono">say hello</span>
               <span className="h3-darr">↗</span>

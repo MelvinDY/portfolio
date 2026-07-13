@@ -140,8 +140,14 @@ export async function GET(req: NextRequest) {
       WHERE ts > now() - interval '5 minutes'
     `
 
-    const [totals, prev, series, pages, referrers, countries, devices, browsers, live] =
-      await Promise.all([totalsQ, prevQ, seriesQ, pagesQ, referrersQ, countriesQ, devicesQ, browsersQ, liveQ])
+    const countryCountQ = sql`
+      SELECT count(DISTINCT country)::int AS n
+      FROM events
+      WHERE ts >= now() - ${days} * interval '1 day' AND country IS NOT NULL
+    `
+
+    const [totals, prev, series, pages, referrers, countries, devices, browsers, live, countryCount] =
+      await Promise.all([totalsQ, prevQ, seriesQ, pagesQ, referrersQ, countriesQ, devicesQ, browsersQ, liveQ, countryCountQ])
 
     const t = totals[0] as { views: number; visitors: number; bounced: number }
     const p = prev[0] as { views: number; visitors: number; bounced: number }
@@ -151,6 +157,7 @@ export async function GET(req: NextRequest) {
         configured: true,
         range,
         live: (live[0] as { n: number }).n,
+        countryCount: (countryCount[0] as { n: number }).n,
         totals: {
           views: t.views,
           visitors: t.visitors,
