@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useRef } from 'react'
 import Link from 'next/link'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import DungeonDot from './dungeon-dot'
 
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
@@ -124,6 +125,7 @@ export default function TeHero() {
             <span className="h3-nline h3-nline-b" aria-hidden="true">
               <span className="h3-nword h3-n2">{chars('Yogiana')}<span className="h3-ch h3-dot">.</span></span>
             </span>
+            <DungeonDot />
           </h1>
           <p className="h3-sub mono">
             Data Analyst <span className="acid-text">·</span> Full-Stack Developer <span className="acid-text">·</span> UNSW Computer Science
