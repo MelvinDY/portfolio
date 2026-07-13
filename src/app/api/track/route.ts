@@ -14,8 +14,17 @@ const bodySchema = z.object({
 
 // Cookieless visitor id: hash of (secret salt, UTC day, IP, UA).
 // Rotates daily, so no cross-day tracking and nothing reversible is stored.
+// The rotation day is Australia/Sydney so identity resets at the same
+// midnight the dashboard buckets by, not mid-morning local time (UTC).
+const sydneyDay = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Australia/Sydney',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+})
+
 function visitorId(ip: string, ua: string): string {
-  const day = new Date().toISOString().slice(0, 10)
+  const day = sydneyDay.format(new Date())
   return createHash('sha256')
     .update(`${process.env.ANALYTICS_SALT ?? 'dev'}:${day}:${ip}:${ua}`)
     .digest('hex')
