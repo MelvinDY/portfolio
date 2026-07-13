@@ -38,6 +38,7 @@ type G = World & {
   introSeen: boolean
   factOrder: number[]
   factI: number
+  revealed: boolean // the dungeon stays dark until the party steps out the door
 }
 
 // doris has opinions and a good memory — all of this is true
@@ -272,7 +273,7 @@ export default function DungeonGame() {
     raycaster: THREE.Raycaster
     ground: THREE.Plane
     meshes: Map<string, MeshInfo>
-    lights: { l: THREE.PointLight; base: number; seed: number }[]
+    lights: { l: THREE.PointLight; base: number; seed: number; tavern?: boolean }[]
     flames: THREE.Mesh[]
     hiPool: THREE.Mesh[]
     hover: THREE.Mesh
@@ -283,6 +284,8 @@ export default function DungeonGame() {
   } | null>(null)
   const tweensRef = useRef<Tween[]>([])
   const hiMoveRef = useRef<Set<string>>(new Set())
+  const dgnStaticRef = useRef<THREE.Object3D[]>([]) // dungeon geometry hidden until reveal
+  const revealKRef = useRef(0) // 0 → dungeon lights dark · 1 → fully lit
   const mountedRef = useRef(true)
   const exitingRef = useRef(false)
 
@@ -305,6 +308,7 @@ export default function DungeonGame() {
       introSeen: false,
       factOrder: Array.from({ length: FACTS.length }, (_, i) => i).sort(() => Math.random() - 0.5),
       factI: 0,
+      revealed: false,
     }
   }
   const g = gRef.current
@@ -343,6 +347,8 @@ export default function DungeonGame() {
     const scene = new THREE.Scene()
     scene.background = new THREE.Color('#0a0705')
     scene.fog = new THREE.FogExp2(0x0a0705, 0.03)
+    dgnStaticRef.current = []
+    revealKRef.current = g.revealed ? 1 : 0
 
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100)
     const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'low-power' })
@@ -379,8 +385,8 @@ export default function DungeonGame() {
 
     const tmpM = new THREE.Matrix4()
     const tmpC = new THREE.Color()
-    const addFloors = (tiles: Vec[], tex: THREE.Texture) => {
-      if (!tiles.length) return
+    const addFloors = (tiles: Vec[], tex: THREE.Texture): THREE.Object3D | null => {
+      if (!tiles.length) return null
       const m = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 0.24, 1), lamb('#ffffff', { map: tex }), tiles.length)
       tiles.forEach((t, i) => {
         tmpM.setPosition(t.x, -0.12, t.z)
@@ -389,13 +395,14 @@ export default function DungeonGame() {
         m.setColorAt(i, tmpC.setRGB(v, v, v))
       })
       scene.add(m)
+      return m
     }
-    addFloors(floorTiles, texes.floor)
+    const dgnFloorMesh = addFloors(floorTiles, texes.floor)
     addFloors(tavFloorTiles, texes.tavFloor)
 
     const wallTopMat = lamb('#ffffff', { map: texes.wallTop })
-    const addWalls = (tiles: Vec[], tex: THREE.Texture) => {
-      if (!tiles.length) return
+    const addWalls = (tiles: Vec[], tex: THREE.Texture): THREE.Object3D | null => {
+      if (!tiles.length) return null
       const side = lamb('#ffffff', { map: tex })
       const m = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1.7, 1), [side, side, wallTopMat, side, side, side], tiles.length)
       tiles.forEach((t, i) => {
@@ -405,9 +412,15 @@ export default function DungeonGame() {
         m.setColorAt(i, tmpC.setRGB(v, v, v))
       })
       scene.add(m)
+      return m
     }
-    addWalls(wallTiles, texes.wall)
+    const dgnWallMesh = addWalls(wallTiles, texes.wall)
     addWalls(tavWallTiles, texes.tavWall)
+    for (const o of [dgnFloorMesh, dgnWallMesh])
+      if (o) {
+        o.visible = g.revealed
+        dgnStaticRef.current.push(o)
+      }
 
     // ── torches + lights ──
     const flames: THREE.Mesh[] = []
@@ -421,22 +434,26 @@ export default function DungeonGame() {
       const flame = box(0.16, 0.22, 0.16, new THREE.MeshBasicMaterial({ color: 0xffa438 }), sx - t.dx * 0.08, 1.24, sz - t.dz * 0.08)
       scene.add(flame)
       flames.push(flame)
+      if (!inRoom(tav, { x: t.x, z: t.z })) {
+        stick.visible = flame.visible = g.revealed
+        dgnStaticRef.current.push(stick, flame)
+      }
     }
-    const lights: { l: THREE.PointLight; base: number; seed: number }[] = []
-    const addLight = (x: number, z: number, color: number, base: number) => {
+    const lights: { l: THREE.PointLight; base: number; seed: number; tavern?: boolean }[] = []
+    const addLight = (x: number, z: number, color: number, base: number, tavern = false) => {
       const l = new THREE.PointLight(color, base, 11, 1.7)
       l.position.set(x, 1.9, z)
       scene.add(l)
-      lights.push({ l, base, seed: Math.random() * 10 })
+      lights.push({ l, base, seed: Math.random() * 10, tavern })
     }
     // the tavern glows warmer than the dungeon proper; the vault glows wrong
     dun.rooms.forEach((rm) =>
-      addLight(rm.x + rm.w / 2, rm.z + rm.h / 2, rm.id === 3 ? 0xff5040 : rm.id === 0 ? 0xffb054 : 0xff8c3a, rm.id === 3 ? 26 : rm.id === 0 ? 30 : 22),
+      addLight(rm.x + rm.w / 2, rm.z + rm.h / 2, rm.id === 3 ? 0xff5040 : rm.id === 0 ? 0xffb054 : 0xff8c3a, rm.id === 3 ? 26 : rm.id === 0 ? 30 : 22, rm.id === 0),
     )
     // two corridor glows + a lantern over the bar
     addLight((dun.rooms[0].x + dun.rooms[1].x) / 2 + 2, (dun.rooms[0].z + dun.rooms[1].z) / 2 + 2, 0xff8c3a, 12)
     addLight((dun.rooms[2].x + dun.rooms[3].x) / 2 + 2, (dun.rooms[2].z + dun.rooms[3].z) / 2 + 2, 0xff8c3a, 12)
-    addLight(tav.x + 1.5, tav.z + 2.5, 0xffb054, 14)
+    addLight(tav.x + 1.5, tav.z + 2.5, 0xffb054, 14, true)
     scene.add(new THREE.AmbientLight(0x6a5648, 0.55))
     const dir = new THREE.DirectionalLight(0x3a4a66, 0.4)
     dir.position.set(-4, 8, -6)
@@ -641,10 +658,11 @@ export default function DungeonGame() {
         }
       }
 
-      // idle animation
+      // idle animation (units outside the tavern stay hidden until the reveal)
       for (const u of g.units) {
         const mi = t.meshes.get(u.id)
         if (!mi || u.hp <= 0) continue
+        mi.grp.visible = g.revealed || inRoom(g.dun.rooms[0], u.pos)
         if (u.sprite === 'slime') {
           const sq = 1 + Math.sin(now / 260 + mi.phase) * 0.09
           mi.body.scale.set(2 - sq, sq, 2 - sq)
@@ -658,7 +676,7 @@ export default function DungeonGame() {
       for (const it of g.items) {
         const im = itemMeshes.get(it.id)
         if (!im) continue
-        im.visible = !!it.pos
+        im.visible = !!it.pos && g.revealed // all floor items live in the dungeon proper
         if (it.pos) im.position.y = 0.08 + Math.sin(now / 380 + it.id.length) * 0.05
       }
       // torch flicker
@@ -666,8 +684,8 @@ export default function DungeonGame() {
         const k = 1 + Math.sin(now / 70 + i * 2.7) * 0.14 + Math.sin(now / 133 + i) * 0.1
         f.scale.set(1, k, 1)
       })
-      t.lights.forEach(({ l, base, seed }) => {
-        l.intensity = base * (1 + Math.sin(now / 90 + seed) * 0.09 + Math.sin(now / 47 + seed * 3) * 0.05)
+      t.lights.forEach(({ l, base, seed, tavern }) => {
+        l.intensity = base * (1 + Math.sin(now / 90 + seed) * 0.09 + Math.sin(now / 47 + seed * 3) * 0.05) * (tavern ? 1 : revealKRef.current)
       })
       // selection ring
       const sel = selectedHero()
@@ -747,6 +765,10 @@ export default function DungeonGame() {
         el.style.display = 'none'
         continue
       }
+      if (!mi.grp.visible) {
+        el.style.display = 'none'
+        continue
+      }
       const p = project(mi.grp.position.x, mi.h + 0.35, mi.grp.position.z)
       if (!p) continue
       el.style.display = ''
@@ -802,6 +824,10 @@ export default function DungeonGame() {
     const tile = pickTile(cx, cy)
     if (!tile || !isFloor(g.dun, tile.x, tile.z) || g.mode === 'dialogue' || g.mode === 'victory' || g.mode === 'defeat') {
       hideTip()
+      return
+    }
+    if (!g.revealed && !inRoom(g.dun.rooms[0], tile)) {
+      hideTip() // nothing to see out there yet
       return
     }
     t.hover.visible = true
@@ -1178,6 +1204,17 @@ export default function DungeonGame() {
     log(`picked up the ${it.name}.`)
   }
 
+  function revealDungeon() {
+    if (g.revealed) return
+    g.revealed = true
+    for (const o of dgnStaticRef.current) o.visible = true
+    void tween(1200, (k) => {
+      revealKRef.current = k
+    })
+    log('the inn door groans open — torches gutter awake in the dark below.')
+    bump()
+  }
+
   async function moveParty(tile: Vec, after?: () => void) {
     const leader = selectedHero() ?? heroes()[0]
     if (!leader) return
@@ -1192,6 +1229,8 @@ export default function DungeonGame() {
     for (const o of others) blocked.delete(key(o.pos)) // heroes flow through each other
     const path = bfsPath(g.dun, blocked, leader.pos, tile)
     if (!path || path.length === 0) return
+    // stepping out the door lights the dungeon
+    if (!g.revealed && !inRoom(g.dun.rooms[0], tile)) revealDungeon()
 
     g.busy = true
     bump()
@@ -1355,6 +1394,11 @@ export default function DungeonGame() {
     const u = unitAt(tile)
 
     if (g.mode === 'explore') {
+      // clicking into the unrevealed dark just walks toward it
+      if (!g.revealed && !inRoom(g.dun.rooms[0], tile)) {
+        void moveParty(tile)
+        return
+      }
       if (u?.faction === 'party') {
         g.selected = u.id
         bump()
@@ -1405,6 +1449,7 @@ export default function DungeonGame() {
     if (g.mode !== 'explore' && g.mode !== 'combat') return
     const tile = pickTile(cx, cy)
     if (!tile) return
+    if (!g.revealed && !inRoom(g.dun.rooms[0], tile)) return
     const u = unitAt(tile)
     if (u) {
       g.popup = { unitId: u.id, x: cx, y: cy }
@@ -1489,6 +1534,8 @@ export default function DungeonGame() {
 
   const hero = selectedHero()
   const popupUnit = g.popup ? g.units.find((u) => u.id === g.popup?.unitId) : null
+  // engaging needs a hero close enough to actually see the foe
+  const engageable = popupUnit ? heroes().some((h) => manhattan(h.pos, popupUnit.pos) <= 6 && hasLOS(g.dun, h.pos, popupUnit.pos)) : false
   const partyUnits = g.units.filter((u) => u.faction === 'party')
   const barUnits = g.units.filter((u) => alive(u) && u.faction !== 'neutral')
   const npcUnits = g.units.filter((u) => alive(u) && u.faction === 'neutral')
@@ -1603,8 +1650,11 @@ export default function DungeonGame() {
             </span>
           )}
           {popupUnit.recruit && heroes().length >= 2 && <span className="dgn-pop-note">the party is full.</span>}
+          {popupUnit.faction === 'foe' && g.mode === 'explore' && !engageable && (
+            <span className="dgn-pop-note">too far away to engage — move closer.</span>
+          )}
           <div className="dgn-pop-row">
-            {popupUnit.faction === 'foe' && g.mode === 'explore' && (
+            {popupUnit.faction === 'foe' && g.mode === 'explore' && engageable && (
               <button className="dgn-btn acid" onClick={() => startCombat(popupUnit.roomId)}>⚔ engage</button>
             )}
             {popupUnit.recruit && heroes().length < 2 && g.mode === 'explore' && (
