@@ -890,6 +890,21 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
   .te-home .rd:nth-child(n+3) { border-top: 1px solid var(--line); }
 }
 
+/* telemetry band — live numbers from the site's own analytics pipeline */
+.te-home .tm-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(28px, 4vw, 64px); align-items: start; }
+.te-home .tm-head { font-size: clamp(38px, 5.4vw, 72px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.02; margin: 0; }
+.te-home .tm-it { font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--acid); }
+.te-home .tm-lead { margin: 0; }
+.te-home .tm-pipe { margin: 24px 0 0; font-size: 12px; letter-spacing: 0.08em; color: var(--ink-faint); }
+.te-home .tm-cta { margin-top: 30px; display: inline-flex; }
+.te-home .tm-cta:hover { color: var(--acid); }
+.te-home .tm-cta:hover .arrow { transform: translate(3px, -3px); }
+.te-home .tm-live-v { display: flex; align-items: center; gap: 12px; }
+.te-home .tm-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--acid); animation: tm-pulse 2s ease-in-out infinite; }
+@keyframes tm-pulse { 0%, 100% { opacity: 1 } 50% { opacity: 0.3 } }
+@media (max-width: 860px) { .te-home .tm-grid { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .te-home .tm-dot { animation: none; } }
+
 /* 02 — work: horizontal shelf (pinned, scrubbed sideways) */
 .te-home .hz { position: relative; margin-top: clamp(80px, 11vw, 150px); overflow: hidden; }
 .te-home .hz-pin { height: 100svh; display: flex; flex-direction: column; justify-content: center; gap: clamp(20px, 4vh, 44px); padding-top: 76px; }
