@@ -39,7 +39,13 @@ type G = World & {
   factOrder: number[]
   factI: number
   revealed: boolean // the dungeon stays dark until the party steps out the door
+  muted: boolean
+  spoke: Record<string, boolean> // one-shot voice lines already delivered
 }
+
+const AUDIO_BASE = '/audio/dungeon/'
+// combat barks, keyed by ability id — played occasionally so they stay fun
+const BARKS: Record<string, string> = { slash: 'bram-bark', ember: 'nyx-bark', longshot: 'vex-bark', hotfix: 'odo-bark' }
 
 // doris has opinions and a good memory — all of this is true
 const FACTS = [
@@ -309,6 +315,14 @@ export default function DungeonGame() {
       factOrder: Array.from({ length: FACTS.length }, (_, i) => i).sort(() => Math.random() - 0.5),
       factI: 0,
       revealed: false,
+      muted: (() => {
+        try {
+          return localStorage.getItem('mv-dgn-muted') === '1'
+        } catch {
+          return false
+        }
+      })(),
+      spoke: {},
     }
   }
   const g = gRef.current
@@ -332,6 +346,47 @@ export default function DungeonGame() {
   }
   const log = (msg: string) => {
     g.log = msg
+  }
+
+  // ── audio: one voice channel (lines never talk over each other) + free sfx ──
+
+  const voiceRef = useRef<HTMLAudioElement | null>(null)
+
+  function stopVoice() {
+    const v = voiceRef.current
+    if (v) {
+      v.pause()
+      voiceRef.current = null
+    }
+  }
+
+  function playVoice(name: string, once = false) {
+    if (once) {
+      if (g.spoke[name]) return
+      g.spoke[name] = true
+    }
+    if (g.muted) return
+    stopVoice()
+    const a = new Audio(AUDIO_BASE + name + '.mp3')
+    a.volume = 0.9
+    voiceRef.current = a
+    void a.play().catch(() => {}) // autoplay may be blocked before the first click — fail silent
+  }
+
+  function playSfx(name: string, vol = 0.6) {
+    if (g.muted) return
+    const a = new Audio(AUDIO_BASE + name + '.mp3')
+    a.volume = vol
+    void a.play().catch(() => {})
+  }
+
+  function toggleMute() {
+    g.muted = !g.muted
+    try {
+      localStorage.setItem('mv-dgn-muted', g.muted ? '1' : '0')
+    } catch {}
+    if (g.muted) stopVoice()
+    bump()
   }
 
   // ── three setup ────────────────────────────────────────────────────────
@@ -721,11 +776,12 @@ export default function DungeonGame() {
       }
     }, 200)
 
-    // ── entrance: dither the orange away ──
-    runDissolve('in')
+    // ── entrance: dither the orange away, then the narrator clears his throat ──
+    runDissolve('in', () => playVoice('narrator-intro', true))
 
     return () => {
       mountedRef.current = false
+      stopVoice()
       cancelAnimationFrame(raf)
       clearInterval(watchdog)
       window.removeEventListener('resize', applySize)
@@ -990,9 +1046,11 @@ export default function DungeonGame() {
     const ab = u.abilities[ai]
     u.acted = true
     u.cooldowns[ai] = ab.cd
+    if (u.faction === 'party' && BARKS[ab.id] && Math.random() < 0.4) playVoice(BARKS[ab.id])
     if (ab.dmg && ab.range > 1) await animProjectile(u, target, u.faction === 'party' ? 0xffa438 : 0x9db06a)
     else await animLunge(u, target)
     if (ab.dmg) {
+      playSfx(ab.range > 1 ? 'sfx-ember' : 'sfx-slash')
       applyDamage(target, ab.dmg)
       log(`${u.name} hits ${target.name} with ${ab.name} for ${ab.dmg}.`)
       if (target.hp <= 0) {
@@ -1017,6 +1075,7 @@ export default function DungeonGame() {
     if (g.mode !== 'combat') return false
     if (heroes().length === 0) {
       g.mode = 'defeat'
+      playVoice('narrator-defeat', true)
       g.busy = false
       refreshHi()
       bump()
@@ -1026,6 +1085,7 @@ export default function DungeonGame() {
       const bossDead = !g.units.some((u) => u.sprite === 'boss' && alive(u))
       if (bossDead) {
         g.mode = 'victory'
+        playVoice('narrator-victory', true)
       } else {
         g.mode = 'explore'
         g.combatRoom = null
@@ -1055,6 +1115,7 @@ export default function DungeonGame() {
     }
     const n = engaged().length
     log(`steel out — ${n} foe${n === 1 ? '' : 's'} engage${n === 1 ? 's' : ''}!`)
+    if (engaged().some((f) => f.sprite === 'boss')) playVoice('boss-roar', true)
     // frame the fight
     const t = threeRef.current
     if (t) {
@@ -1158,6 +1219,7 @@ export default function DungeonGame() {
 
     if (heroes().length === 0) {
       g.mode = 'defeat'
+      playVoice('narrator-defeat', true)
       g.busy = false
       bump()
       return
@@ -1212,6 +1274,7 @@ export default function DungeonGame() {
       revealKRef.current = k
     })
     log('the inn door groans open — torches gutter awake in the dark below.')
+    playSfx('sfx-door', 0.7)
     bump()
   }
 
@@ -1221,6 +1284,7 @@ export default function DungeonGame() {
     // nobody delves alone — the tavern door stays shut until you recruit
     if (heroes().length < 2 && !inRoom(g.dun.rooms[0], tile)) {
       log("doris tuts: 'nobody delves alone, love. one of these three goes with you.'")
+      playVoice('doris-alone')
       bump()
       return
     }
@@ -1272,6 +1336,7 @@ export default function DungeonGame() {
   }
 
   function openPuck() {
+    playVoice('puck-user', true)
     say(PUCK, "GAH— a user?! Nobody ever finds this place. I'm Puck. I haunt the hidden dev dungeon. The beast in the far vault holds the place together — or apart, hard to say.", [
       {
         label: '“what is this place?”',
@@ -1292,20 +1357,24 @@ export default function DungeonGame() {
       },
       {
         label: '“are you… a ghost?”',
-        act: () =>
-          say(PUCK, "An unmerged feature branch, technically. Four thousand commits behind main and full of regrets. Don't be like me, traveler — ship.", [farewell()]),
+        act: () => {
+          playVoice('puck-ship')
+          say(PUCK, "An unmerged feature branch, technically. Four thousand commits behind main and full of regrets. Don't be like me, traveler — ship.", [farewell()])
+        },
       },
       farewell(),
     ])
   }
 
   function nextFact() {
+    playVoice('doris-stories', true)
     if (g.factI >= g.factOrder.length) g.factI = 0
     const fact = FACTS[g.factOrder[g.factI++]]
     say(DORIS, fact, [{ label: '“another one.”', act: nextFact }, farewell()])
   }
 
   function openDoris() {
+    playVoice('doris-welcome', true)
     say(DORIS, "welcome to the rubber duck inn — last warm room before the dungeon. the dev built this whole place, y'know. what'll it be?", [
       { label: '“tell me about the dev.”', act: nextFact },
       {
@@ -1364,6 +1433,7 @@ export default function DungeonGame() {
     if (it.effect === 'heal') {
       const target = heroes().reduce((a, b) => (a.maxHp - a.hp >= b.maxHp - b.hp ? a : b), heroes()[0])
       if (!target) return
+      playSfx('sfx-potion', 0.7)
       target.hp = Math.min(target.maxHp, target.hp + 10)
       floatText(target.pos, 1.6, '+10', '#6fe08a')
       log(`${target.name} downs the cold brew. immediate deadline energy.`)
@@ -1541,7 +1611,12 @@ export default function DungeonGame() {
   const npcUnits = g.units.filter((u) => alive(u) && u.faction === 'neutral')
 
   return (
-    <div className="dgn-root">
+    <div
+      className="dgn-root"
+      onClickCapture={(e) => {
+        if ((e.target as HTMLElement).closest?.('button')) playSfx('sfx-click', 0.35)
+      }}
+    >
       <div className="dgn-mount" ref={mountRef} />
 
       {/* hp bars + npc labels, positioned every frame from the 3d scene */}
@@ -1569,6 +1644,9 @@ export default function DungeonGame() {
         {g.mode === 'combat' && (
           <span className="dgn-turn">{g.playerTurn ? `round ${g.round} · your turn` : 'foes advance…'}</span>
         )}
+        <button className="dgn-close" onClick={toggleMute} title={g.muted ? 'unmute' : 'mute'}>
+          {g.muted ? '🔇' : '🔊'}
+        </button>
         <button className="dgn-close" onClick={exitToPortfolio} title="back to the portfolio">✕</button>
       </div>
 
