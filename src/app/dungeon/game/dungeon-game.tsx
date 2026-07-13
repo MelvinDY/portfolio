@@ -389,6 +389,65 @@ export default function DungeonGame() {
     bump()
   }
 
+  // ── music: one looping channel, crossfaded, chosen from game state ──────
+
+  const musicRef = useRef<{ el: HTMLAudioElement | null; name: string | null }>({ el: null, name: null })
+  if (typeof window !== 'undefined') (window as unknown as { __dgnMusic?: typeof musicRef.current }).__dgnMusic = musicRef.current
+
+  function desiredTrack(): string {
+    if (g.mode === 'victory') return 'music-victory'
+    if (g.mode === 'defeat') return 'music-defeat'
+    if (g.mode === 'combat') return engaged().some((f) => f.sprite === 'boss') ? 'music-boss' : 'music-combat'
+    const leader = selectedHero() ?? heroes()[0]
+    const inTavern = !leader || inRoom(g.dun.rooms[0], leader.pos)
+    return !g.revealed || inTavern ? 'music-tavern' : 'music-dungeon'
+  }
+
+  function updateMusic() {
+    const m = musicRef.current
+    const want = g.muted ? null : desiredTrack()
+    if (m.name === want) return
+    m.name = want
+    const old = m.el
+    m.el = null
+    if (old) {
+      const fadeOut = window.setInterval(() => {
+        old.volume = Math.max(0, old.volume - 0.06)
+        if (old.volume <= 0.01) {
+          clearInterval(fadeOut)
+          old.pause()
+        }
+      }, 60)
+    }
+    if (!want) return
+    const sting = want === 'music-victory' || want === 'music-defeat'
+    const el = new Audio(AUDIO_BASE + want + '.mp3')
+    el.loop = !sting
+    el.volume = 0
+    m.el = el
+    void el
+      .play()
+      .then(() => {
+        const target = sting ? 0.5 : 0.32
+        const fadeIn = window.setInterval(() => {
+          el.volume = Math.min(target, el.volume + 0.06)
+          if (el.volume >= target) clearInterval(fadeIn)
+        }, 60)
+      })
+      .catch(() => {
+        // autoplay blocked before the first gesture — forget it so a later call retries
+        if (m.el === el) {
+          m.el = null
+          m.name = null
+        }
+      })
+  }
+
+  // re-evaluate after every render: bump() fires on every state change that matters
+  useEffect(() => {
+    updateMusic()
+  })
+
   // ── three setup ────────────────────────────────────────────────────────
 
   useEffect(() => {
@@ -687,6 +746,9 @@ export default function DungeonGame() {
     cvs.addEventListener('pointerdown', onDown)
     window.addEventListener('pointermove', onMove)
     window.addEventListener('pointerup', onUp)
+    // autoplay unblocks on the first gesture — cheap no-op once music is running
+    const musicKick = () => updateMusic()
+    window.addEventListener('pointerdown', musicKick)
     cvs.addEventListener('wheel', onWheel, { passive: false })
     cvs.addEventListener('contextmenu', onCtx)
     cvs.addEventListener('pointerleave', onLeaveCanvas)
@@ -782,6 +844,9 @@ export default function DungeonGame() {
     return () => {
       mountedRef.current = false
       stopVoice()
+      musicRef.current.el?.pause()
+      musicRef.current = { el: null, name: null }
+      window.removeEventListener('pointerdown', musicKick)
       cancelAnimationFrame(raf)
       clearInterval(watchdog)
       window.removeEventListener('resize', applySize)
