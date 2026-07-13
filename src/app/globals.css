@@ -953,6 +953,7 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
   .te-home .hz-panel { width: 84vw; }
   .te-home .hz-intro, .te-home .hz-end { width: 80vw; }
   .te-home .wk-card { min-height: 52vh; }
+  .te-home .hz-fade { display: none; }
 }
 
 /* reduced motion: the shelf stacks vertically, no pin */
