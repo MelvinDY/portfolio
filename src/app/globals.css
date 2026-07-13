@@ -718,8 +718,6 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 .te-home .h3-tick.br { bottom: 16px; right: 16px; border-right-width: 1px; border-bottom-width: 1px; }
 
 /* progress rail */
-.te-home .h3-rail { position: absolute; right: 28px; top: 50%; transform: translateY(-50%); width: 1px; height: 34vh; background: var(--line-2); pointer-events: none; }
-.te-home .h3-rail-dot { position: absolute; left: -2.5px; top: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--acid); box-shadow: 0 0 12px rgba(255,94,31,0.55); }
 
 /* drifting marginalia */
 .te-home .h3-frag { position: absolute; font-family: var(--font-serif); font-style: italic; font-size: 13.5px; letter-spacing: 0.02em; color: rgba(242,234,224,0.25); pointer-events: none; user-select: none; white-space: nowrap; }
@@ -733,10 +731,13 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 .te-home .h3-hud-br { bottom: 20px; right: var(--pad); color: var(--acid); }
 .te-home .h3-pct { font-weight: 600; color: var(--ink); }
 
-/* fixed page-scroll counter — inherits the hero HUD's top-right slot */
+/* fixed page-scroll instruments — HUD counter + right-edge rail dot */
 .te-home .scroll-progress { position: fixed; top: 84px; right: var(--pad); z-index: 60; font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-faint); pointer-events: none; opacity: 0; transition: opacity 0.4s; }
 .te-home .scroll-progress b { font-weight: 600; color: var(--ink); }
 .te-home .scroll-progress.sp-on { opacity: 1; }
+.te-home .sp-rail { position: fixed; right: 28px; top: 50%; transform: translateY(-50%); width: 1px; height: 34vh; background: var(--line-2); }
+.te-home .sp-rail-dot { position: absolute; left: -2.5px; top: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--acid); box-shadow: 0 0 12px rgba(255,94,31,0.55); }
+@media (max-width: 760px) { .te-home .sp-rail { display: none; } }
 @media (prefers-reduced-motion: reduce) { .te-home .scroll-progress { transition: none; } }
 
 /* the three acts */
@@ -813,7 +814,7 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 .te-home .h3-drow:hover .h3-darr { color: var(--acid); transform: translate(3px, -3px); }
 
 @media (max-width: 760px) {
-  .te-home .h3-frag, .te-home .h3-rail { display: none; }
+  .te-home .h3-frag { display: none; }
   .te-home .h3-hud-bl { display: none; }
   .te-home .h3-dm { display: none; }
   .te-home .h3-man { max-width: 16ch; }
@@ -823,7 +824,7 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 .te-home .hero3.h3-static { height: auto; min-height: 100svh; padding: 110px 0 56px; }
 .te-home .h3-static .h3-stage { position: static; }
 .te-home .h3-static .h3-scene { position: static; opacity: 1; pointer-events: auto; padding-block: 36px; }
-.te-home .h3-static .h3-scan, .te-home .h3-static .h3-rail, .te-home .h3-static .h3-hud-tr, .te-home .h3-static .h3-hud-br { display: none; }
+.te-home .h3-static .h3-scan, .te-home .h3-static .h3-hud-br { display: none; }
 .te-home .h3-static .h3-w { color: var(--ink); }
 .te-home .h3-static .h3-w-acid { color: var(--acid); }
 
@@ -1530,4 +1531,5 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
   .cmdk, .cmdk-overlay, .cmdk-trigger { transition: opacity .2s ease; }
   .cmdk-dot { animation: none; }
 }
+
 

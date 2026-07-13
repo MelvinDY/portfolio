@@ -51,7 +51,6 @@ export default function TeHero() {
         .from('.h3-n1 .h3-ch', { yPercent: 140, duration: 1.05, stagger: 0.045 }, 0.35)
         .from('.h3-n2 .h3-ch', { yPercent: 140, duration: 1.05, stagger: 0.045 }, 0.5)
         .from('.h3-sub', { opacity: 0, letterSpacing: '0.6em', duration: 0.9 }, 1.0)
-        .from('.h3-rail', { scaleY: 0, transformOrigin: 'top', duration: 1 }, 0.9)
 
       // SCROLL SCRUB — hero pins while the three acts play
       const scrub = gsap.timeline({
@@ -80,7 +79,6 @@ export default function TeHero() {
         .fromTo('.h3-drow', { y: 36, opacity: 0 }, { y: 0, opacity: 1, ease: 'power2.out', duration: 0.8, stagger: 0.3 }, 7.5)
         // continuous instruments across the whole pin
         .fromTo('.h3-scan', { top: '10%' }, { top: '90%', duration: 10 }, 0)
-        .fromTo('.h3-rail-dot', { top: '0%' }, { top: '98%', duration: 10 }, 0)
         // hold the directory settled before unpinning
         .to({}, { duration: 1.2 })
 
@@ -109,7 +107,6 @@ export default function TeHero() {
       <i className="h3-tick tr" aria-hidden="true" />
       <i className="h3-tick bl" aria-hidden="true" />
       <i className="h3-tick br" aria-hidden="true" />
-      <div className="h3-rail" aria-hidden="true"><i className="h3-rail-dot" /></div>
 
       {/* folio */}
       <div className="h3-hud mono" aria-hidden="true">
