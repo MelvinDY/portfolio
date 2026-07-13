@@ -1603,6 +1603,9 @@ export default function DungeonGame() {
   // ── render ─────────────────────────────────────────────────────────────
 
   const hero = selectedHero()
+  const hudHero = hero ?? heroes()[0] ?? null
+  const hudHpFrac = hudHero ? hudHero.hp / hudHero.maxHp : 0
+  const ROLE: Record<string, string> = { knight: 'knight', mage: 'witch', ranger: 'ranger', cleric: 'cleric' }
   const popupUnit = g.popup ? g.units.find((u) => u.id === g.popup?.unitId) : null
   // engaging needs a hero close enough to actually see the foe
   const engageable = popupUnit ? heroes().some((h) => manhattan(h.pos, popupUnit.pos) <= 6 && hasLOS(g.dun, h.pos, popupUnit.pos)) : false
@@ -1650,8 +1653,29 @@ export default function DungeonGame() {
         <button className="dgn-close" onClick={exitToPortfolio} title="back to the portfolio">✕</button>
       </div>
 
-      {/* bottom action bar */}
-      <div className="dgn-hud">
+      {/* bottom action bar, with the controlled hero's big hp readout on top */}
+      <div className="dgn-hud-wrap">
+        {hudHero && (
+          <div className="dgn-hpbar">
+            <span className="dgn-hpbar-name">
+              {hudHero.name.toLowerCase()} · {hudHero.title.toLowerCase()}
+            </span>
+            <div className="dgn-hpbar-shell">
+              <i
+                className={`dgn-hpbar-fill${hudHpFrac <= 0.25 ? ' low' : hudHpFrac <= 0.5 ? ' mid' : ''}`}
+                style={{ width: `${hudHpFrac * 100}%` }}
+              />
+              {hudHero.shield > 0 && (
+                <i className="dgn-hpbar-shield" style={{ width: `${Math.min(100, (hudHero.shield / hudHero.maxHp) * 100)}%` }} />
+              )}
+            </div>
+            <span className="dgn-hpbar-num">
+              {hudHero.hp}/{hudHero.maxHp}
+              {hudHero.shield > 0 ? ` +${hudHero.shield}` : ''}
+            </span>
+          </div>
+        )}
+        <div className="dgn-hud">
         <div className="dgn-party">
           {partyUnits.map((u) => (
             <button
@@ -1665,9 +1689,11 @@ export default function DungeonGame() {
                 bump()
               }}
             >
-              <b>{u.name[0]}</b>
+              {g.selected === u.id && u.hp > 0 && <span className="dgn-port-now">▶ controlling</span>}
+              <b>{u.name.toLowerCase()}</b>
+              <span className="dgn-port-role">{ROLE[u.sprite] ?? u.sprite}</span>
               <i style={{ width: `${(u.hp / u.maxHp) * 100}%` }} />
-              <span>{u.hp <= 0 ? '✝' : `${u.hp}/${u.maxHp}`}</span>
+              <span className="dgn-port-hp">{u.hp <= 0 ? '✝ down' : `${u.hp}/${u.maxHp}`}</span>
             </button>
           ))}
         </div>
@@ -1704,6 +1730,7 @@ export default function DungeonGame() {
               end turn
             </button>
           )}
+        </div>
         </div>
       </div>
 
@@ -1855,7 +1882,7 @@ const CSS = `
 }
 
 /* pixel chrome — notched black frame + hard drop shadow, no smooth borders */
-.dgn-tip, .dgn-turn, .dgn-hud, .dgn-pop, .dgn-dlg, .dgn-over-card, .dgn-hint {
+.dgn-tip, .dgn-turn, .dgn-hud, .dgn-hpbar, .dgn-pop, .dgn-dlg, .dgn-over-card, .dgn-hint {
   border: none; border-radius: 0;
   box-shadow:
     0 -3px 0 0 #000, 0 3px 0 0 #000, -3px 0 0 0 #000, 3px 0 0 0 #000,
@@ -1907,20 +1934,44 @@ const CSS = `
 }
 .dgn-close:hover { background: #ff5e1f; color: #0a0705; }
 
-.dgn-hud {
+.dgn-hud-wrap {
   position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 30;
+  display: flex; flex-direction: column; align-items: stretch; gap: 14px;
+  max-width: calc(100vw - 28px);
+}
+.dgn-hpbar {
+  display: flex; align-items: center; gap: 12px;
+  background: #16100c; padding: 9px 13px;
+}
+.dgn-hpbar-name { font-size: 8px; color: #ff9d5e; white-space: nowrap; }
+.dgn-hpbar-shell {
+  position: relative; flex: 1; min-width: 130px; height: 15px;
+  background: #0a0705; box-shadow: inset 0 0 0 2px #000;
+}
+.dgn-hpbar-fill { position: absolute; left: 0; top: 0; bottom: 0; background: #6fe08a; transition: width .25s steps(6); }
+.dgn-hpbar-fill.mid { background: #f5c93a; }
+.dgn-hpbar-fill.low { background: #e0574a; }
+.dgn-hpbar-shield { position: absolute; left: 0; top: -5px; height: 3px; background: #7fb6ff; }
+.dgn-hpbar-num { font-size: 9px; white-space: nowrap; }
+.dgn-hud {
   display: flex; align-items: stretch; gap: 9px; padding: 10px;
   background: #16100c;
-  max-width: calc(100vw - 28px);
 }
 .dgn-party { display: flex; gap: 9px; }
 .dgn-port {
-  position: relative; width: 56px; padding: 7px 0 5px; text-align: center;
+  position: relative; width: 88px; padding: 8px 4px 6px; text-align: center;
   background: #221812; cursor: pointer; color: #f2eae0; font-family: inherit;
 }
-.dgn-port b { display: block; font-size: 12px; }
-.dgn-port i { display: block; height: 3px; background: #6fe08a; margin: 4px 6px 3px; }
-.dgn-port span { font-size: 7px; color: rgba(242,234,224,.6); }
+.dgn-port b { display: block; font-size: 9px; }
+.dgn-port-role { display: block; font-size: 6px; color: rgba(242,234,224,.45); margin-top: 4px; text-transform: uppercase; letter-spacing: .1em; }
+.dgn-port i { display: block; height: 4px; background: #6fe08a; margin: 5px 7px 4px; }
+.dgn-port-hp { font-size: 7px; color: rgba(242,234,224,.6); }
+.dgn-port-now {
+  position: absolute; left: 50%; top: -15px; transform: translateX(-50%);
+  background: #ff5e1f; color: #0a0705;
+  font-size: 6px; letter-spacing: .1em; padding: 4px 6px 3px; white-space: nowrap;
+  box-shadow: 0 -2px 0 0 #000, 0 2px 0 0 #000, -2px 0 0 0 #000, 2px 0 0 0 #000;
+}
 .dgn-port.sel { background: #38220f; box-shadow: 0 -3px 0 0 #ff5e1f, 0 3px 0 0 #ff5e1f, -3px 0 0 0 #ff5e1f, 3px 0 0 0 #ff5e1f, inset 3px 3px 0 0 rgba(255,255,255,.09), inset -3px -3px 0 0 rgba(0,0,0,.4); }
 .dgn-port.dead { opacity: .35; cursor: default; }
 .dgn-abilities { display: flex; gap: 9px; }
@@ -1964,7 +2015,7 @@ const CSS = `
 .dgn-btn.acid { background: #ff5e1f; color: #0a0705; }
 
 .dgn-dlg {
-  position: absolute; left: 50%; bottom: 116px; transform: translateX(-50%); z-index: 44;
+  position: absolute; left: 50%; bottom: 168px; transform: translateX(-50%); z-index: 44;
   width: min(540px, calc(100vw - 36px));
   background: #16100c;
   padding: 15px 17px; font-size: 8px; line-height: 2;
@@ -1987,7 +2038,7 @@ const CSS = `
 .dgn-over-card .acid { color: #ff5e1f; }
 
 .dgn-hint {
-  position: absolute; left: 50%; bottom: 96px; transform: translateX(-50%); z-index: 28;
+  position: absolute; left: 50%; bottom: 168px; transform: translateX(-50%); z-index: 28;
   max-width: min(600px, calc(100vw - 36px));
   background: rgba(22,16,12,.94);
   padding: 10px 15px; font-size: 8px; line-height: 2.1; text-align: center;
@@ -2009,6 +2060,7 @@ const CSS = `
 }
 @media (max-width: 760px) {
   .dgn-hud { flex-wrap: wrap; justify-content: center; }
+  .dgn-hpbar-name { display: none; }
   .dgn-log { display: none; }
 }
 `
