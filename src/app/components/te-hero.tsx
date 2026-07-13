@@ -123,9 +123,9 @@ export default function TeHero() {
           <h1 className="h3-name" aria-label="Melvin Yogiana">
             <span className="h3-nline" aria-hidden="true"><span className="h3-nword h3-n1">{chars('Melvin')}</span></span>
             <span className="h3-nline h3-nline-b" aria-hidden="true">
-              <span className="h3-nword h3-n2">{chars('Yogiana')}<span className="h3-ch h3-dot">.</span></span>
+              {/* the period is the door — hover it, or tap it on mobile */}
+              <span className="h3-nword h3-n2">{chars('Yogiana')}<DungeonDot /></span>
             </span>
-            <DungeonDot />
           </h1>
           <p className="h3-sub mono">
             Data Analyst <span className="acid-text">·</span> Full-Stack Developer <span className="acid-text">·</span> UNSW Computer Science

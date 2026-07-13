@@ -1,10 +1,12 @@
 "use client"
 
-// the secret dot. hovering it whispers "play the game" — clicking commits:
-// the orange swallows the screen from the dot's exact spot, then the
-// dungeon takes over. coming back plays the whole thing in reverse.
+// the secret is the orange full stop in "Yogiana." itself. hovering it
+// whispers "play the game"; clicking (or tapping, on mobile) commits: the
+// orange swallows the screen from the dot's exact spot, then the dungeon
+// takes over. coming back plays the whole thing in reverse.
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 
 const ACID = '#ff5e1f'
@@ -12,7 +14,7 @@ const ACID = '#ff5e1f'
 function makeWipe(dot: HTMLElement): HTMLDivElement {
   const r = dot.getBoundingClientRect()
   const cx = r.left + r.width / 2
-  const cy = r.top + r.height / 2
+  const cy = r.top + r.height * 0.7 // the period's ink sits near the baseline
   const R =
     Math.max(
       Math.hypot(cx, cy),
@@ -41,8 +43,12 @@ export default function DungeonDot() {
   const dotRef = useRef<HTMLSpanElement>(null)
   const wipeRef = useRef<HTMLDivElement | null>(null)
   const goingRef = useRef(false)
+  const [chip, setChip] = useState<{ x: number; y: number } | null>(null)
+  const [mounted, setMounted] = useState(false)
 
-  // coming back from the dungeon: the orange contracts into the dot
+  useEffect(() => setMounted(true), [])
+
+  // coming back from the dungeon: the orange contracts into the period
   useEffect(() => {
     let flagged = false
     try {
@@ -67,19 +73,29 @@ export default function DungeonDot() {
   const heroVisible = () => {
     const dot = dotRef.current
     if (!dot) return false
-    // once the hero act has scrolled away, the dot is invisible — ignore it
+    // once the hero act has scrolled away, the period is invisible — ignore it
     const act = dot.closest('.h3-a')
     return !act || parseFloat(getComputedStyle(act).opacity) >= 0.5
   }
 
   const onEnter = () => {
-    if (heroVisible()) router.prefetch('/dungeon')
+    const dot = dotRef.current
+    if (!dot || !heroVisible()) return
+    router.prefetch('/dungeon')
+    const r = dot.getBoundingClientRect()
+    setChip({
+      x: Math.min(r.right + 14, window.innerWidth - 200),
+      y: r.top + r.height * 0.55,
+    })
   }
+
+  const onLeave = () => setChip(null)
 
   const onClick = () => {
     if (goingRef.current || !heroVisible()) return
     const dot = dotRef.current
     if (!dot) return
+    router.prefetch('/dungeon')
     goingRef.current = true
     const el = makeWipe(dot)
     el.style.transform = 'scale(0.003)'
@@ -95,37 +111,49 @@ export default function DungeonDot() {
 
   return (
     <>
-      <span ref={dotRef} className="mv-dgn-dot" aria-hidden="true" onPointerEnter={onEnter} onClick={onClick}>
-        <span className="mv-dgn-tip">▸ play the game</span>
+      <span
+        ref={dotRef}
+        className="h3-ch h3-dot mv-dgn-dot"
+        onPointerEnter={onEnter}
+        onPointerLeave={onLeave}
+        onClick={onClick}
+      >
+        .
       </span>
+      {mounted &&
+        chip &&
+        createPortal(
+          <span className="mv-dgn-tip" style={{ left: chip.x, top: chip.y }} aria-hidden="true">
+            ▸ play the game
+          </span>,
+          document.body,
+        )}
       <style>{`
-        .te-home .h3-name { position: relative; }
         .mv-dgn-dot {
-          position: absolute; top: -4px; right: -20px;
-          width: 9px; height: 9px; border-radius: 50%;
-          background: ${ACID}; opacity: .9;
           cursor: pointer;
-          animation: mv-dgn-pulse 3.4s ease-in-out infinite;
+          -webkit-tap-highlight-color: transparent;
+          animation: mv-dgn-glow 3.4s ease-in-out infinite;
         }
-        .mv-dgn-dot::after { content: ''; position: absolute; inset: -10px; border-radius: 50%; }
+        @keyframes mv-dgn-glow {
+          0%, 100% { text-shadow: 0 0 0 rgba(255,94,31,0); }
+          50% { text-shadow: 0 0 20px rgba(255,94,31,.55); }
+        }
         .mv-dgn-tip {
-          position: absolute; left: 16px; top: 50%;
-          transform: translateY(-50%) translateX(-4px);
+          position: fixed; z-index: 9500;
+          transform: translateY(-50%);
           padding: 6px 9px;
           background: #16100c; color: ${ACID};
           font-family: var(--font-mono, ui-monospace, monospace);
           font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
           white-space: nowrap; line-height: 1;
           box-shadow: 0 -2px 0 0 #000, 0 2px 0 0 #000, -2px 0 0 0 #000, 2px 0 0 0 #000, 3px 4px 0 0 rgba(0,0,0,.55);
-          opacity: 0; pointer-events: none;
-          transition: opacity .18s ease, transform .18s ease;
+          pointer-events: none;
+          animation: mv-dgn-tip-in .18s ease;
         }
-        .mv-dgn-dot:hover .mv-dgn-tip { opacity: 1; transform: translateY(-50%) translateX(0); }
-        @keyframes mv-dgn-pulse {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(255,94,31,.45); }
-          50% { box-shadow: 0 0 9px 1px rgba(255,94,31,.2); }
+        @keyframes mv-dgn-tip-in {
+          from { opacity: 0; transform: translateY(-50%) translateX(-4px); }
+          to { opacity: 1; transform: translateY(-50%) translateX(0); }
         }
-        @media (pointer: coarse) { .mv-dgn-dot { display: none; } }
       `}</style>
     </>
   )
