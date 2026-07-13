@@ -8,7 +8,7 @@ import { useEffect, useReducer, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import * as THREE from 'three'
 import {
-  makeWorld, bfsPath, reachable, hasLOS, manhattan, key, isFloor,
+  makeWorld, bfsPath, reachable, hasLOS, manhattan, key, isFloor, inRoom,
   type Unit, type Item, type Vec, type Ability, type World,
 } from './core'
 
@@ -19,6 +19,8 @@ const TILE_STEP_MS = 150
 type Mode = 'explore' | 'combat' | 'dialogue' | 'victory' | 'defeat'
 
 type Popup = { unitId: string; x: number; y: number } | null
+type DlgChoice = { label: string; act: () => void }
+type Dlg = { title: string; text: string; choices: DlgChoice[] }
 
 type G = World & {
   inventory: Item[]
@@ -30,11 +32,25 @@ type G = World & {
   combatRoom: number | null
   busy: boolean
   gaveGift: boolean
-  dlg: { text: string; step: 'root' | 'reply' } | null
+  dlg: Dlg | null
   log: string
   popup: Popup
   introSeen: boolean
+  factOrder: number[]
+  factI: number
 }
+
+// doris has opinions and a good memory — all of this is true
+const FACTS = [
+  "the dev won FIRST PLACE at the csesoc 2025 flagship hackathon. built a real-time coding platform called onlycode. i don't know what that means but he seemed pleased.",
+  "unihack 2026 — his team's game 'peersuade' took home BOTH 'most fun idea' and 'best design'. double trophies. we don't have room for trophies here.",
+  "he once won a golden rubbish bin at the terrible ideas hackathon. ON PURPOSE. the game was called stall wars. he's weirdly proud of it.",
+  "unsw computer science, sydney town. came all the way from indonesia to stare at charts.",
+  "half analyst, half engineer, he says. sql and dashboards with one hand, react and node with the other.",
+  "the stats page upstairs? built the whole analytics pipeline himself — tracker, api, database. trusts no third parties. respect.",
+  "he reckons a good chart should make a room go 'oh'. i've seen it happen once. unsettling.",
+  "this entire dungeon hides behind a nine-pixel dot on his name. he genuinely thought nobody would find it. yet here you are, drinking my ale.",
+]
 
 type MeshInfo = { grp: THREE.Group; body: THREE.Group; h: number; phase: number }
 type Tween = { t0: number; dur: number; fn: (k: number) => void; res: () => void }
@@ -91,7 +107,32 @@ function makeTextures() {
   const wallTop = pixTex(8, (px, rnd) => {
     for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) px(x, y, rnd() > 0.85 ? '#17110e' : '#100c0a')
   })
-  return { floor, wall, wallTop }
+  // the tavern is warmer than the dungeon: plank floors, timbered plaster walls
+  const tavFloor = pixTex(16, (px, rnd) => {
+    for (let y = 0; y < 16; y++)
+      for (let x = 0; x < 16; x++) {
+        if (y % 4 === 0) {
+          px(x, y, '#3a2818') // plank seams
+          continue
+        }
+        const v = 0.8 + rnd() * 0.4
+        px(x, y, `rgb(${Math.floor(126 * v)},${Math.floor(88 * v)},${Math.floor(52 * v)})`)
+      }
+    // staggered plank joints
+    for (let p = 0; p < 4; p++) {
+      const jx = (p * 7 + 3) % 16
+      for (let y = p * 4 + 1; y < p * 4 + 4; y++) px(jx, y, '#4a3420')
+    }
+  })
+  const tavWall = pixTex(16, (px, rnd) => {
+    for (let y = 0; y < 16; y++)
+      for (let x = 0; x < 16; x++) {
+        const beam = x < 2 || y < 2
+        const v = 0.85 + rnd() * 0.3
+        px(x, y, beam ? '#503a24' : `rgb(${Math.floor(184 * v)},${Math.floor(166 * v)},${Math.floor(134 * v)})`)
+      }
+  })
+  return { floor, wall, wallTop, tavFloor, tavWall }
 }
 
 function faceTex(skin: string, eye: string, wide = false): THREE.CanvasTexture {
@@ -147,6 +188,28 @@ function makeUnitGroup(u: Unit): MeshInfo {
     body.add(box(0.06, 0.9, 0.06, lamb('#4a3828'), -0.3, 0.45, 0.08))
     body.add(box(0.12, 0.12, 0.12, new THREE.MeshBasicMaterial({ color: 0xffa438 }), -0.3, 0.95, 0.08))
     h = 1.25
+  } else if (u.sprite === 'ranger') {
+    body.add(box(0.34, 0.22, 0.22, lamb('#33402c'), 0, 0.11, 0))
+    body.add(box(0.42, 0.34, 0.28, lamb('#3f5a3a'), 0, 0.39, 0))
+    body.add(headWithFace(0.29, '#d9a878', '#20180f', 0.78))
+    body.add(box(0.33, 0.1, 0.33, lamb('#2f4a2c'), 0, 0.96, 0)) // hood cap
+    body.add(box(0.33, 0.3, 0.08, lamb('#2f4a2c'), 0, 0.78, -0.17)) // hood back
+    body.add(box(0.05, 0.72, 0.05, lamb('#4a3828'), 0.3, 0.5, 0)) // bow stave
+    h = 1.2
+  } else if (u.sprite === 'cleric') {
+    body.add(box(0.46, 0.5, 0.3, lamb('#cfc0a0'), 0, 0.25, 0))
+    body.add(box(0.47, 0.08, 0.31, lamb(ACID), 0, 0.06, 0)) // hem trim
+    body.add(headWithFace(0.29, '#e5b98c', '#2a1c12', 0.68))
+    body.add(box(0.32, 0.07, 0.32, lamb('#8a7550'), 0, 0.86, 0)) // cap
+    body.add(box(0.06, 0.5, 0.06, lamb('#4a3828'), -0.3, 0.45, 0))
+    body.add(box(0.14, 0.14, 0.14, lamb('#9aa0a8'), -0.3, 0.75, 0)) // mace head
+    h = 1.15
+  } else if (u.sprite === 'keeper') {
+    body.add(box(0.56, 0.44, 0.34, lamb('#6e4a2e'), 0, 0.22, 0))
+    body.add(box(0.4, 0.36, 0.06, lamb('#d8cfc0'), 0, 0.24, 0.18)) // apron
+    body.add(headWithFace(0.32, '#e0a878', '#241a12', 0.66))
+    body.add(box(0.1, 0.1, 0.1, lamb('#f5c93a'), 0.34, 0.42, 0.1)) // mug, always
+    h = 1.1
   } else if (u.sprite === 'slime') {
     body.add(headWithFace(0.6, '#59c135', '#173a0a', 0.3, true))
     h = 0.75
@@ -237,9 +300,11 @@ export default function DungeonGame() {
       busy: false,
       gaveGift: false,
       dlg: null,
-      log: 'the air smells of torch smoke and unresolved merge conflicts.',
+      log: 'the rubber duck inn hums. the dungeon waits beyond the door.',
       popup: null,
       introSeen: false,
+      factOrder: Array.from({ length: FACTS.length }, (_, i) => i).sort(() => Math.random() - 0.5),
+      factI: 0,
     }
   }
   const g = gRef.current
@@ -258,6 +323,7 @@ export default function DungeonGame() {
   const blockedSet = (except?: Unit) => {
     const s = new Set<string>()
     for (const u of g.units) if (alive(u) && u !== except) s.add(key(u.pos))
+    for (const f of g.dun.furniture) s.add(`${f.x},${f.z}`)
     return s
   }
   const log = (msg: string) => {
@@ -287,41 +353,61 @@ export default function DungeonGame() {
     const texes = makeTextures()
 
     // ── level geometry ──
+    // the tavern gets its own materials: plank floors and timbered walls
     const dun = g.dun
+    const tav = dun.rooms[0]
     const floorTiles: Vec[] = []
+    const tavFloorTiles: Vec[] = []
     const wallTiles: Vec[] = []
+    const tavWallTiles: Vec[] = []
     for (let z = 0; z < dun.h; z++)
       for (let x = 0; x < dun.w; x++) {
-        if (isFloor(dun, x, z)) floorTiles.push({ x, z })
-        else {
+        if (isFloor(dun, x, z)) {
+          ;(inRoom(tav, { x, z }) ? tavFloorTiles : floorTiles).push({ x, z })
+        } else {
           let nearFloor = false
-          for (let dz = -1; dz <= 1 && !nearFloor; dz++)
-            for (let dx = -1; dx <= 1 && !nearFloor; dx++) if (isFloor(dun, x + dx, z + dz)) nearFloor = true
-          if (nearFloor) wallTiles.push({ x, z })
+          let nearTavern = false
+          for (let dz = -1; dz <= 1; dz++)
+            for (let dx = -1; dx <= 1; dx++)
+              if (isFloor(dun, x + dx, z + dz)) {
+                nearFloor = true
+                if (inRoom(tav, { x: x + dx, z: z + dz })) nearTavern = true
+              }
+          if (nearFloor) (nearTavern ? tavWallTiles : wallTiles).push({ x, z })
         }
       }
 
     const tmpM = new THREE.Matrix4()
     const tmpC = new THREE.Color()
-    const floorMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 0.24, 1), lamb('#ffffff', { map: texes.floor }), floorTiles.length)
-    floorTiles.forEach((t, i) => {
-      tmpM.setPosition(t.x, -0.12, t.z)
-      floorMesh.setMatrixAt(i, tmpM)
-      const v = 0.82 + ((t.x * 31 + t.z * 17) % 7) * 0.035
-      floorMesh.setColorAt(i, tmpC.setRGB(v, v, v))
-    })
-    scene.add(floorMesh)
+    const addFloors = (tiles: Vec[], tex: THREE.Texture) => {
+      if (!tiles.length) return
+      const m = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 0.24, 1), lamb('#ffffff', { map: tex }), tiles.length)
+      tiles.forEach((t, i) => {
+        tmpM.setPosition(t.x, -0.12, t.z)
+        m.setMatrixAt(i, tmpM)
+        const v = 0.82 + ((t.x * 31 + t.z * 17) % 7) * 0.035
+        m.setColorAt(i, tmpC.setRGB(v, v, v))
+      })
+      scene.add(m)
+    }
+    addFloors(floorTiles, texes.floor)
+    addFloors(tavFloorTiles, texes.tavFloor)
 
-    const wallSide = lamb('#ffffff', { map: texes.wall })
-    const wallTop = lamb('#ffffff', { map: texes.wallTop })
-    const wallMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1.7, 1), [wallSide, wallSide, wallTop, wallSide, wallSide, wallSide], wallTiles.length)
-    wallTiles.forEach((t, i) => {
-      tmpM.setPosition(t.x, 0.73, t.z)
-      wallMesh.setMatrixAt(i, tmpM)
-      const v = 0.8 + ((t.x * 13 + t.z * 29) % 6) * 0.04
-      wallMesh.setColorAt(i, tmpC.setRGB(v, v, v))
-    })
-    scene.add(wallMesh)
+    const wallTopMat = lamb('#ffffff', { map: texes.wallTop })
+    const addWalls = (tiles: Vec[], tex: THREE.Texture) => {
+      if (!tiles.length) return
+      const side = lamb('#ffffff', { map: tex })
+      const m = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1.7, 1), [side, side, wallTopMat, side, side, side], tiles.length)
+      tiles.forEach((t, i) => {
+        tmpM.setPosition(t.x, 0.73, t.z)
+        m.setMatrixAt(i, tmpM)
+        const v = 0.8 + ((t.x * 13 + t.z * 29) % 6) * 0.04
+        m.setColorAt(i, tmpC.setRGB(v, v, v))
+      })
+      scene.add(m)
+    }
+    addWalls(wallTiles, texes.wall)
+    addWalls(tavWallTiles, texes.tavWall)
 
     // ── torches + lights ──
     const flames: THREE.Mesh[] = []
@@ -343,10 +429,14 @@ export default function DungeonGame() {
       scene.add(l)
       lights.push({ l, base, seed: Math.random() * 10 })
     }
-    dun.rooms.forEach((rm) => addLight(rm.x + rm.w / 2, rm.z + rm.h / 2, rm.id === 3 ? 0xff5040 : 0xff8c3a, rm.id === 3 ? 26 : 22))
-    // two corridor glows
+    // the tavern glows warmer than the dungeon proper; the vault glows wrong
+    dun.rooms.forEach((rm) =>
+      addLight(rm.x + rm.w / 2, rm.z + rm.h / 2, rm.id === 3 ? 0xff5040 : rm.id === 0 ? 0xffb054 : 0xff8c3a, rm.id === 3 ? 26 : rm.id === 0 ? 30 : 22),
+    )
+    // two corridor glows + a lantern over the bar
     addLight((dun.rooms[0].x + dun.rooms[1].x) / 2 + 2, (dun.rooms[0].z + dun.rooms[1].z) / 2 + 2, 0xff8c3a, 12)
     addLight((dun.rooms[2].x + dun.rooms[3].x) / 2 + 2, (dun.rooms[2].z + dun.rooms[3].z) / 2 + 2, 0xff8c3a, 12)
+    addLight(tav.x + 1.5, tav.z + 2.5, 0xffb054, 14)
     scene.add(new THREE.AmbientLight(0x6a5648, 0.55))
     const dir = new THREE.DirectionalLight(0x3a4a66, 0.4)
     dir.position.set(-4, 8, -6)
@@ -369,10 +459,45 @@ export default function DungeonGame() {
       itemMeshes.set(it.id, grp)
     }
 
+    // ── tavern furniture ──
+    for (const f of dun.furniture) {
+      const grp = new THREE.Group()
+      if (f.kind === 'counter') {
+        // the bar runs north–south: long axis along z
+        grp.add(box(0.85, 0.72, 1, lamb('#5a3f28'), 0, 0.36, 0))
+        grp.add(box(0.95, 0.09, 1.04, lamb('#8a6a42'), 0, 0.8, 0))
+        if ((f.x + f.z) % 2 === 0) grp.add(box(0.11, 0.12, 0.11, lamb('#f5c93a'), 0.12, 0.9, 0.22))
+      } else if (f.kind === 'table') {
+        grp.add(box(0.16, 0.5, 0.16, lamb('#3c2a1c'), 0, 0.25, 0))
+        grp.add(box(0.85, 0.09, 0.85, lamb('#5a3f2a'), 0, 0.54, 0))
+        grp.add(box(0.12, 0.12, 0.12, lamb('#f5c93a'), 0.2, 0.66, 0.12))
+      } else if (f.kind === 'chair') {
+        grp.add(box(0.52, 0.3, 0.52, lamb('#5a3f2a'), 0, 0.15, 0))
+        // backrest sits opposite the table the chair faces
+        if (f.dx) grp.add(box(0.09, 0.52, 0.52, lamb('#4a3322'), -f.dx * 0.22, 0.55, 0))
+        else grp.add(box(0.52, 0.52, 0.09, lamb('#4a3322'), 0, 0.55, -(f.dz ?? 1) * 0.22))
+      } else {
+        grp.add(box(0.6, 0.7, 0.6, lamb('#5a3a26'), 0, 0.35, 0))
+        grp.add(box(0.64, 0.07, 0.64, lamb('#2c2018'), 0, 0.2, 0))
+        grp.add(box(0.64, 0.07, 0.64, lamb('#2c2018'), 0, 0.52, 0))
+      }
+      grp.position.set(f.x, 0, f.z)
+      scene.add(grp)
+    }
+
     // ── units ──
     const meshes = new Map<string, MeshInfo>()
     for (const u of g.units) {
       const mi = makeUnitGroup(u)
+      if (u.id === 'doris') mi.grp.rotation.y = Math.PI / 2 // face the room, not the wall
+      if (u.recruit) {
+        const chair = dun.furniture.find((f) => f.kind === 'chair' && f.x === u.pos.x && f.z === u.pos.z)
+        if (chair) {
+          // perched on the seat, facing the table — they hop off when recruited
+          mi.grp.position.y = 0.3
+          mi.grp.rotation.y = Math.atan2(chair.dx ?? 0, chair.dz ?? 1)
+        }
+      }
       meshes.set(u.id, mi)
       scene.add(mi.grp)
     }
@@ -686,8 +811,12 @@ export default function DungeonGame() {
     const it = itemAt(tile)
     let html = ''
     if (u) {
-      const tag = u.faction === 'foe' ? 'foe' : u.faction === 'party' ? 'party' : 'friendly'
-      html = `<b>${u.name}</b> · ${tag}<br/>${u.hp}/${u.maxHp} hp${u.shield ? ` · ${u.shield} shield` : ''}<span class="dgn-tip-hint">right-click to inspect</span>`
+      if (u.faction === 'neutral') {
+        html = `<b>${u.name}</b> · friendly<span class="dgn-tip-hint">${u.recruit ? 'click to meet them' : 'click to talk'}</span>`
+      } else {
+        const tag = u.faction === 'foe' ? 'foe' : 'party'
+        html = `<b>${u.name}</b> · ${tag}<br/>${u.hp}/${u.maxHp} hp${u.shield ? ` · ${u.shield} shield` : ''}<span class="dgn-tip-hint">right-click to inspect</span>`
+      }
     } else if (it) {
       html = `<b>${it.name}</b><br/>${it.desc}<span class="dgn-tip-hint">click to walk over &amp; grab it</span>`
     }
@@ -1052,6 +1181,12 @@ export default function DungeonGame() {
   async function moveParty(tile: Vec, after?: () => void) {
     const leader = selectedHero() ?? heroes()[0]
     if (!leader) return
+    // nobody delves alone — the tavern door stays shut until you recruit
+    if (heroes().length < 2 && !inRoom(g.dun.rooms[0], tile)) {
+      log("doris tuts: 'nobody delves alone, love. one of these three goes with you.'")
+      bump()
+      return
+    }
     const others = heroes().filter((h) => h !== leader)
     const blocked = blockedSet(leader)
     for (const o of others) blocked.delete(key(o.pos)) // heroes flow through each other
@@ -1078,49 +1213,107 @@ export default function DungeonGame() {
     bump()
   }
 
-  function npcInteract(npc: Unit) {
-    const near = heroes().some((h) => manhattan(h.pos, npc.pos) <= 2)
-    if (near) {
-      g.mode = 'dialogue'
-      g.dlg = {
-        step: 'root',
-        text: "GAH— a user?! Nobody ever hovers the dot. I'm Puck. I haunt the hidden dev dungeon. The beast in the far vault holds the place together — or apart, hard to say.",
-      }
-      hideTip()
-      bump()
-      return
-    }
-    // walk over, then talk
-    const spots: Vec[] = [
-      { x: npc.pos.x + 1, z: npc.pos.z },
-      { x: npc.pos.x - 1, z: npc.pos.z },
-      { x: npc.pos.x, z: npc.pos.z + 1 },
-      { x: npc.pos.x, z: npc.pos.z - 1 },
-    ].filter((v) => isFloor(g.dun, v.x, v.z) && !unitAt(v))
-    if (spots.length) void moveParty(spots[0], () => npcInteract(npc))
-  }
+  // ── dialogue ───────────────────────────────────────────────────────────
 
-  function dlgChoose(choice: number) {
-    if (!g.dlg) return
-    if (choice === 0)
-      g.dlg = { step: 'reply', text: 'An easter egg. The résumé is upstairs — down here it\'s just me, some slimes, and a beast made of legacy code. Clear the vault and the dungeon is yours.' }
-    if (choice === 1) {
-      let text = 'Keep the witch at range, save the shield for the big lad.'
-      if (!g.gaveGift) {
-        g.gaveGift = true
-        g.inventory.push({ id: 'gift', name: 'cold brew of vigor', desc: 'heals your most wounded hero for 10', pos: null, effect: 'heal' })
-        text += ' Here — cold brew. I made it during standup. It\'s barely cursed.'
-      }
-      g.dlg = { step: 'reply', text }
-    }
-    if (choice === 2)
-      g.dlg = { step: 'reply', text: 'An unmerged feature branch, technically. Four thousand commits behind main and full of regrets. Don\'t be like me, traveler — ship.' }
+  const PUCK = "puck · the intern's ghost"
+  const DORIS = 'doris · keeper of the rubber duck inn'
+
+  function closeDlg() {
+    g.dlg = null
+    g.mode = 'explore'
+    bump()
+  }
+  const farewell = (): DlgChoice => ({ label: '[ farewell ]', act: closeDlg })
+
+  function say(title: string, text: string, choices: DlgChoice[]) {
+    g.mode = 'dialogue'
+    g.dlg = { title, text, choices }
+    hideTip()
     bump()
   }
 
-  function dlgClose() {
-    g.dlg = null
-    g.mode = 'explore'
+  function openPuck() {
+    say(PUCK, "GAH— a user?! Nobody ever finds this place. I'm Puck. I haunt the hidden dev dungeon. The beast in the far vault holds the place together — or apart, hard to say.", [
+      {
+        label: '“what is this place?”',
+        act: () =>
+          say(PUCK, "An easter egg. The résumé is upstairs — down here it's just me, some slimes, and a beast made of legacy code. Clear the vault and the dungeon is yours.", [farewell()]),
+      },
+      {
+        label: '“any advice before I fight?”',
+        act: () => {
+          let text = 'Keep your ranged friend at range, save the shield for the big lad.'
+          if (!g.gaveGift) {
+            g.gaveGift = true
+            g.inventory.push({ id: 'gift', name: 'cold brew of vigor', desc: 'heals your most wounded hero for 10', pos: null, effect: 'heal' })
+            text += " Here — cold brew. I made it during standup. It's barely cursed."
+          }
+          say(PUCK, text, [farewell()])
+        },
+      },
+      {
+        label: '“are you… a ghost?”',
+        act: () =>
+          say(PUCK, "An unmerged feature branch, technically. Four thousand commits behind main and full of regrets. Don't be like me, traveler — ship.", [farewell()]),
+      },
+      farewell(),
+    ])
+  }
+
+  function nextFact() {
+    if (g.factI >= g.factOrder.length) g.factI = 0
+    const fact = FACTS[g.factOrder[g.factI++]]
+    say(DORIS, fact, [{ label: '“another one.”', act: nextFact }, farewell()])
+  }
+
+  function openDoris() {
+    say(DORIS, "welcome to the rubber duck inn — last warm room before the dungeon. the dev built this whole place, y'know. what'll it be?", [
+      { label: '“tell me about the dev.”', act: nextFact },
+      {
+        label: '“who should I take below?”',
+        act: () =>
+          say(DORIS, 'the witch burns from afar, the ranger reaches further, the cleric keeps you standing. no wrong pick, love — only different funerals avoided.', [
+            farewell(),
+          ]),
+      },
+      farewell(),
+    ])
+  }
+
+  function npcInteract(npc: Unit) {
+    // radius 3 with line of sight — close enough to chat across the bar
+    const near = heroes().some((h) => manhattan(h.pos, npc.pos) <= 3 && hasLOS(g.dun, h.pos, npc.pos))
+    if (near) {
+      if (npc.id === 'doris') openDoris()
+      else openPuck()
+      return
+    }
+    // walk within earshot first — doris is boxed in behind the counter
+    const leader = selectedHero() ?? heroes()[0]
+    if (!leader) return
+    const blocked = blockedSet(leader)
+    const spots: Vec[] = []
+    for (let dz = -3; dz <= 3; dz++)
+      for (let dx = -3; dx <= 3; dx++) {
+        const d = Math.abs(dx) + Math.abs(dz)
+        if (d === 0 || d > 3) continue
+        const v = { x: npc.pos.x + dx, z: npc.pos.z + dz }
+        if (isFloor(g.dun, v.x, v.z) && !blocked.has(key(v)) && hasLOS(g.dun, v, npc.pos)) spots.push(v)
+      }
+    spots.sort((a, b) => manhattan(leader.pos, a) - manhattan(leader.pos, b))
+    for (const s of spots) {
+      if (bfsPath(g.dun, blocked, leader.pos, s)) {
+        void moveParty(s, () => npcInteract(npc))
+        return
+      }
+    }
+  }
+
+  function recruitUnit(u: Unit) {
+    if (!u.recruit || heroes().length >= 2 || g.mode !== 'explore') return
+    u.faction = 'party'
+    g.popup = null
+    log(`${u.name.toLowerCase()} ${u.title.toLowerCase()} joins the party. doris nods approvingly.`)
     bump()
   }
 
@@ -1169,7 +1362,10 @@ export default function DungeonGame() {
         g.popup = { unitId: u.id, x: cx, y: cy }
         bump()
       } else if (u?.faction === 'neutral') {
-        npcInteract(u)
+        if (u.recruit) {
+          g.popup = { unitId: u.id, x: cx, y: cy }
+          bump()
+        } else npcInteract(u)
       } else {
         void moveParty(tile)
       }
@@ -1386,18 +1582,33 @@ export default function DungeonGame() {
         </div>
       </div>
 
-      {/* inspect / engage popup */}
+      {/* inspect / engage / recruit popup */}
       {popupUnit && g.popup && (
-        <div className="dgn-pop" style={{ left: Math.min(g.popup.x, (typeof window !== 'undefined' ? window.innerWidth : 1200) - 240), top: g.popup.y }}>
+        <div className="dgn-pop" style={{ left: Math.min(g.popup.x, (typeof window !== 'undefined' ? window.innerWidth : 1200) - 260), top: g.popup.y }}>
           <b>{popupUnit.name}</b>
           <em>{popupUnit.title}</em>
-          <span>
-            {popupUnit.hp}/{popupUnit.maxHp} hp{popupUnit.shield ? ` · ${popupUnit.shield} shield` : ''}
-          </span>
+          {popupUnit.faction !== 'neutral' && (
+            <span>
+              {popupUnit.hp}/{popupUnit.maxHp} hp{popupUnit.shield ? ` · ${popupUnit.shield} shield` : ''}
+            </span>
+          )}
           <p>{popupUnit.flavor}</p>
+          {popupUnit.recruit && (
+            <span className="dgn-pop-abs">
+              {popupUnit.abilities.map((a) => (
+                <span key={a.id}>
+                  {a.name} · {a.dmg ? `${a.dmg} dmg` : a.heal ? `+${a.heal} hp` : `+${a.shield} sh`} · r{a.range}
+                </span>
+              ))}
+            </span>
+          )}
+          {popupUnit.recruit && heroes().length >= 2 && <span className="dgn-pop-note">the party is full.</span>}
           <div className="dgn-pop-row">
             {popupUnit.faction === 'foe' && g.mode === 'explore' && (
               <button className="dgn-btn acid" onClick={() => startCombat(popupUnit.roomId)}>⚔ engage</button>
+            )}
+            {popupUnit.recruit && heroes().length < 2 && g.mode === 'explore' && (
+              <button className="dgn-btn acid" onClick={() => recruitUnit(popupUnit)}>+ recruit</button>
             )}
             <button
               className="dgn-btn"
@@ -1415,19 +1626,15 @@ export default function DungeonGame() {
       {/* dialogue */}
       {g.dlg && (
         <div className="dgn-dlg">
-          <b>puck · the intern&apos;s ghost</b>
+          <b>{g.dlg.title}</b>
           <p>{g.dlg.text}</p>
-          {g.dlg.step === 'root' ? (
-            <div className="dgn-dlg-choices">
-              <button className="dgn-btn" onClick={() => dlgChoose(0)}>“what is this place?”</button>
-              <button className="dgn-btn" onClick={() => dlgChoose(1)}>“any advice before I fight?”</button>
-              <button className="dgn-btn" onClick={() => dlgChoose(2)}>“are you… a ghost?”</button>
-            </div>
-          ) : (
-            <div className="dgn-dlg-choices">
-              <button className="dgn-btn acid" onClick={dlgClose}>[ farewell ]</button>
-            </div>
-          )}
+          <div className="dgn-dlg-choices">
+            {g.dlg.choices.map((c, i) => (
+              <button key={i} className={`dgn-btn${c.label.startsWith('[') ? ' acid' : ''}`} onClick={c.act}>
+                {c.label}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
@@ -1472,7 +1679,7 @@ export default function DungeonGame() {
       {/* intro hint */}
       {!g.introSeen && (
         <div className="dgn-hint">
-          <b>mouse only.</b> click — move &amp; select · drag — pan · wheel — zoom · right-click — inspect · click a foe — engage. a ghost in the north room has notes.
+          <b>mouse only.</b> click — move &amp; talk · drag — pan · wheel — zoom · right-click — inspect. recruit a companion at a table before you descend — and doris behind the bar keeps facts about the dev on tap.
         </div>
       )}
 
@@ -1618,6 +1825,9 @@ const CSS = `
 .dgn-pop b { color: #ff9d5e; display: block; font-size: 9px; }
 .dgn-pop em { display: block; font-style: normal; color: rgba(242,234,224,.55); margin-bottom: 5px; font-size: 7px; }
 .dgn-pop p { margin: 7px 0; color: rgba(242,234,224,.75); }
+.dgn-pop-abs { display: block; margin: 7px 0; color: #ff9d5e; font-size: 7px; line-height: 2.1; }
+.dgn-pop-abs span { display: block; }
+.dgn-pop-note { display: block; color: rgba(242,234,224,.4); font-size: 7px; margin: 5px 0; }
 .dgn-pop-row { display: flex; gap: 9px; margin-top: 10px; }
 .dgn-btn {
   background: #221812; color: #f2eae0;

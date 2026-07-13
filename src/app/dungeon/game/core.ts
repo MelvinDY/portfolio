@@ -4,7 +4,7 @@ export type Vec = { x: number; z: number }
 export const key = (v: Vec) => `${v.x},${v.z}`
 export const manhattan = (a: Vec, b: Vec) => Math.abs(a.x - b.x) + Math.abs(a.z - b.z)
 
-export type Sprite = 'knight' | 'mage' | 'slime' | 'goblin' | 'skeleton' | 'boss' | 'ghost'
+export type Sprite = 'knight' | 'mage' | 'ranger' | 'cleric' | 'keeper' | 'slime' | 'goblin' | 'skeleton' | 'boss' | 'ghost'
 
 export type Ability = {
   id: string
@@ -34,6 +34,7 @@ export type Unit = {
   acted: boolean
   roomId: number
   flavor: string
+  recruit?: boolean
 }
 
 export type Item = {
@@ -46,14 +47,18 @@ export type Item = {
 
 export type Room = { id: number; x: number; z: number; w: number; h: number }
 export type Torch = { x: number; z: number; dx: number; dz: number }
+export type Furniture = { x: number; z: number; kind: 'counter' | 'table' | 'keg' | 'chair'; dx?: number; dz?: number }
 
 export type Dungeon = {
   w: number
   h: number
   cells: Uint8Array // 0 wall · 1 floor
-  rooms: Room[] // 0 entry · 1 den · 2 guard hall · 3 boss vault
+  rooms: Room[] // 0 tavern · 1 den · 2 guard hall · 3 boss vault
   torches: Torch[]
+  furniture: Furniture[] // blocks movement, purely tavern dressing
 }
+
+export const inRoom = (rm: Room, v: Vec) => v.x >= rm.x && v.x < rm.x + rm.w && v.z >= rm.z && v.z < rm.z + rm.h
 
 // mulberry32 — tiny seeded rng so each run is its own arrangement
 export function rng(seed: number) {
@@ -87,7 +92,7 @@ export function genDungeon(seed: number): Dungeon {
   }
 
   const rooms: Room[] = [
-    slot(0, 2, 9, 12, 16, 5, 6, 4, 5), // entry — bottom left
+    { id: 0, x: 2, z: 11, w: 8, h: 6 }, // the tavern — fixed layout so the furniture always fits
     slot(1, 2, 9, 2, 8, 6, 7, 5, 6), // the den — top left
     slot(2, 11, 17, 10, 16, 5, 6, 5, 6), // guard hall — bottom middle
     slot(3, 18, 24, 2, 9, 6, 7, 5, 6), // boss vault — top right
@@ -141,7 +146,47 @@ export function genDungeon(seed: number): Dungeon {
       else if (cells[idx(x - 1, z)] === 0 && (x * 11 + z * 5) % 7 === 0) torches.push({ x, z, dx: -1, dz: 0 })
     }
 
-  return { w: W, h: H, cells, rooms, torches }
+  // ── dress the tavern ──
+  // the bar runs vertically along the west wall (doris works the aisle
+  // behind it); two tables sit in the room, four chairs around each.
+  const furniture: Furniture[] = []
+  const tav = rooms[0]
+  const nearExit = (x: number, z: number) =>
+    [
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ].some(([dx, dz]) => {
+      const nx = x + dx
+      const nz = z + dz
+      return cells[idx(nx, nz)] === 1 && !inRoom(tav, { x: nx, z: nz })
+    })
+  const dress = (x: number, z: number, kind: Furniture['kind'], dx = 0, dz = 0) => {
+    if (cells[idx(x, z)] === 1 && !nearExit(x, z)) furniture.push({ x, z, kind, dx, dz })
+  }
+  const bx = tav.x + 1 // counter column
+  dress(bx, tav.z + 1, 'counter')
+  dress(bx, tav.z + 2, 'counter')
+  dress(bx, tav.z + 3, 'counter')
+  dress(tav.x, tav.z, 'keg') // kegs cap the aisle behind the bar
+  dress(tav.x, tav.z + tav.h - 1, 'keg')
+  // table one, four chairs (dx/dz point at the table — chairs face it)
+  const t1 = { x: tav.x + 3, z: tav.z + 2 }
+  dress(t1.x, t1.z, 'table')
+  dress(t1.x - 1, t1.z, 'chair', 1, 0)
+  dress(t1.x + 1, t1.z, 'chair', -1, 0)
+  dress(t1.x, t1.z - 1, 'chair', 0, 1)
+  dress(t1.x, t1.z + 1, 'chair', 0, -1)
+  // table two
+  const t2 = { x: tav.x + 6, z: tav.z + 3 }
+  dress(t2.x, t2.z, 'table')
+  dress(t2.x - 1, t2.z, 'chair', 1, 0)
+  dress(t2.x + 1, t2.z, 'chair', -1, 0)
+  dress(t2.x, t2.z - 1, 'chair', 0, 1)
+  dress(t2.x, t2.z + 1, 'chair', 0, -1)
+
+  return { w: W, h: H, cells, rooms, torches, furniture }
 }
 
 // ── pathfinding ──────────────────────────────────────────────────────────
@@ -250,6 +295,7 @@ export function makeWorld(seed: number): World {
   const dun = genDungeon(seed)
   const r = rng(seed ^ 0x9e3779b9)
   const taken = new Set<string>()
+  for (const f of dun.furniture) taken.add(`${f.x},${f.z}`)
 
   const freeTile = (rm: Room): Vec => {
     for (let tries = 0; tries < 80; tries++) {
@@ -272,16 +318,25 @@ export function makeWorld(seed: number): World {
     return { x: rm.x, z: rm.z }
   }
 
-  const [entry, den, guard, vault] = dun.rooms
+  const [tavern, den, guard, vault] = dun.rooms
   const units: Unit[] = []
 
-  const hero = (id: string, name: string, title: string, sprite: Sprite, hp: number, abilities: Ability[], flavor: string): Unit => ({
+  const hero = (
+    id: string,
+    name: string,
+    title: string,
+    sprite: Sprite,
+    hp: number,
+    abilities: Ability[],
+    flavor: string,
+    recruit = false,
+  ): Unit => ({
     id,
     name,
     title,
-    faction: 'party',
+    faction: recruit ? 'neutral' : 'party',
     sprite,
-    pos: freeTile(entry),
+    pos: freeTile(tavern),
     hp,
     maxHp: hp,
     shield: 0,
@@ -290,8 +345,9 @@ export function makeWorld(seed: number): World {
     cooldowns: abilities.map(() => 0),
     moved: false,
     acted: false,
-    roomId: entry.id,
+    roomId: tavern.id,
     flavor,
+    recruit,
   })
 
   units.push(
@@ -308,6 +364,7 @@ export function makeWorld(seed: number): World {
       ],
       'sworn to guard the main branch',
     ),
+    // the tavern regulars — recruit exactly one before descending
     hero(
       'nyx',
       'Nyx',
@@ -320,8 +377,69 @@ export function makeWorld(seed: number): World {
         ab('mend', 'mend', 'stitch an ally back together', 4, 3, { heal: 8 }),
       ],
       'she SELECTs her targets carefully',
+      true,
+    ),
+    hero(
+      'vex',
+      'Vex',
+      'the Cache Ranger',
+      'ranger',
+      26,
+      [
+        ab('shiv', 'shiv', 'a quick close cut', 1, 0, { dmg: 4 }),
+        ab('longshot', 'longshot', 'an arrow from way back', 6, 2, { dmg: 5 }),
+        ab('smokeveil', 'smoke veil', 'cover an ally in haze', 2, 3, { shield: 6 }),
+      ],
+      'hits things you can barely see. remembers everything.',
+      true,
+    ),
+    hero(
+      'odo',
+      'Odo',
+      'the Patch Cleric',
+      'cleric',
+      28,
+      [
+        ab('mace', 'mace', 'a blunt correction', 1, 0, { dmg: 5 }),
+        ab('smite', 'smite', 'a bolt of judgement', 3, 2, { dmg: 4 }),
+        ab('hotfix', 'hotfix', 'a big emergency heal', 3, 3, { heal: 10 }),
+      ],
+      'applies hotfixes to flesh. reads the patch notes aloud.',
+      true,
     ),
   )
+
+  // seat the regulars — one per chair, spread across both tables
+  const chairs = dun.furniture.filter((f) => f.kind === 'chair')
+  const seats = Array.from(new Set([chairs[0], chairs[1], chairs[4] ?? chairs[chairs.length - 1]].filter(Boolean)))
+  units
+    .filter((u) => u.recruit)
+    .forEach((u, i) => {
+      const c = seats[i]
+      if (c) u.pos = { x: c.x, z: c.z }
+    })
+
+  // doris works the aisle behind the counter, facing the room
+  const dorisPos = { x: tavern.x, z: tavern.z + 2 }
+  taken.add(key(dorisPos))
+  units.push({
+    id: 'doris',
+    name: 'Doris',
+    title: 'keeper of the rubber duck inn',
+    faction: 'neutral',
+    sprite: 'keeper',
+    pos: dorisPos,
+    hp: 1,
+    maxHp: 1,
+    shield: 0,
+    move: 0,
+    abilities: [],
+    cooldowns: [],
+    moved: false,
+    acted: false,
+    roomId: tavern.id,
+    flavor: 'pours ale and lore in equal measure. knows the dev personally.',
+  })
 
   let foeSeq = 0
   const foe = (name: string, title: string, sprite: Sprite, hp: number, move: number, rm: Room, abilities: Ability[], flavor: string): Unit => ({
