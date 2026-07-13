@@ -2,11 +2,11 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
 import type { Metadata } from "next"
 import { Inter, JetBrains_Mono, Space_Grotesk, Newsreader } from "next/font/google"
-import Script from "next/script"
 import "./globals.css"
 import type React from "react"
 import AiChatbox from "./components/ai-chatbox"
 import UtmBanner from "./components/utm-banner"
+import AnalyticsTracker from "./components/analytics-tracker"
 
 const inter = Inter({ subsets: ["latin"] })
 const jetbrainsMono = JetBrains_Mono({
@@ -44,14 +44,7 @@ export default function RootLayout({
           <AiChatbox />
           <UtmBanner />
         </ThemeProvider>
-        {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && process.env.NEXT_PUBLIC_UMAMI_SRC && (
-          <Script
-            async
-            src={process.env.NEXT_PUBLIC_UMAMI_SRC}
-            data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
-            strategy="afterInteractive"
-          />
-        )}
+        <AnalyticsTracker />
       </body>
     </html>
   )

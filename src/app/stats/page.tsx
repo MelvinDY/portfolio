@@ -1,347 +1,576 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import {
-  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  BarChart, Bar, Cell, PieChart, Pie,
-} from 'recharts'
 
+/* ─── palette (validated: dataviz six-checks, dark surface #09090b) ─── */
+const SURFACE = '#09090b'
+const CARD = '#101014'
+const HAIRLINE = 'rgba(255,255,255,0.08)'
+const INK = '#f2eae0'
+const MUTED = '#9c9ca6'
+const FAINT = '#5c5c66'
+const BRAND = '#ff5e1f' // chrome accent (text-safe, 6.5:1)
+const C1 = '#ea580c' // series 1 — views
+const C2 = '#3b82f6' // series 2 — visitors
+const C3 = '#059669' // series 3
+const GOOD = '#34d399'
+const BAD = '#f87171'
+const SERIES_COLORS = [C1, C2, C3]
+
+/* ─── types ─── */
 interface StatsData {
   configured: boolean
   error?: string
-  stats?: {
-    pageviews: { value: number; prev: number }
-    visitors: { value: number; prev: number }
-    visits: { value: number; prev: number }
-    bounces: { value: number; prev: number }
-    totaltime: { value: number; prev: number }
-  }
-  pageviews?: Array<{ x: string; y: number }>
+  range?: string
+  live?: number
+  totals?: { views: number; visitors: number; bounceRate: number; viewsPerVisitor: number }
+  prev?: { views: number; visitors: number; bounceRate: number }
+  series?: Array<{ t: string; views: number; visitors: number }>
   pages?: Array<{ x: string; y: number }>
   referrers?: Array<{ x: string; y: number }>
   countries?: Array<{ x: string; y: number }>
+  devices?: Array<{ x: string; y: number }>
+  browsers?: Array<{ x: string; y: number }>
 }
 
-const ACID = '#ff5e1f'
-const DIM = '#9c9ca6'
-const SURFACE = '#121217'
-const LINE_COLOR = 'rgba(255,255,255,0.09)'
+const RANGES = [
+  { key: '24h', label: '24H' },
+  { key: '7d', label: '7D' },
+  { key: '30d', label: '30D' },
+  { key: '90d', label: '90D' },
+] as const
 
-const REFERRER_COLORS = [ACID, '#60a5fa', '#f472b6', '#34d399', '#fb923c', '#a78bfa']
+/* ─── helpers ─── */
+const fmt = (n: number) => n.toLocaleString('en-AU')
+const compact = (n: number) =>
+  n >= 10000 ? `${(n / 1000).toFixed(1).replace(/\.0$/, '')}K` : fmt(n)
 
-function StatCard({ label, value, prev }: { label: string; value: number; prev: number }) {
-  const delta = prev > 0 ? Math.round(((value - prev) / prev) * 100) : null
+function countryName(code: string) {
+  try {
+    return new Intl.DisplayNames(['en'], { type: 'region' }).of(code) ?? code
+  } catch {
+    return code
+  }
+}
+
+function flag(code: string) {
+  if (!/^[A-Za-z]{2}$/.test(code)) return ''
+  return String.fromCodePoint(...[...code.toUpperCase()].map(c => 0x1f1e6 + c.charCodeAt(0) - 65))
+}
+
+function tickLabel(t: string, unit: 'hour' | 'day') {
+  const d = new Date(unit === 'hour' ? t : `${t}T00:00`)
+  return unit === 'hour'
+    ? d.toLocaleTimeString('en-AU', { hour: 'numeric' }).replace(' ', '')
+    : d.toLocaleDateString('en-AU', { month: 'short', day: 'numeric' })
+}
+
+/** nice ceiling: 1/2/5 × 10^n */
+function niceMax(v: number) {
+  if (v <= 4) return 4
+  const p = Math.pow(10, Math.floor(Math.log10(v)))
+  for (const m of [1, 2, 5, 10]) if (m * p >= v) return m * p
+  return 10 * p
+}
+
+/* ─── layout hooks ─── */
+function useWidth<T extends HTMLElement>() {
+  const ref = useRef<T>(null)
+  const [w, setW] = useState(0)
+  useEffect(() => {
+    if (!ref.current) return
+    const ro = new ResizeObserver(entries => setW(entries[0].contentRect.width))
+    ro.observe(ref.current)
+    return () => ro.disconnect()
+  }, [])
+  return { ref, width: w }
+}
+
+/* ─── stat tile ─── */
+function StatTile({
+  label, value, delta, deltaSuffix = '%', upIsGood = true, index,
+}: {
+  label: string
+  value: string
+  delta?: number | null
+  deltaSuffix?: string
+  upIsGood?: boolean
+  index: number
+}) {
+  const good = delta != null && (upIsGood ? delta >= 0 : delta <= 0)
   return (
-    <div style={{ background: SURFACE, border: `1px solid ${LINE_COLOR}`, borderRadius: 4, padding: '20px 24px' }}>
-      <div style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 11, letterSpacing: '0.1em', color: DIM, marginBottom: 8, textTransform: 'uppercase' }}>
-        {label}
+    <div className="tile rise" style={{ animationDelay: `${index * 60}ms` }}>
+      <div className="microlabel">{label}</div>
+      <div className="tile-value">{value}</div>
+      <div className="tile-delta" style={{ color: delta == null ? FAINT : good ? GOOD : BAD }}>
+        {delta == null ? '—' : `${delta >= 0 ? '+' : ''}${delta}${deltaSuffix} vs prev period`}
       </div>
-      <div style={{ fontSize: 32, fontWeight: 700, fontFamily: 'var(--font-space-grotesk, system-ui)', color: '#F2EAE0', lineHeight: 1 }}>
-        {value.toLocaleString()}
-      </div>
-      {delta !== null && (
-        <div style={{ fontSize: 11, fontFamily: 'var(--font-mono, monospace)', color: delta >= 0 ? ACID : '#f87171', marginTop: 6 }}>
-          {delta >= 0 ? '+' : ''}{delta}% vs prev 30d
+    </div>
+  )
+}
+
+/* ─── time series (views area + visitors line, crosshair tooltip) ─── */
+function TimeSeries({ series, unit }: { series: Array<{ t: string; views: number; visitors: number }>; unit: 'hour' | 'day' }) {
+  const { ref, width } = useWidth<HTMLDivElement>()
+  const [hover, setHover] = useState<number | null>(null)
+
+  const H = 280
+  const M = { top: 12, right: 16, bottom: 28, left: 44 }
+  const iw = Math.max(width - M.left - M.right, 0)
+  const ih = H - M.top - M.bottom
+
+  const n = series.length
+  const yMax = niceMax(Math.max(...series.map(d => Math.max(d.views, d.visitors)), 0))
+  const x = (i: number) => M.left + (n <= 1 ? iw / 2 : (i / (n - 1)) * iw)
+  const y = (v: number) => M.top + ih - (v / yMax) * ih
+
+  const line = (key: 'views' | 'visitors') =>
+    series.map((d, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(d[key]).toFixed(1)}`).join('')
+  const area = `${line('views')}L${x(n - 1).toFixed(1)},${y(0)}L${x(0).toFixed(1)},${y(0)}Z`
+
+  const yTicks = [0, 0.25, 0.5, 0.75, 1].map(f => Math.round(yMax * f))
+  const xTickEvery = Math.max(1, Math.ceil(n / (width < 560 ? 4 : 8)))
+
+  const onMove = useCallback((e: React.PointerEvent<SVGSVGElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const px = e.clientX - rect.left
+    const i = Math.round(((px - M.left) / Math.max(iw, 1)) * (n - 1))
+    setHover(Math.max(0, Math.min(n - 1, i)))
+  }, [iw, n, M.left])
+
+  const h = hover != null ? series[hover] : null
+  const tooltipLeft = h && width > 0 ? Math.min(Math.max(x(hover!) + 14, M.left), width - 170) : 0
+
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      {width > 0 && (
+        <svg
+          width={width}
+          height={H}
+          role="img"
+          aria-label="Traffic over time: page views and unique visitors"
+          onPointerMove={onMove}
+          onPointerLeave={() => setHover(null)}
+          style={{ display: 'block', touchAction: 'pan-y' }}
+        >
+          {/* gridlines — hairline, recessive */}
+          {yTicks.map(v => (
+            <g key={v}>
+              <line x1={M.left} x2={width - M.right} y1={y(v)} y2={y(v)} stroke={HAIRLINE} strokeWidth={1} />
+              <text x={M.left - 8} y={y(v) + 3} textAnchor="end" fill={FAINT} fontSize={10} fontFamily="var(--font-mono, monospace)">
+                {compact(v)}
+              </text>
+            </g>
+          ))}
+          {/* x ticks — drop any modulo tick that would collide with the final label */}
+          {series.map((d, i) => {
+            const isLast = i === n - 1
+            const show = isLast || (i % xTickEvery === 0 && n - 1 - i > xTickEvery * 0.6)
+            return show ? (
+              <text
+                key={d.t}
+                x={isLast ? x(i) + 6 : x(i)}
+                y={H - 8}
+                textAnchor={isLast ? 'end' : 'middle'}
+                fill={FAINT}
+                fontSize={10}
+                fontFamily="var(--font-mono, monospace)"
+              >
+                {tickLabel(d.t, unit)}
+              </text>
+            ) : null
+          })}
+          {/* views: 10% wash + 2px line */}
+          <path d={area} fill={C1} opacity={0.1} />
+          <path d={line('views')} fill="none" stroke={C1} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+          {/* visitors: 2px line */}
+          <path d={line('visitors')} fill="none" stroke={C2} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+
+          {/* crosshair + markers with surface ring */}
+          {h && (
+            <g>
+              <line x1={x(hover!)} x2={x(hover!)} y1={M.top} y2={M.top + ih} stroke="rgba(255,255,255,0.22)" strokeWidth={1} />
+              <circle cx={x(hover!)} cy={y(h.views)} r={4} fill={C1} stroke={SURFACE} strokeWidth={2} />
+              <circle cx={x(hover!)} cy={y(h.visitors)} r={4} fill={C2} stroke={SURFACE} strokeWidth={2} />
+            </g>
+          )}
+        </svg>
+      )}
+
+      {/* tooltip — one readout, every series; values lead */}
+      {h && (
+        <div className="chart-tooltip" style={{ left: tooltipLeft }}>
+          <div style={{ color: FAINT, marginBottom: 6 }}>
+            {unit === 'hour'
+              ? new Date(h.t).toLocaleString('en-AU', { hour: 'numeric', minute: '2-digit' })
+              : new Date(`${h.t}T00:00`).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric' })}
+          </div>
+          <div className="tt-row"><span className="tt-key" style={{ background: C1 }} /><strong>{fmt(h.views)}</strong>&nbsp;views</div>
+          <div className="tt-row"><span className="tt-key" style={{ background: C2 }} /><strong>{fmt(h.visitors)}</strong>&nbsp;visitors</div>
         </div>
       )}
+
+      {/* screen-reader table — tooltip never gates */}
+      <table className="sr-only">
+        <caption>Traffic over time</caption>
+        <thead><tr><th>Time</th><th>Views</th><th>Visitors</th></tr></thead>
+        <tbody>
+          {series.map(d => (
+            <tr key={d.t}><td>{d.t}</td><td>{d.views}</td><td>{d.visitors}</td></tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }
 
-function SetupGuide() {
+/* ─── bar list (nominal categories → single hue, value at row end) ─── */
+function BarList({
+  items, format = (s: string) => s, emptyNote,
+}: {
+  items: Array<{ x: string; y: number }>
+  format?: (x: string) => React.ReactNode
+  emptyNote: string
+}) {
+  const max = Math.max(...items.map(i => i.y), 1)
+  if (items.length === 0) return <div className="empty-note">{emptyNote}</div>
   return (
-    <div style={{ maxWidth: 640, margin: '0 auto', padding: '48px 24px' }}>
-      <div style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 11, letterSpacing: '0.1em', color: ACID, marginBottom: 16 }}>
-        SETUP REQUIRED
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {items.map((item, i) => (
+        <div key={`${item.x}-${i}`} className="bar-row">
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, marginBottom: 5 }}>
+            <span className="bar-label">{format(item.x)}</span>
+            <span className="bar-value">{fmt(item.y)}</span>
+          </div>
+          <div style={{ height: 6 }}>
+            <div
+              className="bar-fill"
+              style={{ width: `${Math.max((item.y / max) * 100, 1.5)}%` }}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/* ─── devices: single stacked bar, 2px surface gaps, legend ─── */
+function DeviceSplit({ devices }: { devices: Array<{ x: string; y: number }> }) {
+  const order = ['desktop', 'mobile', 'tablet']
+  const sorted = order.map(k => devices.find(d => d.x === k)).filter(Boolean) as Array<{ x: string; y: number }>
+  const total = sorted.reduce((s, d) => s + d.y, 0)
+  if (total === 0) return <div className="empty-note">No device data yet</div>
+  return (
+    <div>
+      <div style={{ display: 'flex', height: 20, borderRadius: 4, overflow: 'hidden', gap: 2, background: SURFACE }}>
+        {sorted.map((d, i) => (
+          <div key={d.x} title={`${d.x}: ${fmt(d.y)} visitors`} style={{ width: `${(d.y / total) * 100}%`, minWidth: 4, background: SERIES_COLORS[i] }} />
+        ))}
       </div>
-      <h2 style={{ fontSize: 28, fontWeight: 700, color: '#F2EAE0', marginBottom: 16 }}>Connect Umami Analytics</h2>
-      <p style={{ color: DIM, lineHeight: 1.7, marginBottom: 32, fontSize: 15 }}>
-        This page pulls live data from Umami — an open-source, privacy-friendly analytics platform. No cookies, no GDPR consent banners needed.
-      </p>
-      <ol style={{ color: DIM, lineHeight: 2, fontSize: 14, paddingLeft: 20, marginBottom: 32 }}>
-        <li>Sign up free at <span style={{ color: ACID, fontFamily: 'monospace' }}>umami.is</span></li>
-        <li>Add your website and copy the <strong style={{ color: '#F2EAE0' }}>Website ID</strong></li>
-        <li>Generate an <strong style={{ color: '#F2EAE0' }}>API Key</strong> in Settings → API Keys</li>
-        <li>Add to your <code style={{ background: SURFACE, padding: '1px 6px', borderRadius: 3, color: ACID }}>{"`.env.local`"}</code>:</li>
-      </ol>
-      <pre style={{ background: SURFACE, border: `1px solid ${LINE_COLOR}`, borderRadius: 4, padding: '16px 20px', fontFamily: 'monospace', fontSize: 13, color: '#F2EAE0', overflowX: 'auto', marginBottom: 32 }}>
-{`NEXT_PUBLIC_UMAMI_WEBSITE_ID=your-website-id
-UMAMI_API_KEY=your-api-key
-UMAMI_WEBSITE_ID=your-website-id`}
-      </pre>
-      <p style={{ color: DIM, fontSize: 13, lineHeight: 1.6 }}>
-        Add <code style={{ color: ACID, fontFamily: 'monospace' }}>{"?utm_source=linkedin"}</code> to your LinkedIn profile URL so referrer data starts tracking from day one.
-      </p>
+      <div style={{ display: 'flex', gap: 18, marginTop: 12, flexWrap: 'wrap' }}>
+        {sorted.map((d, i) => (
+          <div key={d.x} style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12 }}>
+            <span style={{ width: 10, height: 10, borderRadius: 2, background: SERIES_COLORS[i], flexShrink: 0 }} />
+            <span style={{ color: MUTED, textTransform: 'capitalize' }}>{d.x}</span>
+            <span style={{ color: INK, fontFamily: 'var(--font-mono, monospace)', fontSize: 11 }}>
+              {Math.round((d.y / total) * 100)}%
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
 
-function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number }>; label?: string }) {
-  if (!active || !payload?.length) return null
-  return (
-    <div style={{ background: '#1a1a22', border: `1px solid ${LINE_COLOR}`, borderRadius: 4, padding: '8px 14px', fontFamily: 'monospace', fontSize: 12, color: '#F2EAE0' }}>
-      <div style={{ color: DIM, marginBottom: 4 }}>{label}</div>
-      <div style={{ color: ACID }}>{payload[0].value.toLocaleString()} views</div>
-    </div>
-  )
-}
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('en-AU', { month: 'short', day: 'numeric' })
-}
-
-function shortUrl(url: string) {
-  return url.replace(/^https?:\/\/[^/]+/, '') || '/'
-}
-
-function shortReferrer(ref: string) {
-  if (!ref) return 'Direct'
-  try { return new URL(ref.startsWith('http') ? ref : `https://${ref}`).hostname.replace('www.', '') }
-  catch { return ref }
-}
-
+/* ─── page ─── */
 export default function StatsPage() {
+  const [range, setRange] = useState<string>('30d')
   const [data, setData] = useState<StatsData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [refetching, setRefetching] = useState(false)
 
   useEffect(() => {
-    fetch('/api/stats')
+    let cancelled = false
+    setRefetching(true)
+    fetch(`/api/stats?range=${range}`)
       .then(r => r.json())
-      .then(setData)
-      .finally(() => setLoading(false))
-  }, [])
+      .then(d => { if (!cancelled) setData(d) })
+      .catch(() => { if (!cancelled) setData({ configured: true, error: 'Failed to load analytics' }) })
+      .finally(() => { if (!cancelled) { setLoading(false); setRefetching(false) } })
+    return () => { cancelled = true }
+  }, [range])
 
-  const styles = {
-    page: {
-      minHeight: '100vh',
-      background: '#09090b',
-      color: '#F2EAE0',
-      fontFamily: 'var(--font-space-grotesk, system-ui, sans-serif)',
-    } as React.CSSProperties,
-    wrap: {
-      maxWidth: 1280,
-      margin: '0 auto',
-      padding: '0 clamp(20px, 5vw, 64px)',
-    } as React.CSSProperties,
-  }
+  const t = data?.totals
+  const p = data?.prev
+  const pct = (cur: number, prev: number) => (prev > 0 ? Math.round(((cur - prev) / prev) * 100) : null)
+  const unit = range === '24h' ? 'hour' : 'day'
+  const hasAny = (t?.views ?? 0) > 0 || (p?.views ?? 0) > 0
 
   return (
-    <div style={styles.page}>
-      {/* Header */}
-      <header style={{ borderBottom: `1px solid ${LINE_COLOR}`, position: 'sticky', top: 0, background: '#09090b', zIndex: 50 }}>
-        <div style={{ ...styles.wrap, display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56 }}>
-          <Link href="/" style={{ fontWeight: 700, color: '#F2EAE0', textDecoration: 'none', fontSize: 15 }}>
-            ← MelvinDY
-          </Link>
-          <span style={{ fontFamily: 'monospace', fontSize: 11, letterSpacing: '0.1em', color: DIM, textTransform: 'uppercase' }}>
-            Site Analytics · Last 30 days
+    <div className="stats-page">
+      <style>{css}</style>
+
+      {/* header */}
+      <header className="stats-header">
+        <div className="wrap stats-header-in">
+          <Link href="/" className="back-link">← MelvinDY</Link>
+          <span className="microlabel" style={{ marginBottom: 0 }}>The Data Room</span>
+          <span className="live-badge" title="Unique visitors in the last 5 minutes">
+            <span className="live-dot" />
+            {data?.live ?? 0} live
           </span>
         </div>
       </header>
 
-      <main style={{ ...styles.wrap, paddingTop: 48, paddingBottom: 80 }}>
-
+      <main className="wrap" style={{ paddingTop: 56, paddingBottom: 96 }}>
         {loading && (
-          <div style={{ textAlign: 'center', padding: '80px 0', fontFamily: 'monospace', fontSize: 13, color: DIM }}>
-            fetching data...
-          </div>
+          <div className="loading-note">measuring<span className="blink">_</span></div>
         )}
 
-        {!loading && data && !data.configured && <SetupGuide />}
+        {!loading && data && !data.configured && (
+          <div className="center-note">
+            <div className="microlabel" style={{ color: BRAND }}>Setup required</div>
+            <p>Set <code>DATABASE_URL</code> and <code>ANALYTICS_SALT</code> in the environment to switch the analytics pipeline on.</p>
+          </div>
+        )}
 
         {!loading && data?.configured && data.error && (
-          <div style={{ maxWidth: 520, margin: '0 auto', padding: '80px 24px', textAlign: 'center' }}>
-            <div style={{ fontFamily: 'monospace', fontSize: 11, letterSpacing: '0.1em', color: '#f87171', marginBottom: 16 }}>
-              ANALYTICS UNAVAILABLE
-            </div>
-            <p style={{ color: DIM, lineHeight: 1.7, fontSize: 14 }}>
-              Couldn&apos;t reach the analytics backend right now. Live data will return once the connection is restored.
-            </p>
+          <div className="center-note">
+            <div className="microlabel" style={{ color: BAD }}>Analytics unavailable</div>
+            <p>Couldn&apos;t reach the database right now. Live data will return once the connection is restored.</p>
           </div>
         )}
 
-        {!loading && data?.configured && data.stats && !data.error && (
-          <>
-            {/* Hero line */}
-            <div style={{ marginBottom: 40 }}>
-              <div style={{ fontFamily: 'monospace', fontSize: 11, letterSpacing: '0.1em', color: ACID, marginBottom: 12, textTransform: 'uppercase' }}>
-                live · portfolio.melvindy.com
+        {!loading && data?.configured && t && !data.error && (
+          <div style={{ opacity: refetching ? 0.55 : 1, transition: 'opacity 200ms ease' }}>
+            {/* hero */}
+            <div className="rise" style={{ marginBottom: 44 }}>
+              <div className="microlabel" style={{ color: BRAND, marginBottom: 14 }}>
+                first-party · cookieless · anonymised daily
               </div>
-              <h1 style={{ fontSize: 'clamp(28px, 5vw, 48px)', fontWeight: 700, lineHeight: 1.1, margin: 0 }}>
-                Who&apos;s been reading<br />
-                <span style={{ color: ACID }}>the work.</span>
+              <h1 className="hero-title">
+                Who&apos;s been reading<br /><span style={{ color: BRAND }}>the work.</span>
               </h1>
+              <p className="hero-sub">
+                Every number on this page comes from an analytics pipeline built into this site —
+                a 60-line tracker, a Postgres table, and SQL. No third parties, no cookies.
+              </p>
             </div>
 
-            {/* Stat cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 48 }}>
-              <StatCard label="Page Views" value={data.stats.pageviews.value} prev={data.stats.pageviews.prev} />
-              <StatCard label="Unique Visitors" value={data.stats.visitors.value} prev={data.stats.visitors.prev} />
-              <StatCard label="Sessions" value={data.stats.visits.value} prev={data.stats.visits.prev} />
-              <StatCard
-                label="Avg Session (min)"
-                value={Math.round(data.stats.totaltime.value / Math.max(data.stats.visits.value, 1) / 60)}
-                prev={Math.round(data.stats.totaltime.prev / Math.max(data.stats.visits.prev, 1) / 60)}
-              />
+            {/* filter row — scopes everything below */}
+            <div className="range-row rise" style={{ animationDelay: '40ms' }}>
+              {RANGES.map(r => (
+                <button
+                  key={r.key}
+                  className={`range-btn ${range === r.key ? 'on' : ''}`}
+                  onClick={() => setRange(r.key)}
+                >
+                  {r.label}
+                </button>
+              ))}
+              <span className="range-note">Australia/Sydney</span>
             </div>
 
-            {/* Pageviews chart */}
-            {data.pageviews && data.pageviews.length > 0 && (
-              <div style={{ background: SURFACE, border: `1px solid ${LINE_COLOR}`, borderRadius: 4, padding: '24px', marginBottom: 24 }}>
-                <div style={{ fontFamily: 'monospace', fontSize: 11, letterSpacing: '0.1em', color: DIM, marginBottom: 20, textTransform: 'uppercase' }}>
-                  Page Views — Daily
+            {/* KPI row */}
+            <div className="tile-grid">
+              <StatTile index={0} label="Page views" value={compact(t.views)} delta={pct(t.views, p!.views)} />
+              <StatTile index={1} label="Unique visitors" value={compact(t.visitors)} delta={pct(t.visitors, p!.visitors)} />
+              <StatTile index={2} label="Bounce rate" value={`${t.bounceRate}%`} delta={p!.visitors > 0 ? t.bounceRate - p!.bounceRate : null} deltaSuffix="pp" upIsGood={false} />
+              <StatTile index={3} label="Views / visitor" value={`${t.viewsPerVisitor}`} delta={null} />
+            </div>
+
+            {/* traffic chart */}
+            <section className="card rise" style={{ animationDelay: '120ms', marginBottom: 20 }}>
+              <div className="card-head">
+                <span className="microlabel" style={{ marginBottom: 0 }}>Traffic</span>
+                <div className="legend">
+                  <span className="legend-item"><span className="legend-line" style={{ background: C1 }} />Views</span>
+                  <span className="legend-item"><span className="legend-line" style={{ background: C2 }} />Visitors</span>
                 </div>
-                <ResponsiveContainer width="100%" height={200}>
-                  <LineChart data={data.pageviews} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
-                    <XAxis
-                      dataKey="x"
-                      tickFormatter={formatDate}
-                      tick={{ fill: DIM, fontSize: 10, fontFamily: 'monospace' }}
-                      axisLine={false}
-                      tickLine={false}
-                      interval="preserveStartEnd"
-                    />
-                    <YAxis
-                      tick={{ fill: DIM, fontSize: 10, fontFamily: 'monospace' }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Line
-                      type="monotone"
-                      dataKey="y"
-                      stroke={ACID}
-                      strokeWidth={2}
-                      dot={false}
-                      activeDot={{ r: 4, fill: ACID, strokeWidth: 0 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+              </div>
+              {data.series && data.series.length > 0 ? (
+                <TimeSeries series={data.series} unit={unit} />
+              ) : (
+                <div className="empty-note">No traffic in this window yet</div>
+              )}
+            </section>
+
+            {/* breakdown grid */}
+            <div className="break-grid">
+              <section className="card rise" style={{ animationDelay: '160ms' }}>
+                <div className="card-head"><span className="microlabel" style={{ marginBottom: 0 }}>Top pages</span><span className="unit-note">views</span></div>
+                <BarList items={data.pages ?? []} emptyNote="No pageviews yet" />
+              </section>
+
+              <section className="card rise" style={{ animationDelay: '200ms' }}>
+                <div className="card-head"><span className="microlabel" style={{ marginBottom: 0 }}>Referrers</span><span className="unit-note">visitors</span></div>
+                <BarList
+                  items={data.referrers ?? []}
+                  format={x => (x === 'direct' ? <em style={{ fontStyle: 'normal', color: FAINT }}>direct / none</em> : x)}
+                  emptyNote="No referrers yet"
+                />
+              </section>
+
+              <section className="card rise" style={{ animationDelay: '240ms' }}>
+                <div className="card-head"><span className="microlabel" style={{ marginBottom: 0 }}>Countries</span><span className="unit-note">visitors</span></div>
+                <BarList
+                  items={data.countries ?? []}
+                  format={code => <>{flag(code)}&nbsp;&nbsp;{countryName(code)}</>}
+                  emptyNote="Geo data appears once deployed on Vercel"
+                />
+              </section>
+
+              <section className="card rise" style={{ animationDelay: '280ms' }}>
+                <div className="card-head"><span className="microlabel" style={{ marginBottom: 0 }}>Devices &amp; browsers</span><span className="unit-note">visitors</span></div>
+                <DeviceSplit devices={data.devices ?? []} />
+                <div style={{ height: 24 }} />
+                <BarList items={data.browsers ?? []} emptyNote="No browser data yet" />
+              </section>
+            </div>
+
+            {!hasAny && (
+              <div className="collecting rise" style={{ animationDelay: '320ms' }}>
+                <span className="live-dot" style={{ position: 'static' }} />
+                The pipeline is live and listening — charts fill in as visits arrive.
               </div>
             )}
 
-            {/* Bottom grid: pages + referrers + countries */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
-
-              {/* Top pages */}
-              {data.pages && data.pages.length > 0 && (
-                <div style={{ background: SURFACE, border: `1px solid ${LINE_COLOR}`, borderRadius: 4, padding: '24px' }}>
-                  <div style={{ fontFamily: 'monospace', fontSize: 11, letterSpacing: '0.1em', color: DIM, marginBottom: 20, textTransform: 'uppercase' }}>
-                    Top Pages
-                  </div>
-                  <ResponsiveContainer width="100%" height={220}>
-                    <BarChart data={data.pages} layout="vertical" margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                      <XAxis type="number" hide />
-                      <YAxis
-                        type="category"
-                        dataKey="x"
-                        tickFormatter={shortUrl}
-                        tick={{ fill: DIM, fontSize: 10, fontFamily: 'monospace' }}
-                        axisLine={false}
-                        tickLine={false}
-                        width={110}
-                      />
-                      <Tooltip
-                        cursor={{ fill: 'rgba(255,255,255,0.03)' }}
-                        content={({ active, payload }) =>
-                          active && payload?.length ? (
-                            <div style={{ background: '#1a1a22', border: `1px solid ${LINE_COLOR}`, borderRadius: 4, padding: '6px 12px', fontFamily: 'monospace', fontSize: 12, color: ACID }}>
-                              {payload[0].value} views
-                            </div>
-                          ) : null
-                        }
-                      />
-                      <Bar dataKey="y" radius={[0, 2, 2, 0]}>
-                        {data.pages.map((_, i) => (
-                          <Cell key={i} fill={i === 0 ? ACID : `rgba(255,94,31,${0.6 - i * 0.06})`} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
-
-              {/* Referrers */}
-              {data.referrers && data.referrers.length > 0 && (
-                <div style={{ background: SURFACE, border: `1px solid ${LINE_COLOR}`, borderRadius: 4, padding: '24px' }}>
-                  <div style={{ fontFamily: 'monospace', fontSize: 11, letterSpacing: '0.1em', color: DIM, marginBottom: 20, textTransform: 'uppercase' }}>
-                    Top Referrers
-                  </div>
-                  <ResponsiveContainer width="100%" height={180}>
-                    <PieChart>
-                      <Pie
-                        data={data.referrers}
-                        dataKey="y"
-                        nameKey="x"
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={50}
-                        outerRadius={80}
-                        strokeWidth={0}
-                      >
-                        {data.referrers.map((_, i) => (
-                          <Cell key={i} fill={REFERRER_COLORS[i % REFERRER_COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        content={({ active, payload }) =>
-                          active && payload?.length ? (
-                            <div style={{ background: '#1a1a22', border: `1px solid ${LINE_COLOR}`, borderRadius: 4, padding: '6px 12px', fontFamily: 'monospace', fontSize: 12, color: '#F2EAE0' }}>
-                              <div style={{ color: DIM }}>{shortReferrer(payload[0].name as string)}</div>
-                              <div style={{ color: ACID }}>{payload[0].value} sessions</div>
-                            </div>
-                          ) : null
-                        }
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8 }}>
-                    {data.referrers.slice(0, 5).map((r, i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
-                        <span style={{ width: 8, height: 8, borderRadius: '50%', background: REFERRER_COLORS[i % REFERRER_COLORS.length], flexShrink: 0 }} />
-                        <span style={{ color: DIM, fontFamily: 'monospace', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{shortReferrer(r.x)}</span>
-                        <span style={{ color: '#F2EAE0', fontFamily: 'monospace' }}>{r.y}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Countries */}
-              {data.countries && data.countries.length > 0 && (
-                <div style={{ background: SURFACE, border: `1px solid ${LINE_COLOR}`, borderRadius: 4, padding: '24px' }}>
-                  <div style={{ fontFamily: 'monospace', fontSize: 11, letterSpacing: '0.1em', color: DIM, marginBottom: 20, textTransform: 'uppercase' }}>
-                    Visitors by Country
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    {data.countries.map((c, i) => {
-                      const max = data.countries![0].y
-                      const pct = Math.round((c.y / max) * 100)
-                      return (
-                        <div key={i}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, fontSize: 12, fontFamily: 'monospace' }}>
-                            <span style={{ color: DIM }}>{c.x}</span>
-                            <span style={{ color: '#F2EAE0' }}>{c.y}</span>
-                          </div>
-                          <div style={{ height: 3, background: 'rgba(255,255,255,0.08)', borderRadius: 2 }}>
-                            <div style={{ height: '100%', width: `${pct}%`, background: i === 0 ? ACID : `rgba(255,94,31,${0.55 - i * 0.06})`, borderRadius: 2 }} />
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
+            {/* footer note */}
+            <div className="foot-note">
+              Built in-house · Next.js route handler → Neon Postgres · visitors are a salted
+              hash that rotates every 24h · no cookies, no fingerprinting, nothing to consent to
             </div>
-
-            {/* Footer note */}
-            <div style={{ marginTop: 40, fontFamily: 'monospace', fontSize: 11, color: DIM, textAlign: 'center' }}>
-              Powered by <a href="https://umami.is" target="_blank" rel="noopener noreferrer" style={{ color: ACID, textDecoration: 'none' }}>Umami Analytics</a> · No cookies · GDPR-friendly
-            </div>
-          </>
+          </div>
         )}
       </main>
     </div>
   )
 }
+
+/* ─── styles ─── */
+const css = `
+.stats-page {
+  min-height: 100vh;
+  background: ${SURFACE};
+  color: ${INK};
+  font-family: var(--font-space-grotesk, system-ui, sans-serif);
+}
+.wrap { max-width: 1200px; margin: 0 auto; padding-left: clamp(20px, 5vw, 56px); padding-right: clamp(20px, 5vw, 56px); }
+
+.stats-header {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(9,9,11,0.85); backdrop-filter: blur(12px);
+  border-bottom: 1px solid ${HAIRLINE};
+}
+.stats-header-in { display: flex; align-items: center; justify-content: space-between; height: 56px; gap: 16px; }
+.back-link { color: ${INK}; text-decoration: none; font-weight: 700; font-size: 15px; }
+.back-link:hover { color: ${BRAND}; }
+
+.microlabel {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: ${MUTED}; margin-bottom: 10px;
+}
+
+.live-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono, monospace); font-size: 11px; letter-spacing: 0.08em;
+  color: ${MUTED}; border: 1px solid ${HAIRLINE}; border-radius: 999px; padding: 5px 12px;
+}
+.live-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: ${BRAND};
+  animation: pulse 2s ease-in-out infinite; flex-shrink: 0;
+}
+@keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.35 } }
+
+.hero-title {
+  font-size: clamp(34px, 6vw, 64px); font-weight: 700; line-height: 1.04;
+  letter-spacing: -0.02em; margin: 0 0 18px;
+}
+.hero-sub { color: ${MUTED}; max-width: 520px; line-height: 1.65; font-size: 15px; margin: 0; }
+
+.range-row { display: flex; align-items: center; gap: 6px; margin-bottom: 20px; }
+.range-btn {
+  font-family: var(--font-mono, monospace); font-size: 11px; letter-spacing: 0.1em;
+  background: none; border: 1px solid transparent; border-radius: 3px;
+  color: ${FAINT}; padding: 7px 14px; cursor: pointer; transition: color 150ms, border-color 150ms;
+}
+.range-btn:hover { color: ${INK}; }
+.range-btn.on { color: ${BRAND}; border-color: rgba(255,94,31,0.4); }
+.range-note { margin-left: auto; font-family: var(--font-mono, monospace); font-size: 10px; letter-spacing: 0.08em; color: ${FAINT}; }
+
+.tile-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+@media (max-width: 980px) { .tile-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 400px) { .tile-grid { grid-template-columns: 1fr; } }
+.tile { background: ${CARD}; border: 1px solid ${HAIRLINE}; border-radius: 6px; padding: 20px 22px; }
+.tile-value { font-size: 36px; font-weight: 700; line-height: 1.05; letter-spacing: -0.01em; margin: 2px 0 8px; }
+.tile-delta { font-family: var(--font-mono, monospace); font-size: 11px; }
+
+.card { background: ${CARD}; border: 1px solid ${HAIRLINE}; border-radius: 6px; padding: 22px 24px; }
+.card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+.unit-note { font-family: var(--font-mono, monospace); font-size: 10px; color: ${FAINT}; letter-spacing: 0.08em; }
+
+.legend { display: flex; gap: 16px; }
+.legend-item { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: ${MUTED}; }
+.legend-line { width: 14px; height: 2px; border-radius: 1px; }
+
+.chart-tooltip {
+  position: absolute; top: 10px; pointer-events: none;
+  background: #1a1a21; border: 1px solid rgba(255,255,255,0.12); border-radius: 5px;
+  padding: 10px 14px; font-family: var(--font-mono, monospace); font-size: 12px; color: ${INK};
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5); min-width: 140px; z-index: 10;
+}
+.tt-row { display: flex; align-items: center; margin-top: 3px; color: ${MUTED}; }
+.tt-row strong { color: ${INK}; font-weight: 600; }
+.tt-key { width: 10px; height: 2px; border-radius: 1px; margin-right: 8px; flex-shrink: 0; }
+
+.break-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+
+.bar-label {
+  font-family: var(--font-mono, monospace); font-size: 12px; color: ${MUTED};
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+}
+.bar-value { font-family: var(--font-mono, monospace); font-size: 12px; color: ${INK}; font-variant-numeric: tabular-nums; }
+.bar-fill {
+  height: 100%; background: ${C1};
+  border-radius: 0 4px 4px 0; /* rounded data-end, square baseline */
+  transition: width 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.bar-row:hover .bar-fill { filter: brightness(1.2); }
+.bar-row:hover .bar-label { color: ${INK}; }
+
+.empty-note, .loading-note { font-family: var(--font-mono, monospace); font-size: 12px; color: ${FAINT}; padding: 18px 0; }
+.loading-note { text-align: center; padding: 120px 0; }
+.blink { animation: blink 1s step-start infinite; }
+@keyframes blink { 50% { opacity: 0 } }
+
+.center-note { max-width: 520px; margin: 0 auto; padding: 100px 24px; text-align: center; }
+.center-note p { color: ${MUTED}; line-height: 1.7; font-size: 14px; }
+.center-note code { color: ${BRAND}; font-family: var(--font-mono, monospace); font-size: 13px; }
+
+.collecting {
+  display: flex; align-items: center; gap: 10px; justify-content: center;
+  margin-top: 32px; font-family: var(--font-mono, monospace); font-size: 12px; color: ${MUTED};
+}
+
+.foot-note {
+  margin-top: 56px; text-align: center;
+  font-family: var(--font-mono, monospace); font-size: 11px; line-height: 1.8; color: ${FAINT};
+  max-width: 560px; margin-left: auto; margin-right: auto;
+}
+
+.rise { animation: rise 600ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: none } }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise { animation: none; }
+  .live-dot { animation: none; }
+  .bar-fill { transition: none; }
+}
+`
