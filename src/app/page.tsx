@@ -7,6 +7,7 @@ import TeHeader from './components/te-header'
 import TeHero from './components/te-hero'
 import TeCursor from './components/te-cursor'
 import HomeTelemetry from './components/home-telemetry'
+import ScrollProgress from './components/scroll-progress'
 
 type InkWord = { t: string; acid?: boolean }
 
@@ -53,6 +54,7 @@ export default function HomePage() {
     <div className="te-home">
       <TeCursor />
       <TeHeader />
+      <ScrollProgress />
 
       <main>
         {/* HERO */}

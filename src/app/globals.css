@@ -733,6 +733,12 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 .te-home .h3-hud-br { bottom: 20px; right: var(--pad); color: var(--acid); }
 .te-home .h3-pct { font-weight: 600; color: var(--ink); }
 
+/* fixed page-scroll counter — inherits the hero HUD's top-right slot */
+.te-home .scroll-progress { position: fixed; top: 84px; right: var(--pad); z-index: 60; font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-faint); pointer-events: none; opacity: 0; transition: opacity 0.4s; }
+.te-home .scroll-progress b { font-weight: 600; color: var(--ink); }
+.te-home .scroll-progress.sp-on { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .te-home .scroll-progress { transition: none; } }
+
 /* the three acts */
 .te-home .h3-stage { position: absolute; inset: 0; }
 .te-home .h3-scene {
@@ -1524,3 +1530,4 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
   .cmdk, .cmdk-overlay, .cmdk-trigger { transition: opacity .2s ease; }
   .cmdk-dot { animation: none; }
 }
+
