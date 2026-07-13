@@ -70,11 +70,19 @@ export function useHomeGsap() {
         })
       })
 
-      // work shelf — pinned horizontal scrub
+      // work shelf — pinned horizontal scrub; the run ends with the last
+      // card (.hz-end) centered in the viewport, not flush right
       const hz = document.querySelector<HTMLElement>('.hz')
       const track = document.querySelector<HTMLElement>('.hz-track')
       if (hz && track) {
-        const dist = () => Math.max(0, track.scrollWidth - document.documentElement.clientWidth)
+        const dist = () => {
+          const vw = document.documentElement.clientWidth
+          const end = track.querySelector<HTMLElement>('.hz-end')
+          if (!end) return Math.max(0, track.scrollWidth - vw)
+          // offsetLeft is relative to .hz (position: relative), which is
+          // full-bleed — so this is the card center's untranslated x
+          return Math.max(0, end.offsetLeft + end.offsetWidth / 2 - vw / 2)
+        }
         gsap.to(track, {
           x: () => -dist(),
           ease: 'none',

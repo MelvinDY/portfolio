@@ -920,6 +920,8 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 
 /* 02 — work: horizontal shelf (pinned, scrubbed sideways) */
 .te-home .hz { position: relative; margin-top: clamp(80px, 11vw, 150px); overflow: hidden; }
+.te-home .hz-fade { position: absolute; top: 0; right: 0; bottom: 0; width: clamp(90px, 10vw, 160px); background: linear-gradient(to right, transparent, var(--bg)); pointer-events: none; z-index: 5; }
+.te-home .hz.hz-static .hz-fade { display: none; }
 .te-home .hz-pin { height: 100svh; display: flex; flex-direction: column; justify-content: center; gap: clamp(20px, 4vh, 44px); padding-top: 76px; }
 .te-home .hz-pin .sh { margin-bottom: 0; }
 .te-home .hz-track { display: flex; align-items: stretch; gap: 20px; width: max-content; padding-inline: var(--pad); will-change: transform; }
@@ -1531,5 +1533,6 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
   .cmdk, .cmdk-overlay, .cmdk-trigger { transition: opacity .2s ease; }
   .cmdk-dot { animation: none; }
 }
+
 
 
