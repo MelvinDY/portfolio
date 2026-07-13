@@ -25,7 +25,6 @@ const chars = (word: string) =>
 
 export default function TeHero() {
   const scope = useRef<HTMLElement>(null)
-  const pctRef = useRef<HTMLElement>(null)
 
   useIsomorphicLayoutEffect(() => {
     const el = scope.current
@@ -63,11 +62,6 @@ export default function TeHero() {
           pin: true,
           scrub: 1,
           anticipatePin: 1,
-          onUpdate(self) {
-            if (pctRef.current) {
-              pctRef.current.textContent = String(Math.round(self.progress * 100)).padStart(3, '0')
-            }
-          },
         },
         defaults: { ease: 'none' },
       })
@@ -120,7 +114,6 @@ export default function TeHero() {
       {/* folio */}
       <div className="h3-hud mono" aria-hidden="true">
         <span className="h3-hud-tl">Melvin Yogiana — Portfolio</span>
-        <span className="h3-hud-tr"><b className="h3-pct" ref={pctRef}>000</b>%</span>
         <span className="h3-hud-bl">Vol. 01 · 33.8688°S — 151.2093°E</span>
         <span className="h3-hud-br">scroll to read ↓</span>
       </div>
