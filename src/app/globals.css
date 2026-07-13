@@ -899,6 +899,12 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 .te-home .tm-cta { margin-top: 30px; display: inline-flex; }
 .te-home .tm-cta:hover { color: var(--acid); }
 .te-home .tm-cta:hover .arrow { transform: translate(3px, -3px); }
+.te-home .tm-pulse { margin-top: clamp(36px, 5vw, 64px); }
+.te-home .tm-pulse-head { display: flex; justify-content: space-between; gap: 16px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 14px; }
+.te-home .tm-pulse-head span:first-child { color: var(--acid); }
+.te-home .tm-pulse-read { text-transform: none; letter-spacing: 0.08em; }
+.te-home .tm-pulse-axis { display: flex; justify-content: space-between; font-size: 10px; letter-spacing: 0.1em; color: var(--ink-faint); margin-top: 8px; text-transform: uppercase; }
+.te-home .tm-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 .te-home .tm-live-v { display: flex; align-items: center; gap: 12px; }
 .te-home .tm-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--acid); animation: tm-pulse 2s ease-in-out infinite; }
 @keyframes tm-pulse { 0%, 100% { opacity: 1 } 50% { opacity: 0.3 } }
