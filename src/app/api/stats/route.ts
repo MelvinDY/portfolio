@@ -1,95 +1,178 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { db } from '@/app/lib/analytics'
 
-// Self-hosted Umami instance, e.g. https://umami-yourname.vercel.app
-const UMAMI_URL = process.env.UMAMI_URL?.replace(/\/$/, '')
-const USERNAME = process.env.UMAMI_USERNAME
-const PASSWORD = process.env.UMAMI_PASSWORD
-const WEBSITE_ID = process.env.UMAMI_WEBSITE_ID
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
-function dateRange(days: number) {
-  const end = Date.now()
-  const start = end - days * 24 * 60 * 60 * 1000
-  return { startAt: start, endAt: end }
+const TZ = 'Australia/Sydney'
+
+const RANGES: Record<string, { days: number; buckets: number; unit: 'hour' | 'day' }> = {
+  '24h': { days: 1, buckets: 24, unit: 'hour' },
+  '7d': { days: 7, buckets: 7, unit: 'day' },
+  '30d': { days: 30, buckets: 30, unit: 'day' },
+  '90d': { days: 90, buckets: 90, unit: 'day' },
 }
 
-// Self-hosted Umami: POST /api/auth/login -> { token }, then Authorization: Bearer
-async function login(): Promise<string> {
-  const res = await fetch(`${UMAMI_URL}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: USERNAME, password: PASSWORD }),
-  })
-  if (!res.ok) {
-    throw new Error(`Umami login failed (${res.status})`)
-  }
-  const data = await res.json()
-  if (!data?.token) throw new Error('Umami login returned no token')
-  return data.token
-}
-
-// Stat fields can be a plain number (older/cloud) or { value, prev } (v2 self-hosted)
-function stat(field: unknown): { value: number; prev: number } {
-  if (field == null) return { value: 0, prev: 0 }
-  if (typeof field === 'number') return { value: field, prev: 0 }
-  const f = field as { value?: number; prev?: number }
-  return { value: f.value ?? 0, prev: f.prev ?? 0 }
-}
-
-export async function GET() {
-  if (!UMAMI_URL || !USERNAME || !PASSWORD || !WEBSITE_ID) {
+export async function GET(req: NextRequest) {
+  if (!process.env.DATABASE_URL) {
     return NextResponse.json({ configured: false }, { status: 200 })
   }
 
-  const { startAt, endAt } = dateRange(30)
-  const base = `startAt=${startAt}&endAt=${endAt}`
+  const range = RANGES[req.nextUrl.searchParams.get('range') ?? '30d'] ? (req.nextUrl.searchParams.get('range') ?? '30d') : '30d'
+  const { days, buckets, unit } = RANGES[range]
 
   try {
-    const token = await login()
-    const headers = { Authorization: `Bearer ${token}`, Accept: 'application/json' }
-    const api = (path: string) => `${UMAMI_URL}/api/websites/${WEBSITE_ID}/${path}`
+    const sql = db()
 
-    const [statsRes, pageviewsRes, pagesRes, referrersRes, countriesRes] = await Promise.all([
-      fetch(api(`stats?${base}`), { headers }),
-      fetch(api(`pageviews?${base}&unit=day&timezone=Australia/Sydney`), { headers }),
-      fetch(api(`metrics?type=url&${base}`), { headers }),
-      fetch(api(`metrics?type=referrer&${base}`), { headers }),
-      fetch(api(`metrics?type=country&${base}`), { headers }),
-    ])
+    const totalsQ = sql`
+      WITH pv AS (
+        SELECT visitor_id, count(*) AS c
+        FROM events
+        WHERE ts >= now() - ${days} * interval '1 day' AND event IS NULL
+        GROUP BY visitor_id
+      )
+      SELECT coalesce(sum(c), 0)::int AS views,
+             count(*)::int AS visitors,
+             count(*) FILTER (WHERE c = 1)::int AS bounced
+      FROM pv
+    `
 
-    if (!statsRes.ok) throw new Error(`Umami stats request failed (${statsRes.status})`)
+    const prevQ = sql`
+      WITH pv AS (
+        SELECT visitor_id, count(*) AS c
+        FROM events
+        WHERE ts >= now() - ${days * 2} * interval '1 day'
+          AND ts < now() - ${days} * interval '1 day'
+          AND event IS NULL
+        GROUP BY visitor_id
+      )
+      SELECT coalesce(sum(c), 0)::int AS views,
+             count(*)::int AS visitors,
+             count(*) FILTER (WHERE c = 1)::int AS bounced
+      FROM pv
+    `
 
-    const [stats, pageviewsRaw, pagesRaw, referrersRaw, countriesRaw] = await Promise.all([
-      statsRes.json(),
-      pageviewsRes.json(),
-      pagesRes.json(),
-      referrersRes.json(),
-      countriesRes.json(),
-    ])
+    const seriesQ =
+      unit === 'hour'
+        ? sql`
+          WITH slots AS (
+            SELECT generate_series(
+              date_trunc('hour', now() AT TIME ZONE ${TZ}) - interval '23 hours',
+              date_trunc('hour', now() AT TIME ZONE ${TZ}),
+              interval '1 hour'
+            ) AS t
+          ),
+          agg AS (
+            SELECT date_trunc('hour', ts AT TIME ZONE ${TZ}) AS t,
+                   count(*) FILTER (WHERE event IS NULL)::int AS views,
+                   count(DISTINCT visitor_id)::int AS visitors
+            FROM events
+            WHERE ts >= now() - interval '24 hours'
+            GROUP BY 1
+          )
+          SELECT to_char(slots.t, 'YYYY-MM-DD"T"HH24:MI') AS t,
+                 coalesce(agg.views, 0)::int AS views,
+                 coalesce(agg.visitors, 0)::int AS visitors
+          FROM slots LEFT JOIN agg ON agg.t = slots.t
+          ORDER BY slots.t
+        `
+        : sql`
+          WITH slots AS (
+            SELECT generate_series(
+              date_trunc('day', now() AT TIME ZONE ${TZ}) - ${buckets - 1} * interval '1 day',
+              date_trunc('day', now() AT TIME ZONE ${TZ}),
+              interval '1 day'
+            ) AS t
+          ),
+          agg AS (
+            SELECT date_trunc('day', ts AT TIME ZONE ${TZ}) AS t,
+                   count(*) FILTER (WHERE event IS NULL)::int AS views,
+                   count(DISTINCT visitor_id)::int AS visitors
+            FROM events
+            WHERE ts >= now() - ${days + 1} * interval '1 day'
+            GROUP BY 1
+          )
+          SELECT to_char(slots.t, 'YYYY-MM-DD') AS t,
+                 coalesce(agg.views, 0)::int AS views,
+                 coalesce(agg.visitors, 0)::int AS visitors
+          FROM slots LEFT JOIN agg ON agg.t = slots.t
+          ORDER BY slots.t
+        `
 
-    // Umami returns { pageviews: [...], sessions: [...] } for the pageviews endpoint
-    const pageviews = Array.isArray(pageviewsRaw?.pageviews) ? pageviewsRaw.pageviews : []
-    const asList = (v: unknown) => (Array.isArray(v) ? (v as Array<{ x: string; y: number }>) : [])
+    const pagesQ = sql`
+      SELECT path AS x, count(*)::int AS y
+      FROM events
+      WHERE ts >= now() - ${days} * interval '1 day' AND event IS NULL
+      GROUP BY path ORDER BY y DESC LIMIT 8
+    `
 
-    return NextResponse.json({
-      configured: true,
-      stats: {
-        pageviews: stat(stats.pageviews),
-        visitors: stat(stats.visitors),
-        visits: stat(stats.visits),
-        bounces: stat(stats.bounces),
-        totaltime: stat(stats.totaltime),
-      },
-      pageviews,
-      pages: asList(pagesRaw).slice(0, 8),
-      referrers: asList(referrersRaw).slice(0, 6),
-      countries: asList(countriesRaw).slice(0, 8),
-    })
-  } catch (err) {
-    console.error('[stats] Umami fetch failed:', err)
-    // configured:true so the page shows an error state, not the setup guide
+    const referrersQ = sql`
+      SELECT coalesce(referrer_host, 'direct') AS x, count(DISTINCT visitor_id)::int AS y
+      FROM events
+      WHERE ts >= now() - ${days} * interval '1 day' AND event IS NULL
+      GROUP BY 1 ORDER BY y DESC LIMIT 6
+    `
+
+    const countriesQ = sql`
+      SELECT country AS x, count(DISTINCT visitor_id)::int AS y
+      FROM events
+      WHERE ts >= now() - ${days} * interval '1 day' AND country IS NOT NULL
+      GROUP BY country ORDER BY y DESC LIMIT 8
+    `
+
+    const devicesQ = sql`
+      SELECT device AS x, count(DISTINCT visitor_id)::int AS y
+      FROM events
+      WHERE ts >= now() - ${days} * interval '1 day' AND device IS NOT NULL
+      GROUP BY device ORDER BY y DESC
+    `
+
+    const browsersQ = sql`
+      SELECT browser AS x, count(DISTINCT visitor_id)::int AS y
+      FROM events
+      WHERE ts >= now() - ${days} * interval '1 day' AND browser IS NOT NULL
+      GROUP BY browser ORDER BY y DESC LIMIT 5
+    `
+
+    const liveQ = sql`
+      SELECT count(DISTINCT visitor_id)::int AS n
+      FROM events
+      WHERE ts > now() - interval '5 minutes'
+    `
+
+    const [totals, prev, series, pages, referrers, countries, devices, browsers, live] =
+      await Promise.all([totalsQ, prevQ, seriesQ, pagesQ, referrersQ, countriesQ, devicesQ, browsersQ, liveQ])
+
+    const t = totals[0] as { views: number; visitors: number; bounced: number }
+    const p = prev[0] as { views: number; visitors: number; bounced: number }
+
     return NextResponse.json(
-      { configured: true, error: 'Failed to load analytics' },
-      { status: 502 },
+      {
+        configured: true,
+        range,
+        live: (live[0] as { n: number }).n,
+        totals: {
+          views: t.views,
+          visitors: t.visitors,
+          bounceRate: t.visitors > 0 ? Math.round((t.bounced / t.visitors) * 100) : 0,
+          viewsPerVisitor: t.visitors > 0 ? +(t.views / t.visitors).toFixed(1) : 0,
+        },
+        prev: {
+          views: p.views,
+          visitors: p.visitors,
+          bounceRate: p.visitors > 0 ? Math.round((p.bounced / p.visitors) * 100) : 0,
+        },
+        series,
+        pages,
+        referrers,
+        countries,
+        devices,
+        browsers,
+      },
+      { headers: { 'Cache-Control': 'public, max-age=0, s-maxage=60, stale-while-revalidate=300' } },
     )
+  } catch (err) {
+    console.error('[stats]', err)
+    return NextResponse.json({ configured: true, error: 'Failed to load analytics' }, { status: 502 })
   }
 }
