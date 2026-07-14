@@ -1,5 +1,5 @@
 // src/lib/blog.ts
-import { BlogPost } from "../types/blog"
+import { BlogPost, PostCard } from "../types/blog"
 import fs from "fs"
 import path from "path"
 import matter from "gray-matter"
@@ -37,11 +37,49 @@ function readAllPosts(): BlogPost[] {
         date: data.date || '',
         readTime: data.readTime,
         tags: data.tags || [],
+        keywords: data.keywords,
         content: content
       } as BlogPost
     })
 
   return allPostsData
+}
+
+/** "Data Engineering" -> "data-engineering" — must match TAG_BUTTONS values. */
+export function tagSlug(tag: string): string {
+  return tag.toLowerCase().trim().replace(/\s+/g, '-')
+}
+
+/**
+ * Format a frontmatter date for the index card, preserving each post's own
+ * precision: "January 23, 2025" -> "Jan 23, 2025", "June 2026" -> "Jun 2026".
+ */
+function shortDate(date: string): string {
+  const d = new Date(date)
+  if (isNaN(d.getTime())) return date
+
+  const month = d.toLocaleString('en-US', { month: 'short' })
+  const hasDay = /\d{1,2}\s*,/.test(date)
+
+  return hasDay
+    ? `${month} ${d.getDate()}, ${d.getFullYear()}`
+    : `${month} ${d.getFullYear()}`
+}
+
+/** All posts flattened for the blog index, newest first. */
+export function getPostCards(): PostCard[] {
+  return getAllPosts().map(post => ({
+    href: `/blog/${post.id}`,
+    text: [post.title, post.excerpt, post.tags.join(' '), post.keywords ?? '']
+      .join(' ')
+      .toLowerCase(),
+    tags: post.tags.map(tagSlug).join(','),
+    date: shortDate(post.date),
+    rt: post.readTime ?? '',
+    title: post.title,
+    excerpt: post.excerpt,
+    tagLabels: post.tags,
+  }))
 }
 
 /**
