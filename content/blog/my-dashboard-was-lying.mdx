@@ -1,0 +1,193 @@
+---
+title: "My Dashboard Looked Finished. Three of Its Numbers Were Lying."
+excerpt: "I built an end-to-end pipeline on real ABS labour force data — Python, Azure SQL, Power BI. It rendered beautifully. It was also double-counting the population, showing a page that was four years out of date, and quietly missing two Australian territories. None of it threw an error."
+date: "July 2026"
+readTime: "10 min read"
+tags: ["Data Analysis", "Data Engineering"]
+keywords: "abs labour force data quality australian bureau of statistics azure sql power bi staging mart views double counting dimension total member stale data source vintage missing states act nt northern territory seasonally adjusted trend series tsest sdmx api pipeline python pandas analytics engineering validation assertion"
+---
+
+# My Dashboard Looked Finished. Three of Its Numbers Were Lying.
+
+I built a four-page Power BI dashboard on real Australian Bureau of Statistics labour force data. Python pulls it from the ABS Data API, pandas cleans it, it lands in Azure SQL as staging tables, SQL views model it into a mart layer, and Power BI reads only the mart. The report itself is generated from a Python script rather than clicked together in Desktop, so the whole thing is diffable and reproducible.
+
+It looked *done*. Clean KPI cards, a national unemployment trend going back to 1978, industry breakdowns, a full-time versus part-time split by gender.
+
+Then I reviewed it like a stakeholder instead of like the person who built it, and found that three of the numbers on screen were wrong. Not "could be improved" wrong. **Wrong.**
+
+Here's the part that should bother you: not one of them raised an error. No exception, no failed build, no red cell. Every chart rendered with total confidence. That's the actual lesson of this post, and it's why I think data quality is the least glamorous and most important skill in this job.
+
+## Lie #1: I double-counted the entire population
+
+The full-time/part-time data has a `sex` dimension. Here's how the ABS codes it, straight out of my transform script:
+
+```python
+SEX_LABELS = {"1": "Male", "2": "Female", "3": "Persons"}
+```
+
+Look at that for a second. The dimension has three members, and the third one is **the sum of the other two**. "Persons" isn't a peer of Male and Female — it's a total that the ABS has helpfully pre-aggregated and shipped inside the same column.
+
+So when Power BI does the completely reasonable thing and sums the value column across the whole dimension, it computes Male + Female + (Male + Female). Every total was exactly double. And because it was *consistently* double, nothing looked obviously broken — the shape of the chart was right, the trend was right, the proportions between series were right. Only the magnitude was nonsense, and magnitude is the one thing your eye can't sanity-check on a series it's never seen before.
+
+I caught it by pulling a number off the dashboard and comparing it to the ABS's own published figure. That's it. That's the whole technique.
+
+**The lesson:** before you aggregate a dimension, check whether it already contains a total member. Government statistical agencies do this constantly — `Persons`, `All industries`, `Australia`, `Total` — because their data is designed to be read a row at a time, not summed. If you treat those rows as peers, you will double-count, and the result will look plausible.
+
+## Lie #2: One page was four years out of date
+
+My national data comes from the monthly Labour Force survey. My industry data comes from the annual Labour Account, which is a different ABS product with a different release cadence.
+
+I never checked how far each one actually went. So here's what I found when I finally looked at the max date on each processed file:
+
+```
+national date range:  1978-02-01  ->  2026-04-01
+industry date range:  1995-01-01  ->  2022-01-01
+```
+
+The industry page was showing data that ended in **2022** while sitting three clicks away from a page current to **April 2026**. Same dashboard. Same navigation bar. Nothing on the industry page said "this is four years old."
+
+I assumed I'd broken my own extract. I hadn't — I checked the live ABS API and the series really is that stale *at source*. The annual Labour Account just lags that badly. My pipeline was faithfully reproducing reality; the dashboard was the thing lying, by presenting stale data with exactly the same visual confidence as fresh data.
+
+That's a trust-killer, and it's worse than a visible bug. If a stakeholder had made a call about which industries are growing, they'd have been reasoning about a labour market that no longer exists — and nothing on the screen would have warned them.
+
+**The lesson:** check the latest available period of **every** source before you build anything on it, and never silently mix cadences. A monthly survey and an annual account can absolutely live in one dashboard, but the moment they do, the page has to say which is which and how fresh each one is. A date footnote is not decoration. It's part of the number.
+
+## Lie #3: My map of Australia was missing two territories
+
+The state page is built on a region dimension. Here is every distinct region that actually survived my pipeline:
+
+```
+New South Wales
+Queensland
+South Australia
+Tasmania
+Victoria
+Western Australia
+```
+
+Six. Australia has eight states and territories. The **ACT and the Northern Territory** are simply not there.
+
+I didn't notice for an embarrassingly long time, because six bars in a bar chart look exactly as finished as eight bars in a bar chart. There's no gap to see. Nothing renders as empty. The chart is a perfectly well-formed picture of an incomplete country, and it will happily tell you that Tasmania is Australia's smallest labour market — which is only true if you've quietly deleted the two jurisdictions smaller than it.
+
+I assumed I'd written a bad filter somewhere between my staging and mart views — that I'd dropped them myself. So I went looking for my bug, and I couldn't find it, because it wasn't there.
+
+Here's the key my extract sends to the ABS API. The last-but-one position is the region dimension:
+
+```
+M3+M13.3.1599.20.1+2+3+4+5+6+7+8.M
+                 ^^^^^^^^^^^^^^^
+```
+
+I was **already asking for all eight**. Regions 1 through 8, explicitly, by hand. And the API returned `200 OK` with six of them.
+
+The reason took a while to find, and it's a good one. That `20` in the middle is `TSEST`, the series type: `20` means **seasonally adjusted**. So I asked the live API for each territory on its own:
+
+```
+NT  seasonally adjusted  -> 404
+ACT seasonally adjusted  -> 404
+NT  original             -> 200
+ACT original             -> 200
+NSW seasonally adjusted  -> 200
+```
+
+**The ABS doesn't publish a seasonally adjusted series for the NT or the ACT at all.** Their survey samples are too small to seasonally adjust reliably, so those series simply don't exist. Ask for one on its own and you correctly get a 404.
+
+But ask for *all eight at once*, and the API hands back the six that exist, with a 200, and says nothing about the two that don't. It quietly returns the **intersection of what you asked for and what exists**. Which is a perfectly defensible API design, and it's also how two territories fell out of my country without a single line of my code being wrong.
+
+That reframes the whole bug. There was never a broken filter to find. The defect was the *absence of a check* — nothing in my pipeline ever asserted that the eight things I asked for were the eight things I got.
+
+**The lesson:** validate that a dimension contains the full set of members you expect, and make it an assertion rather than a vibe. Row counts tell you whether data arrived; they cannot tell you whether it's *all* there. So now the extract config declares what it expects, and the run fails loudly when reality disagrees:
+
+```python
+"state_summary": {
+    "key": "M3+M13.3.1599.30.1+2+3+4+5+6+7+8.M",
+    "expect": {"REGION": 8},
+},
+```
+
+```python
+def validate(df, name, expect):
+    """
+    The ABS API does not error when you ask for dimension members that don't
+    exist — it just returns the ones that do. A key requesting all 8 states can
+    quietly come back with 6, and every downstream chart will render a
+    well-formed picture of an incomplete country.
+    """
+    problems = []
+    for col, want in expect.items():
+        got = df[col].nunique()
+        if got != want:
+            problems.append(f"{name}: expected {want} distinct {col}, got {got}")
+    return problems
+```
+
+## The fix was not "add the two territories back"
+
+This is the part I'd have got wrong a year ago.
+
+The obvious repair is to pull NT and ACT as **Original** data — it exists, it's right there, 200 OK — and staple them onto the six seasonally adjusted states. The map fills in. Everything looks finished. Ship it.
+
+That would have been a *fourth* lie, and a worse one, because it would have looked like a fix.
+
+Seasonally adjusted and Original are not the same measurement. Seasonal adjustment strips out the predictable annual rhythm — the summer hiring, the post-Christmas layoffs — so that a change month-to-month means something real. Original data still has all of that in it. Put them side by side in a bar chart that **ranks states against each other**, which is exactly what my state page does, and the ranking is meaningless: you'd be comparing six de-seasonalised numbers against two raw ones and reading the gap as if it were signal. Some of that gap would just be what month it is.
+
+You cannot mix bases in a chart whose entire purpose is comparison.
+
+So I looked for a series type that exists for all eight, and there is one — **Trend** (`TSEST=30`) returns 200 for every jurisdiction, including both territories. The whole state page moved onto Trend. Now all eight sit on one consistent basis and every comparison on the page is legitimate.
+
+That choice has its own honest cost, and it goes in the page's footnote rather than getting buried: Trend is not the seasonally adjusted headline rate the ABS puts in its media release, so my state numbers will no longer exactly match the figure quoted on the news. I'd rather be internally consistent and explain myself than match a headline by comparing two things that aren't comparable.
+
+The pipeline now returns all eight, from February 1978 through to May 2026:
+
+```
+Australian Capital Territory
+New South Wales
+Northern Territory
+Queensland
+South Australia
+Tasmania
+Victoria
+Western Australia
+```
+
+## The common thread: dashboards fail silently
+
+Three bugs. Zero errors.
+
+That's not a coincidence, it's the nature of the medium. In application code, a bad reference throws and you get a stack trace pointing at the line. In an analytics stack, the equivalent mistakes just... produce a number. A wrong number, rendered in the right font, in a card with a nice border, next to three numbers that happen to be correct.
+
+I hit the exact same failure mode one layer up, in the Power BI report definition. Because I generate the report as code, I had to learn its JSON schema by hand, and I spent hours confused about why my custom chart titles weren't applying — every chart kept falling back to auto-generated names like `employed_thousands by industry_name`. The reason: container formatting has to live under a key called `vcObjects`, and I'd used `visualContainerObjects`. **Power BI silently ignored the whole block.** Wrong property name, no error, no warning, just no effect.
+
+Same shape as the data bugs. The system's response to "you asked for something meaningless" is not to object. It's to render.
+
+So the discipline you need in analytics isn't the one that catches exceptions. It's the one that goes looking for wrongness that has no symptom.
+
+## What I actually do now, before building anything
+
+The checklist that came out of this. It's boring, it takes fifteen minutes, and it would have caught all three:
+
+1. **Print the max date of every source.** Not the row count — the actual latest period. Do this per source, and put the answers next to each other where the mismatch is impossible to miss.
+2. **Print the distinct members of every dimension you'll group by**, and count them against what you expect. Eight states. Nineteen industries. If the number's off, stop.
+3. **Ask whether any dimension already contains a total member** — `Persons`, `Total`, `All`, `Australia` — before you let anything sum over it.
+4. **Take one number off the finished dashboard and reconcile it by hand** against the source's own published figure. One number. This is the single highest-value fifteen minutes in the whole project and it's what caught the double-counting.
+5. **Put units and a data-as-of date on every number**, because a number without a unit or a vintage is an assertion you can't check.
+
+None of that is clever. That's rather the point — the failures here weren't caused by a lack of cleverness, they were caused by the absence of a habit.
+
+## The honest scoreboard
+
+The double-counting is fixed. The `vcObjects` bug is fixed.
+
+The missing territories are fixed **in the pipeline** — the extract now pulls Trend for all eight jurisdictions, the completeness assertion passes, and the processed data has ACT and NT in it through May 2026.
+
+The screenshots in the repo still show six, and they always will, because I've since torn the Azure SQL database down rather than keep paying to store a finished project. That was deliberate, and it's why the pipeline mattering more than the dashboard isn't just a nice line: the repo rebuilds the whole thing from the ABS API in three commands, so the dashboard is a *derivable artifact*, not something I have to keep alive on a credit card. The exported PDF is the snapshot; the code is the project.
+
+The industry staleness is a real limitation of the ABS source, so the fix is to swap it for the quarterly Labour Force Detailed series and, until then, to *label it loudly* rather than let it pretend to be current.
+
+I could have written this post about the stack. Python to Azure SQL to a staging-and-mart view layer to a report generated as code — that's the part that looks impressive on a portfolio, and honestly it was the fun part to build.
+
+But the stack isn't the job. Anyone can move data from A to B; the tooling is genuinely good now and getting better. The job is being the person who asks *"is this number actually true?"* when every single indicator on the screen, including your own pride in having finished it, says yes.
+
+The pipeline was the easy half. Not trusting it was the work.
+
+— Melvin

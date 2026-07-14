@@ -1,0 +1,226 @@
+---
+title: "I Built My Own Web Analytics Because I Wanted the Raw Event Table"
+excerpt: "Umami's free tier let me collect my data but not query it. So I replaced it with 40 lines of tracker, one Postgres table, and a pile of SQL — and learned more about metric definitions than any dashboard tool would have taught me."
+date: "July 2026"
+readTime: "9 min read"
+tags: ["Data Engineering", "Data Analysis"]
+keywords: "first party web analytics postgres sql neon umami alternative event table data modelling bounce rate definition cookieless visitor hash generate_series zero fill timezone analytics engineering privacy"
+---
+
+# I Built My Own Web Analytics Because I Wanted the Raw Event Table
+
+I used to run [Umami](https://umami.is) on this site. It's a good product — privacy-friendly, clean dashboard, no cookie banner. But when I went to pull my own numbers into a `/stats` page on this site, the free tier told me the read API needs a Pro plan.
+
+Which is a completely reasonable thing for them to charge for. It just made something uncomfortably clear: **the data was mine, and I couldn't query it.** I could look at it through their dashboard, in the shapes their dashboard offered, and that was the whole relationship.
+
+My next move was to self-host Umami. I got most of the way there — forked it, pointed it at a Neon Postgres database, worked out that Prisma needs the *direct* connection string because migrations break on the pooled endpoint. Then I stopped and asked what I was actually doing. I was about to deploy and maintain an entire second Next.js application, with its own auth and its own migrations, so that it could write rows to a Postgres database that I already owned, so that I could read those rows back out.
+
+I didn't want an analytics product. I wanted a table.
+
+So I deleted all of it and wrote my own in an afternoon. This is what that taught me — and most of it is not about web analytics at all. It's about the stuff that quietly decides whether a number is right.
+
+## The whole thing is one table
+
+Here's the entire data model:
+
+```sql
+CREATE TABLE events (
+  id            bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  ts            timestamptz NOT NULL DEFAULT now(),
+  visitor_id    text NOT NULL,
+  path          text NOT NULL,
+  referrer_host text,
+  country       text,
+  device        text,
+  browser       text,
+  os            text,
+  utm_source    text,
+  event         text
+);
+
+CREATE INDEX events_ts_idx         ON events (ts DESC);
+CREATE INDEX events_visitor_ts_idx ON events (visitor_id, ts);
+```
+
+One row per thing that happened. No sessions table, no visitors dimension, no star schema. At my volume, a wide denormalised event log is the correct amount of engineering, and everything a dashboard needs is a `GROUP BY` away.
+
+The one modelling decision worth pausing on is that last column. A row with `event IS NULL` is a **pageview**. A row with a value in `event` is a **custom event** — someone clicked the thing, someone found the easter egg. Two kinds of fact, one table, distinguished by a nullable column.
+
+That's a normal choice, and it comes with a trap I'll come back to.
+
+## Rule one: the tracker is never allowed to break the site
+
+The client side is about forty lines. The part that matters:
+
+```tsx
+if (navigator.sendBeacon) {
+  navigator.sendBeacon('/api/track', new Blob([payload], { type: 'application/json' }))
+} else {
+  fetch('/api/track', { method: 'POST', body: payload, keepalive: true }).catch(() => {})
+}
+```
+
+`sendBeacon` hands the request to the browser and returns immediately. It doesn't block navigation, it survives the page unloading, and nothing on the page is ever waiting on it. The `fetch` fallback has `keepalive` set and swallows its own errors.
+
+The server end follows the same rule, harder:
+
+```ts
+export async function POST(req: NextRequest) {
+  const ok = new NextResponse(null, { status: 204 })
+  try {
+    // ...validate, filter bots, insert
+  } catch (err) {
+    console.error('[track]', err)
+  }
+  // Always 204 — tracking must never break the page
+  return ok
+}
+```
+
+Every path returns 204. Bad payload: 204. Bot: 204. Database on fire: 204, log it, move on. The endpoint is physically incapable of telling the browser that something went wrong.
+
+This felt wrong to write. Swallowing errors is the thing you're taught not to do. But measurement is a **passenger** on the product, never a blocker of it, and an analytics table with a gap in it is a much smaller problem than a portfolio that hangs because a database in Sydney had a bad afternoon. Getting this backwards is how tracking scripts end up in incident reports.
+
+## Identity without cookies
+
+I wanted to know "how many *people*", not just "how many hits", without setting a cookie or touching localStorage. So the visitor ID is derived, server-side, and never stored in raw form:
+
+```ts
+function visitorId(ip: string, ua: string): string {
+  const day = sydneyDay.format(new Date())
+  return createHash('sha256')
+    .update(`${process.env.ANALYTICS_SALT}:${day}:${ip}:${ua}`)
+    .digest('hex')
+    .slice(0, 16)
+}
+```
+
+Salt, day, IP, user agent — hashed, truncated to 16 hex characters. The raw IP is never written to the database. The hash rotates at midnight, so the same person on Tuesday and Wednesday is two different visitors and there is nothing in the table that follows anyone across days. No cookie, so no cookie banner, because there's nothing to consent to.
+
+**The honest cost:** I have made it impossible to measure returning visitors. That's not an oversight I'm going to fix later — it's the actual point of the design, and it's the price of the privacy property. If I ever want retention, I have to give up the thing that makes this table safe to own. Every privacy-preserving design is a trade, and the useful habit is being able to say out loud what you traded away.
+
+There's a subtler detail in there. The day used in the hash is the **Sydney** day, not the UTC day:
+
+```ts
+const sydneyDay = new Intl.DateTimeFormat('en-CA', { timeZone: 'Australia/Sydney', ... })
+```
+
+If identity rotated at UTC midnight while my dashboard bucketed by Sydney days, a visitor's ID would flip over somewhere in the middle of a Sydney morning — one real person would be counted as two, and the split would land inside a bucket rather than between two. Making identity and reporting agree on where midnight is costs one line of code and saves a class of bug that is genuinely miserable to find later, because nothing errors. The number is just quietly wrong.
+
+## Cleaning at write time, and the part I'd change
+
+Two things get normalised before the row is ever inserted.
+
+Bots get dropped:
+
+```ts
+const BOT_RE = /bot|crawl|spider|slurp|headless|lighthouse|prerender|scan|curl|wget|python-requests|.../i
+
+export function isBot(ua: string | null): boolean {
+  if (!ua || ua.length < 20) return true
+  return BOT_RE.test(ua)
+}
+```
+
+And paths get conformed — query strings stripped, trailing slashes removed, so `/blog/`, `/blog`, and `/blog?utm_source=x` are all one page and not three:
+
+```ts
+const cleanPath = (path.split('?')[0].replace(/\/+$/, '') || '/').slice(0, 200)
+```
+
+The path normalisation I'd defend anywhere. It's dimension conforming, and skipping it is how you end up with your best page split into four rows, none of which crack the top eight.
+
+The bot filter is the one I'd now argue with. **I'm destroying data at write time.** If my regex is wrong — too aggressive, and it's eating real users on some browser I've never heard of; too loose, and some crawler is inflating everything — I will never know, because the evidence was never written down. I can't audit the filter, I can't tune it, and I can't reprocess history after I improve it.
+
+The better shape is the one analytics engineering already settled on: **load raw, filter in the transform.** Write every hit, mark it `is_bot`, and let the reporting layer decide what counts. Then the filter is a definition living in SQL that I can change my mind about on a Tuesday and have all of history retroactively agree with me — instead of a `return` statement that silently ate the last six months.
+
+That's the raw-versus-mart argument in miniature, and I got to learn it by getting it wrong on something that costs me nothing.
+
+## Nobody hands you a bounce rate
+
+This is the section I'd want another analyst to read, because it's the one that changed how I think.
+
+I put "bounce rate" on the dashboard because dashboards have bounce rates. Then I had to write the query, and discovered that I had no idea what a bounce *was* — not because the definition is hard, but because I had spent years reading the number without ever once being the person who decided it.
+
+Here's what I decided:
+
+```sql
+WITH pv AS (
+  SELECT visitor_id, count(*) AS c
+  FROM events
+  WHERE ts >= now() - ${days} * interval '1 day' AND event IS NULL
+  GROUP BY visitor_id
+)
+SELECT coalesce(sum(c), 0)::int              AS views,
+       count(*)::int                         AS visitors,
+       count(*) FILTER (WHERE c = 1)::int    AS bounced
+FROM pv
+```
+
+A bounce is a visitor who, within the selected window, viewed exactly one page. That's it. That's the whole definition, and it lives in `count(*) FILTER (WHERE c = 1)`.
+
+Notice what it *doesn't* say. It has no concept of a session — a visitor who reads one post in the morning and one at night is not a bounce, even though those were two separate visits. It has no concept of engagement, so someone who lands on a post, reads all nine minutes of it, and leaves satisfied is a "bounce", which is arguably the exact opposite of what the word suggests. GA4, for what it's worth, gave up on the pageview definition entirely and now defines a bounce as a session that *wasn't* engaged, where "engaged" means ten seconds or a conversion or two pageviews. That's a different number wearing the same name.
+
+Neither of us is wrong. We just answered a question that the metric's name pretends doesn't exist.
+
+I'd read the phrase "metrics are definitions, not facts" a hundred times and nodded at it. Writing that `FILTER` clause is what actually taught it to me, because for the first time the definition was *mine* — if the number is misleading, there is nobody else to blame for it. That's the whole job, and you can't learn it from a tool that already made the choice for you.
+
+## The bug that hides in a nullable column
+
+Remember `event IS NULL` meaning "pageview"? Go back and look at that query. Every pageview metric has to carry that filter, and if you forget it anywhere, custom events silently inflate your traffic.
+
+Which brings me to a real inconsistency in my own dashboard, which I'm keeping and want to be explicit about. The pageview metrics — totals, the time series, top pages, referrers — all filter to `event IS NULL`. But the audience breakdowns don't:
+
+```sql
+SELECT device AS x, count(DISTINCT visitor_id)::int AS y
+FROM events
+WHERE ts >= now() - ${days} * interval '1 day' AND device IS NOT NULL
+GROUP BY device ORDER BY y DESC
+```
+
+No `event IS NULL` there. That's deliberate — I'm counting *distinct visitors* by device, and a visitor who only ever fired a custom event is still a visitor, still on a phone, still someone I want in the denominator. Same for the live counter: anyone doing anything in the last five minutes is a person on my site.
+
+But look at what that means. "Visitors" in the totals card and "visitors" in the device chart are, strictly, **two different populations** — and nothing in the UI says so. This is exactly where dashboards rot. Not in the hard queries, in the ones so obvious that nobody re-reads them, where one word means two things on the same screen and every individual query is defensible.
+
+The fix isn't a better `WHERE` clause, it's a definition that only exists in one place — the thing dbt models and semantic layers are *for*. That's my next weekend.
+
+## Two small SQL things worth stealing
+
+**Zero-fill your time series.** `GROUP BY day` only returns days that have data, so a quiet Sunday doesn't come back as zero — it doesn't come back at all, and your chart draws a straight line from Saturday to Monday as if Sunday never happened. Generate the buckets first and left-join onto them:
+
+```sql
+WITH slots AS (
+  SELECT generate_series(
+    date_trunc('day', now() AT TIME ZONE 'Australia/Sydney') - ${buckets - 1} * interval '1 day',
+    date_trunc('day', now() AT TIME ZONE 'Australia/Sydney'),
+    interval '1 day'
+  ) AS t
+),
+agg AS (
+  SELECT date_trunc('day', ts AT TIME ZONE 'Australia/Sydney') AS t,
+         count(*) FILTER (WHERE event IS NULL)::int AS views,
+         count(DISTINCT visitor_id)::int AS visitors
+  FROM events
+  WHERE ts >= now() - ${days + 1} * interval '1 day'
+  GROUP BY 1
+)
+SELECT to_char(slots.t, 'YYYY-MM-DD') AS t,
+       coalesce(agg.views, 0)::int    AS views,
+       coalesce(agg.visitors, 0)::int AS visitors
+FROM slots LEFT JOIN agg ON agg.t = slots.t
+ORDER BY slots.t
+```
+
+The calendar is the spine; the data hangs off it. Absence of a row and a row containing zero are different claims, and only one of them is true.
+
+**Store UTC, bucket local.** `ts` is `timestamptz`, which is always UTC underneath. Every bucket is `ts AT TIME ZONE 'Australia/Sydney'`. Store one truth, present it in whatever timezone the reader lives in — and never, ever let those two decisions drift apart, which is the same lesson as the visitor hash, arriving from the other direction.
+
+## Was it worth it?
+
+The dashboard runs ten queries concurrently through `Promise.all`, caches for sixty seconds at the edge with `stale-while-revalidate`, and costs me nothing. It replaced a product I'd have paid nine dollars a month for, on a free database tier, and I can ask it any question I can express in SQL.
+
+But that's not really the return. The return is that I now know **exactly** what every number on that page means, because I had to decide, and the deciding is where all the interesting problems were hiding — the day boundary, the destroyed bot rows, the two different meanings of the word "visitor". Every one of those is invisible from inside a tool that already made the choice for you, and every one of them is the actual job.
+
+The dashboard is live at [/stats](/stats). It's honest about being a small site. But every number on it is one I can defend, which is more than I could say about the numbers I was renting.
+
+— Melvin
