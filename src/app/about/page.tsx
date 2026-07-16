@@ -49,7 +49,7 @@ export default function AboutPage() {
             <div className="lead-prose">
               <div data-reveal>
                 <p>I came to Sydney to study Computer Science at UNSW, and somewhere between a database lecture and my third hackathon I realised I&apos;d fallen for two things at once: <strong>finding the story hiding in data</strong>, and <strong>building the thing that puts that story in front of people</strong>.</p>
-                <p>Most developers pick a lane. I genuinely couldn&apos;t. So I lean into both — I&apos;ll spend a weekend untangling ABS labour statistics or scraping supermarket prices, then turn around and ship a full-stack app with a team under deadline. The two halves feed each other: the analyst makes my software honest, and the engineer makes my analysis usable.</p>
+                <p>Most developers pick a lane. I genuinely couldn&apos;t. So I lean into both — I&apos;ll spend a weekend untangling ABS labour statistics or matching supermarket prices, then turn around and ship a full-stack app with a team under deadline. The two halves feed each other: the analyst makes my software honest, and the engineer makes my analysis usable.</p>
                 <p>Along the way I&apos;ve been lucky enough to win a few rooms — a hackathon first place, two UNIHACK 2026 categories, and one gloriously cursed <em>Golden Rubbish Bin</em>. I also help run tech for <strong>PPIA UNSW</strong>, the Indonesian student community here, because building things that bring people together is the whole reason I started.</p>
                 <p>When I&apos;m not coding you&apos;ll find me hunting Sydney&apos;s coffee scene, planning the next trip, or quietly turning caffeine into commits. ☕</p>
               </div>
