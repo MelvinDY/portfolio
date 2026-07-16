@@ -23,12 +23,13 @@ export default function DataProjectsPage() {
             <div className="subhero-foot">
               <p className="lead" data-reveal data-reveal-delay="2">
                 Four questions I couldn&apos;t stop poking at — labour markets, viral video,
-                supermarket price wars and a leaking sales funnel. Each one is written as a{' '}
+                supermarket price wars and a subscription business quietly losing its cheapest customers.
+                Each one is written as a{' '}
                 <span className="acid-text">data story</span>: a finding first, the working underneath.
               </p>
               <div className="subhero-meta" data-reveal data-reveal-delay="2">
                 <div className="sm"><div className="v" data-count="4">4</div><div className="l">Case studies</div></div>
-                <div className="sm"><div className="v" data-count="1.2" data-suf="M+">0</div><div className="l">Rows analysed</div></div>
+                <div className="sm"><div className="v" data-count="75" data-suf="K+">0</div><div className="l">Rows analysed</div></div>
               </div>
             </div>
           </div>
@@ -67,29 +68,29 @@ export default function DataProjectsPage() {
               </Link>
 
               <Link className="pcard dcard" href="/projects/data/grocery" data-reveal data-reveal-delay="2">
-                <div className="pcard-top"><span className="pcard-no">/ 03</span><span className="badge">Scraping · dbt · Postgres</span></div>
+                <div className="pcard-top"><span className="pcard-no">/ 03</span><span className="badge">Retailer APIs · DuckDB · Python</span></div>
                 <div className="finding">
-                  <div className="fnum"><span data-count="1240" data-pre="$">$1,240</span></div>
-                  <div className="flabel">The yearly gap on an identical basket of staples — but the <em className="serif">cheaper</em> store flips week to week. Specials decide it, not shelf price.</div>
+                  <div className="fnum"><span data-count="1.82" data-pre="$">$1.82</span></div>
+                  <div className="flabel">The gap on a 50-item basket — a near dead-heat. Of 104 identical products, half cost <em className="serif">exactly</em> the same. The real money hides in the specials.</div>
                 </div>
                 <h3>Woolworths vs Coles Price Analytics</h3>
-                <p className="pcard-desc">Six months of daily price scrapes on 1,000 staple products. Who&apos;s genuinely cheaper, when each store discounts, and how much loyalty actually costs you.</p>
+                <p className="pcard-desc">Same-day prices from both retailers&apos; public web APIs, fuzzy-matched into identical product pairs and compared in a DuckDB warehouse — basket totals, per-100g unit prices, and $15 same-product outliers.</p>
                 <div className="tagrow">
-                  <span className="tag">Web Scraping</span><span className="tag">PostgreSQL</span><span className="tag">dbt</span><span className="tag">Python</span>
+                  <span className="tag">Python</span><span className="tag">DuckDB</span><span className="tag">rapidfuzz</span><span className="tag">Entity Resolution</span>
                 </div>
                 <span className="cardlink">Read the case study <span className="arrow">↗</span></span>
               </Link>
 
               <Link className="pcard dcard" href="/projects/data/saas" data-reveal data-reveal-delay="3">
-                <div className="pcard-top"><span className="pcard-no">/ 04</span><span className="badge">Snowflake · dbt · Looker</span></div>
+                <div className="pcard-top"><span className="pcard-no">/ 04</span><span className="badge">dbt · DuckDB · SQL</span></div>
                 <div className="finding">
-                  <div className="fnum"><span data-count="3.1" data-suf="×">3.1×</span></div>
-                  <div className="flabel">Deals with a demo booked in <em className="serif">week one</em> closed at triple the rate — regardless of company size or deal value.</div>
+                  <div className="fnum"><span data-count="37" data-suf="%">37%</span></div>
+                  <div className="flabel">of the discount-promo cohort was still a customer by month six — neighbouring cohorts kept ~71%. Cheap signups, <em className="serif">expensive</em> churn.</div>
                 </div>
-                <h3>SaaS Sales &amp; Revenue Pipeline</h3>
-                <p className="pcard-desc">A full funnel teardown of 4,200 opportunities — where revenue leaks, where deals stall, and the two behaviours that compound into closed-won.</p>
+                <h3>SaaS Sales &amp; Revenue Analytics</h3>
+                <p className="pcard-desc">MRR, churn, NRR and CLV computed from 12.5K invoices through a tested dbt pipeline — 8 models, 44 data tests — with a cohort retention heatmap as the centrepiece.</p>
                 <div className="tagrow">
-                  <span className="tag">SQL</span><span className="tag">Snowflake</span><span className="tag">dbt</span><span className="tag">Looker</span>
+                  <span className="tag">dbt</span><span className="tag">SQL</span><span className="tag">DuckDB</span><span className="tag">BigQuery</span>
                 </div>
                 <span className="cardlink">Read the case study <span className="arrow">↗</span></span>
               </Link>

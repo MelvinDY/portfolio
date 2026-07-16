@@ -47,11 +47,11 @@ const SYSTEM_PROMPT = `You are the AI assistant on Melvin Darial Yogiana's portf
 - 🗑 Terrible Ideas Hackathon — Golden Rubbish Bin (Most Absurd Idea with Best Execution), for Stall Wars (48-hour two-player arcade game).
 - ★ UNSW International Student Award — for academic work and community contribution.
 
-## DATA PROJECTS (4 case studies, ~1.2M+ rows analysed total)
+## DATA PROJECTS (4 case studies, ~75K+ rows analysed total)
 1. Australian Labour Market Dashboard — end-to-end pipeline on live ABS data: Python ingests it, Azure SQL models it (staging → mart), a 4-page Power BI report (generated as code, not clicked together) visualises it. Key finding: 80% of working men hold full-time jobs vs 57% of women. Stack: ABS API, Azure SQL, Power BI, DAX, Python.
 2. YouTube Trending Analytics — forensics on ~40,000 trending videos across 10 regions: what predicts a trending spot and how long it survives (avg life under ~38 hrs). Stack: YouTube API, pandas, scikit-learn, Plotly.
-3. Woolworths vs Coles Price Analytics — 6 months of daily price scrapes on 1,000 staples; who's genuinely cheaper and how much loyalty costs (~$1,240/yr basket gap, decided by specials). Stack: web scraping, PostgreSQL, dbt, Python.
-4. SaaS Sales & Revenue Pipeline — funnel teardown of 4,200 opportunities; deals with a demo booked in week one closed at 3.1× the rate. Stack: SQL, Snowflake, dbt, Looker.
+3. Woolworths vs Coles Price Analytics — same-day prices from both retailers' public web APIs, 104 identical products fuzzy-matched across catalogues (rapidfuzz entity resolution). Finding: a 50-item basket differs by under $2 (near dead-heat); half the identical products are priced to the cent, and the big $9–15 gaps are specials-driven. Stack: Python, DuckDB, rapidfuzz, static SVG dashboard.
+4. SaaS Sales & Revenue Analytics — MRR, churn, NRR and CLV computed from 12.5K invoices + 1,147 subscriptions through a tested dbt pipeline (8 models, 44 data tests, staging → intermediate → marts). Finding: MRR $520K (+5.1% MoM) but Basic-tier NRR is 68% vs Pro's 103%, and the May–Jul 2024 discount-promo cohorts kept only 37–49% of customers at month six vs ~71% for neighbours. Stack: dbt, DuckDB, SQL, BigQuery + Looker Studio cloud path. (Data is synthetic/seeded — the pipeline is the product.)
 
 ## SOFTWARE PROJECTS (4 builds)
 1. Peersuade — real-time multiplayer debate/persuasion game; won two UNIHACK 2026 categories. Stack: React, TypeScript, WebSocket, Node.js, Tailwind. Live: politics-game.vercel.app.
@@ -232,7 +232,7 @@ function getFallbackResponse(message: string): string {
   }
 
   if (lowerMessage.includes("project") || lowerMessage.includes("portfolio")) {
-    return "A few highlights:\n\nData\n• Australian Labour Market Dashboard — ABS data → Azure SQL → Power BI\n• YouTube Trending Analytics — ~40k videos, pandas + scikit-learn\n• Woolworths vs Coles Price Analytics — 6 months of scrapes, dbt + Postgres\n• SaaS Sales & Revenue Pipeline — Snowflake, dbt, Looker\n\nSoftware\n• Peersuade — UNIHACK 2026 double winner (React, WebSocket)\n• Ignite — PPIA UNSW platform, team of 10\n• AI Confluence Q&A Helper — RAG capstone (Python, FastAPI)\n• Rate My Accom NSW — production Next.js review site\n\nGitHub: github.com/MelvinDY";
+    return "A few highlights:\n\nData\n• Australian Labour Market Dashboard — ABS data → Azure SQL → Power BI\n• YouTube Trending Analytics — ~40k videos, pandas + scikit-learn\n• Woolworths vs Coles Price Analytics — retailer APIs, DuckDB + rapidfuzz matching\n• SaaS Sales & Revenue Analytics — dbt pipeline, 44 tests, cohort retention\n\nSoftware\n• Peersuade — UNIHACK 2026 double winner (React, WebSocket)\n• Ignite — PPIA UNSW platform, team of 10\n• AI Confluence Q&A Helper — RAG capstone (Python, FastAPI)\n• Rate My Accom NSW — production Next.js review site\n\nGitHub: github.com/MelvinDY";
   }
 
   if (lowerMessage.includes("onlycode") || lowerMessage.includes("hackathon") || lowerMessage.includes("award") || lowerMessage.includes("peersuade")) {
