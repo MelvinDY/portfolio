@@ -120,7 +120,14 @@ export default function TeHero() {
         {/* act i — the name */}
         <div className="h3-scene h3-a">
           <p className="h3-pre mono">[ data analyst · full-stack dev — sydney, au ]</p>
-          <h1 className="h3-name" aria-label="Melvin Yogiana">
+          <h1 className="h3-name">
+            {/*
+              The visible name is split per-character for the GSAP reveal and
+              hidden from a11y, so the only machine-readable copy of the name
+              lives here. It carries the full legal name — the display keeps
+              its two-line "Melvin / Yogiana" composition.
+            */}
+            <span className="sr-only">Melvin Darial Yogiana</span>
             <span className="h3-nline" aria-hidden="true"><span className="h3-nword h3-n1">{chars('Melvin')}</span></span>
             <span className="h3-nline h3-nline-b" aria-hidden="true">
               {/* the period is the door — hover it, or tap it on mobile */}
