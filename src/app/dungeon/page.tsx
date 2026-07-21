@@ -6,7 +6,9 @@ import GameLoader from './game-loader'
 const pixel = Press_Start_2P({ weight: '400', subsets: ['latin'], variable: '--font-pixel' })
 
 export const metadata: Metadata = {
-  title: '??? — you found something',
+  // `absolute` opts out of the root title template — the easter egg should not
+  // announce whose site it is in the tab title.
+  title: { absolute: '??? — you found something' },
   robots: { index: false, follow: false },
 }
 

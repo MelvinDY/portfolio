@@ -1,7 +1,15 @@
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ArrowLeft, Mail, Globe } from "lucide-react"
+import type { Metadata } from "next"
 import Link from "next/link"
+
+export const metadata: Metadata = {
+  title: "Privacy",
+  description:
+    "How this site handles analytics and contact data — the privacy policy for melvindarialyogiana.com.",
+  alternates: { canonical: "/privacy" },
+}
 
 export default function PrivacyPage() {
   return (
