@@ -1,22 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { clientIp, rateLimit } from "@/app/lib/rate-limit";
 
-// Rate limiting: 5 questions per day per IP
-interface RateLimit {
-  count: number;
-  resetTime: number;
-}
+export const runtime = "nodejs";
 
-const rateLimitStore = new Map<string, RateLimit>();
+// 5 questions per day per caller, counted in Postgres so the limit actually
+// holds across serverless instances and cold starts.
+const DAILY_LIMIT = 5;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
-// Clean up old entries every hour
-setInterval(() => {
-  const now = Date.now();
-  for (const [ip, data] of rateLimitStore.entries()) {
-    if (now > data.resetTime) {
-      rateLimitStore.delete(ip);
-    }
-  }
-}, 60 * 60 * 1000); // 1 hour
+// Cap the message before it reaches the model: an uncapped body is a free
+// prompt-length lever on someone else's API quota.
+const bodySchema = z.object({
+  message: z.string().trim().min(1).max(500),
+});
 
 const SYSTEM_PROMPT = `You are the AI assistant on Melvin Darial Yogiana's portfolio website. You help recruiters, employers, and curious visitors learn about Melvin's background, skills, and work. Be professional, warm, and concise — answer in a few short sentences or tight bullet points, and never invent facts beyond what's below.
 
@@ -74,68 +71,44 @@ Indonesian, based in Sydney. Helps run tech for PPIA UNSW (the Indonesian studen
 4. For hiring/availability, note he's after Data Analyst / Analytics Engineer (and full-stack/grad) roles in Sydney and invite them to email melvindarialyogiana@gmail.com.
 5. Stay professional and human — you represent Melvin. Don't over-sell or use hype; let the specifics speak.`;
 
-function getRateLimitInfo(ip: string): { allowed: boolean; remaining: number; resetTime: number } {
-  const now = Date.now();
-  const oneDayMs = 24 * 60 * 60 * 1000;
-  const maxRequests = 5;
-
-  let rateLimit = rateLimitStore.get(ip);
-
-  // If no record or reset time has passed, create new entry
-  if (!rateLimit || now > rateLimit.resetTime) {
-    const resetTime = now + oneDayMs;
-    rateLimit = { count: 0, resetTime };
-    rateLimitStore.set(ip, rateLimit);
-  }
-
-  const remaining = maxRequests - rateLimit.count;
-  const allowed = rateLimit.count < maxRequests;
-
-  return { allowed, remaining, resetTime: rateLimit.resetTime };
-}
-
 export async function POST(request: NextRequest) {
   let message = "";
   try {
-    const body = await request.json();
-    message = body.message;
+    const parsed = bodySchema.safeParse(await request.json());
 
-    if (!message || typeof message !== "string") {
+    if (!parsed.success) {
       return NextResponse.json(
         { error: "Invalid message format" },
         { status: 400 }
       );
     }
+    message = parsed.data.message;
 
-    // Get user's IP address
-    const ip = request.headers.get("x-forwarded-for") ||
-               request.headers.get("x-real-ip") ||
-               "unknown";
+    const limit = await rateLimit({
+      scope: "chat",
+      ip: clientIp(request.headers),
+      limit: DAILY_LIMIT,
+      windowMs: DAY_MS,
+    });
 
-    // Check rate limit
-    const rateLimitInfo = getRateLimitInfo(ip);
-
-    if (!rateLimitInfo.allowed) {
-      const hoursUntilReset = Math.ceil((rateLimitInfo.resetTime - Date.now()) / (1000 * 60 * 60));
+    if (!limit.allowed) {
+      const hoursUntilReset = Math.max(
+        1,
+        Math.ceil((limit.resetAt.getTime() - Date.now()) / (1000 * 60 * 60))
+      );
 
       return NextResponse.json(
         {
           error: "Daily question limit reached",
-          message: `You've reached your daily limit of 5 questions. Please try again in ${hoursUntilReset} hours or contact Melvin directly at melvindarialyogiana@gmail.com.`,
-          resetTime: rateLimitInfo.resetTime,
+          message: `You've reached your daily limit of ${DAILY_LIMIT} questions. Please try again in ${hoursUntilReset} hours or contact Melvin directly at melvindarialyogiana@gmail.com.`,
+          resetTime: limit.resetAt.getTime(),
           remaining: 0
         },
         { status: 429 }
       );
     }
 
-    // Increment the counter
-    const rateLimit = rateLimitStore.get(ip)!;
-    rateLimit.count++;
-    rateLimitStore.set(ip, rateLimit);
-
-    // Get updated rate limit info for response
-    const updatedRateLimitInfo = getRateLimitInfo(ip);
+    const remaining = limit.remaining;
 
     // Check if Gemini API key is configured
     const apiKey = process.env.GEMINI_API_KEY;
@@ -145,7 +118,7 @@ export async function POST(request: NextRequest) {
       // Fallback response when API key is not configured
       return NextResponse.json({
         message: getFallbackResponse(message),
-        remaining: updatedRateLimitInfo.remaining,
+        remaining,
         source: "fallback:no-key",
       });
     }
@@ -178,7 +151,7 @@ export async function POST(request: NextRequest) {
       // Any upstream error → canned fallback, but report why
       return NextResponse.json({
         message: getFallbackResponse(message),
-        remaining: updatedRateLimitInfo.remaining,
+        remaining,
         source: `fallback:api-${response.status}`,
       });
     }
@@ -194,32 +167,29 @@ export async function POST(request: NextRequest) {
       // 200 OK but no usable text (e.g. safety block or empty candidates)
       return NextResponse.json({
         message: getFallbackResponse(message),
-        remaining: updatedRateLimitInfo.remaining,
+        remaining,
         source: "fallback:no-candidates",
       });
     }
 
     return NextResponse.json({
       message: assistantText,
-      remaining: updatedRateLimitInfo.remaining,
+      remaining,
       source: "gemini",
     });
   } catch (error) {
     console.error("Chat API error:", error);
-    // Use fallback response on any error
-    const ip = request.headers.get("x-forwarded-for") ||
-               request.headers.get("x-real-ip") ||
-               "unknown";
-    const rateLimitInfo = getRateLimitInfo(ip);
+    // Fall back rather than fail. `remaining` is deliberately omitted: the
+    // request was already counted above, and re-reading the limiter here would
+    // count it a second time. The client keeps whatever count it last saw.
     return NextResponse.json({
       message: getFallbackResponse(message),
-      remaining: rateLimitInfo.remaining,
       source: "fallback:exception",
     });
   }
 }
 
-// Fallback responses when OpenAI API is not configured
+// Canned answers for when the model is unavailable
 function getFallbackResponse(message: string): string {
   const lowerMessage = message.toLowerCase();
 
