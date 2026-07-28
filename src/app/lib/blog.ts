@@ -1,4 +1,5 @@
 // src/lib/blog.ts
+import { cache } from "react"
 import { BlogPost, PostCard } from "../types/blog"
 import fs from "fs"
 import path from "path"
@@ -7,9 +8,15 @@ import matter from "gray-matter"
 const postsDirectory = path.join(process.cwd(), "content/blog")
 
 /**
- * Read all blog posts from MDX files
+ * Read and parse every post from disk.
+ *
+ * Memoised with React's `cache` because almost every other export here funnels
+ * through it -- rendering one blog page previously re-read and re-parsed the
+ * whole content directory several times over (once for the post, again for
+ * related posts, again for the index cards). The memo is per-request, so
+ * editing a post in dev still shows up on the next load.
  */
-function readAllPosts(): BlogPost[] {
+const readAllPosts = cache((): BlogPost[] => {
   // Check if directory exists
   if (!fs.existsSync(postsDirectory)) {
     return []
@@ -43,7 +50,7 @@ function readAllPosts(): BlogPost[] {
     })
 
   return allPostsData
-}
+})
 
 /** "Data Engineering" -> "data-engineering" — must match TAG_BUTTONS values. */
 export function tagSlug(tag: string): string {
