@@ -1,9 +1,48 @@
 import { neon } from '@neondatabase/serverless'
+import { createHash } from 'crypto'
 
 export function db() {
   const url = process.env.DATABASE_URL
   if (!url) throw new Error('DATABASE_URL is not set')
   return neon(url)
+}
+
+/** The timezone every bucket, rotation and "today" on this site is measured in. */
+export const TZ = 'Australia/Sydney'
+
+const sydneyDay = new Intl.DateTimeFormat('en-CA', {
+  timeZone: TZ,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+})
+
+/**
+ * Cookieless visitor id: hash of (secret salt, Sydney day, IP, UA).
+ *
+ * Rotates daily, so there is no cross-day tracking and nothing reversible is
+ * stored. The rotation day is Australia/Sydney so identity resets at the same
+ * midnight the dashboard buckets by, not mid-morning local time (UTC).
+ *
+ * Lives here rather than in the track route because the read side recomputes
+ * it too: that is how the live feed can mark which row is *you* without ever
+ * storing anything extra.
+ */
+export function visitorId(ip: string, ua: string): string {
+  const day = sydneyDay.format(new Date())
+  return createHash('sha256')
+    .update(`${process.env.ANALYTICS_SALT ?? 'dev'}:${day}:${ip}:${ua}`)
+    .digest('hex')
+    .slice(0, 16)
+}
+
+/** Best-effort client IP behind Vercel's proxy. Never stored — only hashed. */
+export function clientIp(headers: Headers): string {
+  return (
+    headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    headers.get('x-real-ip') ??
+    '0.0.0.0'
+  )
 }
 
 const BOT_RE = /bot|crawl|spider|slurp|headless|lighthouse|prerender|preview|scan|fetch|monitor|curl|wget|python-requests|axios|node-fetch/i

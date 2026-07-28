@@ -16,16 +16,17 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
   weight: ["400", "500", "600"],
 })
+// Both display faces load as variable fonts — `weight` is deliberately
+// omitted. The hero interpolates the name's weight per character under the
+// pointer, which needs a continuous wght axis, not four static instances.
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-space-grotesk",
-  weight: ["400", "500", "600", "700"],
 })
 const newsreader = Newsreader({
   subsets: ["latin"],
   variable: "--font-newsreader",
   style: ["normal", "italic"],
-  weight: ["300", "400", "500"],
 })
 
 export const metadata: Metadata = {

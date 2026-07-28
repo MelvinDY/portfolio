@@ -8,6 +8,7 @@ import TeHero from './components/te-hero'
 import TeCursor from './components/te-cursor'
 import HomeTelemetry from './components/home-telemetry'
 import ScrollProgress from './components/scroll-progress'
+import TeContactForm from './components/te-contact-form'
 
 type InkWord = { t: string; acid?: boolean }
 
@@ -232,6 +233,7 @@ export default function HomePage() {
                 <span className="ct-note mono">let&apos;s connect ↗</span>
               </a>
             </div>
+            <TeContactForm />
           </div>
         </section>
       </main>
