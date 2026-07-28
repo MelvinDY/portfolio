@@ -121,7 +121,8 @@ export default function AiChatbox() {
     return () => window.removeEventListener("keydown", onKey);
   }, [isOpen, open, close]);
 
-  // focus input + lock body scroll while open
+  // focus input + lock body scroll while open, and hand focus back to the
+  // trigger on close so keyboard users don't get dumped at the top of the page
   useEffect(() => {
     if (isOpen) {
       inputRef.current?.focus();
@@ -129,8 +130,43 @@ export default function AiChatbox() {
       document.body.style.overflow = "hidden";
       return () => {
         document.body.style.overflow = prev;
+        triggerRef.current?.focus();
       };
     }
+  }, [isOpen]);
+
+  // Trap Tab inside the palette. The overlay stays mounted so the FLIP morph
+  // has a box to animate, which means without this the tab order walks straight
+  // out of the "modal" and into the page behind it.
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const onTab = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+      const pal = paletteRef.current;
+      if (!pal) return;
+
+      const focusable = Array.from(
+        pal.querySelectorAll<HTMLElement>(
+          'a[href], button, input, textarea, select, [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((el) => !el.hasAttribute("disabled") && el.offsetParent !== null);
+
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", onTab);
+    return () => document.removeEventListener("keydown", onTab);
   }, [isOpen]);
 
   useEffect(() => {
@@ -221,15 +257,26 @@ export default function AiChatbox() {
       </button>
 
       {/* Overlay + palette */}
+      {/* `inert` rather than aria-hidden: the overlay stays mounted for the
+          morph animation, and aria-hidden on a subtree that still contains
+          focusable controls is an accessibility conflict -- screen readers are
+          told to ignore inputs the keyboard can still reach. `inert` removes it
+          from both the a11y tree and the tab order in one go. */}
       <div
         className="cmdk-overlay"
         data-open={isOpen ? "true" : "false"}
-        aria-hidden={!isOpen}
+        inert={!isOpen}
         onMouseDown={(e) => {
           if (e.target === e.currentTarget) close();
         }}
       >
-        <div className="cmdk" ref={paletteRef} role="dialog" aria-label="Ask about Melvin" aria-modal="true">
+        <div
+          className="cmdk"
+          ref={paletteRef}
+          role="dialog"
+          aria-label="Ask about Melvin"
+          aria-modal={isOpen}
+        >
           {/* Input row */}
           <form className="cmdk-row" onSubmit={handleSubmit}>
             <span className="cmdk-row-ico" aria-hidden="true">

@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createHash } from 'crypto'
 import { z } from 'zod'
-import { db, isBot, parseDevice, referrerHost } from '@/app/lib/analytics'
+import { clientIp, db, isBot, parseDevice, referrerHost, visitorId } from '@/app/lib/analytics'
 
 export const runtime = 'nodejs'
+
+/** Pageviews accepted per visitor per minute before writes are dropped. */
+const MAX_PER_MINUTE = 30
 
 const bodySchema = z.object({
   path: z.string().min(1).max(200),
@@ -11,25 +13,6 @@ const bodySchema = z.object({
   utm_source: z.string().max(80).optional(),
   event: z.string().max(60).optional(),
 })
-
-// Cookieless visitor id: hash of (secret salt, UTC day, IP, UA).
-// Rotates daily, so no cross-day tracking and nothing reversible is stored.
-// The rotation day is Australia/Sydney so identity resets at the same
-// midnight the dashboard buckets by, not mid-morning local time (UTC).
-const sydneyDay = new Intl.DateTimeFormat('en-CA', {
-  timeZone: 'Australia/Sydney',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-})
-
-function visitorId(ip: string, ua: string): string {
-  const day = sydneyDay.format(new Date())
-  return createHash('sha256')
-    .update(`${process.env.ANALYTICS_SALT ?? 'dev'}:${day}:${ip}:${ua}`)
-    .digest('hex')
-    .slice(0, 16)
-}
 
 export async function POST(req: NextRequest) {
   const ok = new NextResponse(null, { status: 204 })
@@ -41,10 +24,7 @@ export async function POST(req: NextRequest) {
     const ua = req.headers.get('user-agent')
     if (isBot(ua)) return ok
 
-    const ip =
-      req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
-      req.headers.get('x-real-ip') ??
-      '0.0.0.0'
+    const ip = clientIp(req.headers)
     const country = req.headers.get('x-vercel-ip-country') ?? null
     const { device, browser, os } = parseDevice(ua!)
     const { path, referrer, utm_source, event } = parsed.data
@@ -52,15 +32,33 @@ export async function POST(req: NextRequest) {
     // Normalise: strip trailing slash (except root), drop query strings
     const cleanPath = (path.split('?')[0].replace(/\/+$/, '') || '/').slice(0, 200)
 
+    const vid = visitorId(ip, ua!)
+
+    // Cap writes per visitor per minute. This is an INSERT ... SELECT with a
+    // guard rather than a separate check, so flood protection costs no extra
+    // round trip on the hot path, and the count is index-backed by
+    // events_visitor_ts_idx. MAX_PER_MINUTE is well above what real browsing
+    // produces (client-side nav fires one row per route change).
+    //
+    // Caveat worth stating plainly: visitor_id is derived from IP *and* UA, so
+    // a script rotating its user-agent still gets a fresh bucket each time.
+    // This stops naive floods, not a determined attacker.
+    // The casts are belt-and-braces, not a requirement: Postgres does infer
+    // these parameters from the INSERT target columns (verified on 16). They
+    // stay because a bare SELECT list is the one spot where that inference is
+    // easy to lose track of if the column list is ever reordered.
     const sql = db()
     await sql`
       INSERT INTO events (visitor_id, path, referrer_host, country, device, browser, os, utm_source, event)
-      VALUES (
-        ${visitorId(ip, ua!)}, ${cleanPath},
-        ${referrerHost(referrer, req.nextUrl.hostname)},
-        ${country}, ${device}, ${browser}, ${os},
-        ${utm_source?.slice(0, 80) ?? null}, ${event ?? null}
-      )
+      SELECT
+        ${vid}::text, ${cleanPath}::text,
+        ${referrerHost(referrer, req.nextUrl.hostname)}::text,
+        ${country}::text, ${device}::text, ${browser}::text, ${os}::text,
+        ${utm_source?.slice(0, 80) ?? null}::text, ${event ?? null}::text
+      WHERE (
+        SELECT count(*) FROM events
+        WHERE visitor_id = ${vid}::text AND ts > now() - interval '1 minute'
+      ) < ${MAX_PER_MINUTE}::int
     `
   } catch (err) {
     console.error('[track]', err)
