@@ -712,7 +712,7 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 .te-home .h3-plate {
   position: absolute; inset: 0;
   pointer-events: none;
-  opacity: 0.2;
+  opacity: 0.38;
   background-image: image-set(url("/hero/plate.avif") type("image/avif"),
                               url("/hero/plate.webp") type("image/webp"));
   background-image: -webkit-image-set(url("/hero/plate.avif") type("image/avif"),
@@ -769,8 +769,8 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
       rgba(11,9,7,0.93) 88%,
       transparent 96%),
     radial-gradient(ellipse 78% 30% at 50% 44%,
-      rgba(11,9,7,0.60) 0%,
-      rgba(11,9,7,0.30) 55%,
+      rgba(11,9,7,0.42) 0%,
+      rgba(11,9,7,0.18) 55%,
       transparent 80%);
 }
 
