@@ -756,22 +756,21 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 .te-home .h3-scrim {
   position: absolute; inset: 0;
   pointer-events: none;
-  /* Two gradients, because the two kinds of type need different protection.
-     The 11px mono sub-line is the hard case — small text needs 4.5:1, and a
-     single broad ellipse strong enough to deliver that flattened the whole
-     engraving. So: a tight full-width band does the real work exactly where
-     the small type sits, and a soft wash sits behind the name, which is large
-     text and only needs 3:1. The peak above and the base below stay open. */
+  /* One ellipse, deliberately — an earlier version used a full-width linear
+     band over the type. It measured fine and looked fine while the plate was
+     faint, but once the plate came up to 0.38 the mountain was bright above
+     and below a flat 0.93 plateau, and the seam read as a black bar across
+     the hero. A band bounded by brighter material always risks that; an
+     ellipse has no horizontal edge to notice, so it reads as depth instead.
+     Centred low, on the 11px sub-line — that is the type that needs 4.5:1.
+     The name above only needs 3:1 and the mountain base below stays open. */
   background:
-    linear-gradient(to bottom,
-      transparent 58%,
-      rgba(11,9,7,0.93) 70%,
-      rgba(11,9,7,0.93) 88%,
-      transparent 96%),
-    radial-gradient(ellipse 78% 30% at 50% 44%,
-      rgba(11,9,7,0.42) 0%,
-      rgba(11,9,7,0.18) 55%,
-      transparent 80%);
+    radial-gradient(ellipse 120% 42% at 50% 62%,
+      rgba(11,9,7,0.93) 0%,
+      rgba(11,9,7,0.80) 34%,
+      rgba(11,9,7,0.45) 62%,
+      rgba(11,9,7,0.15) 82%,
+      transparent 100%);
 }
 
 /* the same grid, acid-tinted, revealed only under the pointer — the blueprint
@@ -960,14 +959,12 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
   }
   .te-home .h3-scrim {
     background:
-      linear-gradient(to bottom,
-        transparent 50%,
-        rgba(11,9,7,0.93) 62%,
-        rgba(11,9,7,0.93) 90%,
-        transparent 97%),
-      radial-gradient(ellipse 95% 26% at 50% 40%,
-        rgba(11,9,7,0.55) 0%,
-        transparent 82%);
+      radial-gradient(ellipse 150% 38% at 50% 58%,
+        rgba(11,9,7,0.93) 0%,
+        rgba(11,9,7,0.80) 34%,
+        rgba(11,9,7,0.45) 62%,
+        rgba(11,9,7,0.15) 82%,
+        transparent 100%);
   }
 }
 
