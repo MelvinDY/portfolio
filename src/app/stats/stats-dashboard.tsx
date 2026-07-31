@@ -713,42 +713,150 @@ const css = `
 }
 .sql-foot code { color: ${MUTED}; }
 
-/* ─── the live wire ─── */
+/* ─── the wire ───
+   A dispatch log on a real time axis: the vertical gap between two entries is
+   proportional (log-scaled, in the component) to the gap between the two hits,
+   so a burst clusters and a quiet night opens up. Mono is what the database
+   saw; the serif italic is the page talking to you. */
+.wire-card {
+  --rail: rgba(242,234,224,0.10);
+  --rail-visit: rgba(242,234,224,0.30);
+  --sep: rgba(242,234,224,0.18);
+  --row-pad: 13px;
+}
 .wire-head-right { display: flex; align-items: baseline; gap: 14px; }
-.wire-you-note { font-family: var(--font-mono, monospace); font-size: 10px; letter-spacing: 0.08em; color: ${BRAND}; }
-.wire { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.wire-you-note {
+  font-family: var(--font-newsreader, Georgia, serif); font-style: italic;
+  font-size: 12.5px; color: ${MUTED};
+}
+
+/* the poll, on screen */
+.wire-pulse {
+  position: relative; height: 1px; margin: -2px 0 18px;
+  background: rgba(255,255,255,0.05); overflow: hidden;
+}
+.wire-tick {
+  position: absolute; top: 0; bottom: 0; left: 0; width: 0;
+  background: var(--sep); animation: wire-tick linear both;
+}
+@keyframes wire-tick { from { width: 0 } to { width: 100% } }
+.wire-pulse.is-idle .wire-tick { animation: none; width: 100%; background: rgba(242,234,224,0.06); }
+
+.wire { list-style: none; margin: 0; padding: 0; }
 .wire-row {
+  position: relative;
   display: grid;
-  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
-  align-items: baseline; gap: 14px;
-  font-family: var(--font-mono, monospace); font-size: 11.5px;
-  color: ${MUTED}; padding: 7px 10px; border-left: 2px solid transparent;
-  border-radius: 3px;
+  grid-template-columns: 58px 14px minmax(0, 1fr);
+  column-gap: 12px;
+  padding-top: var(--gap, 0px);
+  padding-bottom: var(--row-pad);
 }
-.wire-row:nth-child(odd) { background: rgba(255,255,255,0.015); }
-.wire-t { color: ${FAINT}; font-variant-numeric: tabular-nums; }
-.wire-geo { color: ${MUTED}; white-space: nowrap; }
-.wire-path { color: ${INK}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.wire-ua { color: ${FAINT}; white-space: nowrap; }
-.wire-age { color: ${FAINT}; font-variant-numeric: tabular-nums; text-align: right; min-width: 3ch; }
-.wire-you { color: ${BRAND}; white-space: nowrap; letter-spacing: 0.04em; }
-.wire-row.is-you { border-left-color: ${BRAND}; background: rgba(255,94,31,0.06); }
-.wire-row.is-new { animation: wire-in 620ms cubic-bezier(0.16, 1, 0.3, 1) both; }
-@keyframes wire-in {
-  from { opacity: 0; transform: translateY(-6px); background: rgba(255,94,31,0.16); }
-  to   { opacity: 1; transform: none; }
+.wire-t {
+  font-family: var(--font-mono, monospace); font-size: 11px; line-height: 18px;
+  color: ${FAINT}; font-variant-numeric: tabular-nums; white-space: nowrap;
 }
+
+/* the rail — ::before spans the proportional gap above the entry, ::after the
+   entry itself, so the line stays continuous through the padding and the two
+   halves can be styled apart when the gap is a lull. */
+.wire-rail { position: relative; }
+.wire-rail::before, .wire-rail::after {
+  content: ''; position: absolute; left: 50%; width: 1px; margin-left: -0.5px;
+  background: var(--rail);
+}
+.wire-rail::before { top: calc(-1 * var(--gap, 0px)); height: var(--gap, 0px); }
+/* The rail cell is a grid item, so it stops at the row's content box — reach
+   down through the row padding or the line breaks once per entry. */
+.wire-rail::after { top: 0; bottom: calc(-1 * var(--row-pad)); }
+.wire-row.is-quiet .wire-rail::before {
+  background: linear-gradient(var(--rail) 45%, transparent 45%);
+  background-size: 1px 5px;
+}
+/* One visit, drawn as one stroke. Listed after the lull rule on purpose and at
+   matching specificity: a reader who pauses fifteen minutes and carries on is
+   still one visit, so the stroke wins over the dotted gap. */
+.wire-row.link-up .wire-rail::before,
+.wire-row.link-down .wire-rail::after { background: var(--rail-visit); }
+/* Last row fades out regardless — it may be linked to a row behind the fold. */
+.wire-row:last-child .wire-rail::after { background: linear-gradient(var(--rail), transparent); }
+
+.wire-node {
+  position: absolute; left: 50%; top: 6px;
+  width: 6px; height: 6px; margin-left: -3px; border-radius: 50%;
+  background: ${FAINT};
+}
+.wire-row.is-you .wire-node { background: ${BRAND}; }
+.wire-row.is-new .wire-node { animation: node-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes node-in { from { transform: scale(2.6); opacity: 0 } to { transform: none; opacity: 1 } }
+
+.wire-quiet {
+  position: absolute; left: 96px; top: calc(var(--gap, 0px) / 2);
+  transform: translateY(-50%);
+  font-family: var(--font-newsreader, Georgia, serif); font-style: italic;
+  font-size: 12px; color: ${FAINT}; white-space: nowrap;
+}
+
+.wire-body { min-width: 0; }
+.wire-path {
+  display: block;
+  font-family: var(--font-mono, monospace); font-size: 13px; font-weight: 500;
+  line-height: 18px; letter-spacing: -0.01em; color: ${MUTED};
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.wire-path.t-fresh { color: ${INK}; }
+.wire-path.t-recent { color: #c9c2bb; }
+.wire-row.is-new .wire-path { animation: path-in 620ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes path-in { from { opacity: 0; transform: translateX(-4px) } to { opacity: 1; transform: none } }
+
+.wire-line2 { display: flex; align-items: baseline; gap: 12px; margin-top: 2px; }
+.wire-meta {
+  flex: 1; min-width: 0;
+  font-family: var(--font-mono, monospace); font-size: 11px; color: ${FAINT};
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.wire-meta > span:not(:first-child)::before {
+  content: '·'; margin: 0 7px; color: rgba(255,255,255,0.18);
+}
+.wire-ref { color: ${MUTED}; }
+.wire-you {
+  flex-shrink: 0;
+  font-family: var(--font-newsreader, Georgia, serif); font-style: italic;
+  font-size: 12.5px; color: ${BRAND};
+}
+.wire-age {
+  flex-shrink: 0; font-family: var(--font-mono, monospace); font-size: 11px;
+  color: ${FAINT}; font-variant-numeric: tabular-nums;
+}
+
+.wire-now .wire-node { background: ${BRAND}; animation: pulse 2s ease-in-out infinite; }
+.wire-now-label {
+  font-family: var(--font-newsreader, Georgia, serif); font-style: italic;
+  font-size: 13px; line-height: 18px; color: ${MUTED};
+}
+
 .wire-foot {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
   margin-top: 16px; font-family: var(--font-mono, monospace); font-size: 10px;
   letter-spacing: 0.08em; color: ${FAINT};
 }
-.wire-resume {
-  font: inherit; color: ${BRAND}; background: none; border: none; padding: 0; cursor: pointer;
+.wire-resume, .wire-more {
+  font: inherit; letter-spacing: inherit; background: none; border: none;
+  padding: 0; cursor: pointer; flex-shrink: 0;
 }
+.wire-resume { color: ${BRAND}; }
+.wire-more { color: ${MUTED}; }
+.wire-more:hover, .wire-more:focus-visible, .wire-resume:hover { color: ${BRAND}; }
+.wire-more:focus-visible, .wire-resume:focus-visible { outline: 1px solid rgba(255,94,31,0.5); outline-offset: 3px; }
+.wire-more-n { color: ${FAINT}; }
+
+/* Narrow: the gutter tightens but nothing is dropped — the meta line wraps
+   instead, so geo, client and referrer survive on a phone. */
 @media (max-width: 620px) {
-  .wire-row { grid-template-columns: auto minmax(0, 1fr) auto; row-gap: 2px; }
-  .wire-ua { display: none; }
-  .wire-geo { display: none; }
+  .wire-row { grid-template-columns: 52px 12px minmax(0, 1fr); column-gap: 8px; }
+  .wire-t { font-size: 10.5px; }
+  .wire-quiet { left: 80px; }
+  .wire-meta { white-space: normal; overflow: visible; }
+  .wire-line2 { flex-wrap: wrap; row-gap: 2px; }
 }
 
 /* ─── rhythm heatmap ─── */
@@ -832,9 +940,14 @@ const css = `
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rise, .spark, .wire-row.is-new, .sql-sheet, .sql-back { animation: none; }
+  .rise, .spark, .sql-sheet, .sql-back { animation: none; }
   .spark { opacity: 1; }
   .live-dot { animation: none; }
   .bar-fill { transition: none; }
+  .wire-row.is-new .wire-node,
+  .wire-row.is-new .wire-path,
+  .wire-now .wire-node { animation: none; }
+  /* The hairline still marks the interval, it just stops sweeping it. */
+  .wire-tick { animation: none; width: 100%; background: rgba(242,234,224,0.08); }
 }
 `
