@@ -16,6 +16,7 @@ interface FeedRow {
   browser: string | null
   referrer_host: string | null
   you: boolean
+  who: number
   live: number
 }
 
@@ -27,6 +28,11 @@ interface FeedRow {
  * (IP, user-agent), so recomputing it here for the requester and comparing
  * inside the query marks "you" without the hash ever leaving the server — the
  * browser only receives a boolean.
+ *
+ * Rows also carry `who`, a rank within this payload that groups a single
+ * person's consecutive pageviews so the wire can draw a session as one stroke.
+ * It is deliberately payload-local: the numbers mean nothing across two polls,
+ * and nothing outside the twenty-four rows they were computed over.
  */
 export async function GET(req: NextRequest) {
   if (!process.env.DATABASE_URL) {
