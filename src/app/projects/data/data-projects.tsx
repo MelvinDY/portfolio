@@ -1,152 +1,223 @@
-"use client"
-
 import Link from 'next/link'
-import TeHeader from '../../components/te-header'
-import { dataProjects, softwareProjects } from '../../data/project-index'
-import { useTeEffects } from '../../lib/use-te-effects'
+import LightHeader from '../../components/light-header'
+import Reveal from '../../components/reveal'
+import { entries, HERO_SUB, type DataEntry } from '../../data/data-case-studies'
 
-export default function DataProjectsPage() {
-  useTeEffects()
+/**
+ * The data index, built around its findings.
+ *
+ * Adopted from Path 1. The argument: on a data portfolio the artefact is a
+ * conclusion, not an app, so each study is a spread built around its figure at
+ * display scale with the method reduced to a line. Density 2 is load-bearing.
+ * If the numbers are the point they need air, and 4.4 says group with spacing
+ * rather than cards, so there are no cards on this page.
+ *
+ * Palette is locked to /projects/software: sibling pages, one palette. Brand
+ * orange at display sizes and on rules, #C13E00 wherever small text needs AA
+ * against this ground. Every corner square.
+ *
+ * Three layout families across four studies, per the repetition rule in 4.7:
+ * the spread, used by the first and last study and separated by the two in
+ * between; a full-width statement; and a three-column arrangement.
+ *
+ * The page carries no images at all, which is a deliberate departure from
+ * Section 4.8. The direction's thesis is that the figure is the visual, and
+ * every study except one has no screenshot anyway, so plates would have made
+ * the page look complete in one place and thin in three. The Power BI captures
+ * still live under public/projects/labour-market and are used by that study's
+ * own case-study page.
+ */
 
+const mono = { fontFamily: 'var(--font-mono), ui-monospace, monospace' } as const
+const display = { fontFamily: 'var(--font-space-grotesk), system-ui, sans-serif' } as const
+
+function MethodLine({ e }: { e: DataEntry }) {
   return (
-    <div className="te-home">
-      <TeHeader activePage="data" />
+    <p className="text-[12px] leading-relaxed text-[#8A8378]" style={mono}>
+      {e.method.source} &nbsp;/&nbsp; {e.method.transform} &nbsp;/&nbsp; {e.method.output}
+    </p>
+  )
+}
 
-      <main>
-        <section className="subhero">
-          <div className="wrap">
-            <div className="crumb" data-reveal>
-              <Link href="/">home</Link><span>/</span><span className="now">data projects</span>
-            </div>
-            <h1 className="display" data-reveal data-reveal-delay="1">
-              Data<br /><span className="outline">Projects</span>
-            </h1>
-            <div className="subhero-foot">
-              <p className="lead" data-reveal data-reveal-delay="2">
-                Four questions I couldn&apos;t stop poking at — labour markets, viral video,
-                supermarket price wars and a subscription business quietly losing its cheapest customers.
-                Each one is written as a{' '}
-                <span className="acid-text">data story</span>: a finding first, the working underneath.
-              </p>
-              <div className="subhero-meta" data-reveal data-reveal-delay="2">
-                <div className="sm"><div className="v" data-count="4">4</div><div className="l">Case studies</div></div>
-                <div className="sm"><div className="v" data-count="75" data-suf="K+">0</div><div className="l">Rows analysed</div></div>
+function ReadLink({ e, index }: { e: DataEntry; index: number }) {
+  return (
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-3" style={mono}>
+      <Link
+        href={e.href}
+        className="border-b border-[#14120F]/30 pb-0.5 text-[13px] transition-colors hover:border-[#C13E00] hover:text-[#C13E00]"
+      >
+        Read the case study <span aria-hidden="true">&rarr;</span>
+      </Link>
+      <span className="text-[11.5px] text-[#8A8378]">
+        {String(index + 1).padStart(2, '0')} of {String(entries.length).padStart(2, '0')}
+      </span>
+    </div>
+  )
+}
+
+function Figure({ e, className = '' }: { e: DataEntry; className?: string }) {
+  return (
+    <p className={`font-semibold leading-[0.82] tracking-[-0.055em] text-[#ff5e1f] tabular-nums ${className}`}>
+      {e.figure}
+    </p>
+  )
+}
+
+export default function DataProjects() {
+  return (
+    <div className="min-h-[100dvh] bg-[#F3F3F1] text-[#14120F] antialiased" style={display}>
+      <LightHeader active="/projects/data" />
+
+      <section className="mx-auto max-w-[1400px] px-5 pt-20 pb-24 md:px-10 md:pt-28 md:pb-32">
+        <h1 className="max-w-[16ch] text-[clamp(2.75rem,7vw,5.75rem)] font-semibold leading-[0.92] tracking-[-0.045em]">
+          Four findings,
+          <br />
+          and the working.
+        </h1>
+        <p className="mt-8 max-w-[44ch] text-[17px] leading-relaxed text-[#5A544C]">{HERO_SUB}</p>
+        <div className="mt-10 flex flex-wrap items-center gap-5">
+          <Link
+            href={entries[0].href}
+            className="bg-[#ff5e1f] px-7 py-3.5 text-[14.5px] font-semibold text-[#1c0d03] transition-transform active:scale-[0.98]"
+          >
+            Read the first
+          </Link>
+          <Link
+            href="/projects/all"
+            className="border-b-2 border-[#14120F]/25 pb-1 text-[14.5px] font-semibold transition-colors hover:border-[#C13E00] hover:text-[#C13E00]"
+          >
+            All projects
+          </Link>
+        </div>
+      </section>
+
+      {/* Family A, and the only study with screenshots, so it leads. */}
+      {entries.slice(0, 1).map((e, i) => (
+        <Reveal key={e.id}>
+          <section className="mx-auto max-w-[1400px] border-t border-[#14120F]/15 px-5 py-20 md:px-10 md:py-28">
+            <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
+              <div className="lg:col-span-5">
+                <Figure e={e} className="text-[clamp(4rem,11vw,9rem)]" />
+              </div>
+              <div className="lg:col-span-7">
+                <p className="max-w-[26ch] text-[clamp(1.4rem,2.6vw,2.1rem)] font-medium leading-[1.2] tracking-[-0.02em]">
+                  {e.claim}
+                </p>
+                <h2 className="mt-10 text-[1.5rem] font-semibold tracking-[-0.02em]">{e.title}</h2>
+                <p className="mt-1.5 text-[12.5px] text-[#C13E00]" style={mono}>{e.sub}</p>
+                <p className="mt-5 max-w-[58ch] text-[15.5px] leading-relaxed text-[#5A544C]">{e.blurb}</p>
+                <div className="mt-7"><MethodLine e={e} /></div>
+                <div className="mt-8"><ReadLink e={e} index={i} /></div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </Reveal>
+      ))}
 
-        <section className="tight">
-          <div className="wrap">
-            <p className="kicker acid shelf-featured-label" data-reveal>Featured</p>
-            <div className="index-grid">
-
-              <Link className="pcard dcard" href="/projects/data/labour-market" data-reveal>
-                <div className="pcard-top"><span className="pcard-no">/ 01</span><span className="badge">ABS · Azure SQL · Power BI</span></div>
-                <div className="finding">
-                  <div className="fnum"><span data-count="80" data-suf="%">80%</span></div>
-                  <div className="flabel">of working men hold a full-time job — for women it&apos;s 57%. Australia&apos;s part-time economy is overwhelmingly <em className="serif">female</em>.</div>
-                </div>
-                <h3>Australian Labour Market Dashboard</h3>
-                <p className="pcard-desc">An end-to-end pipeline on live ABS data — Python ingests it, Azure SQL models it through a staging→mart layer, and a 4-page Power BI report visualises it. The report is generated as code, not clicked together.</p>
-                <div className="tagrow">
-                  <span className="tag">ABS API</span><span className="tag">Azure SQL</span><span className="tag">Power BI</span><span className="tag">DAX</span><span className="tag">Python</span>
-                </div>
-                <span className="cardlink">Read the case study <span className="arrow">↗</span></span>
-              </Link>
-
-              <Link className="pcard dcard" href="/projects/data/youtube" data-reveal data-reveal-delay="1">
-                <div className="pcard-top"><span className="pcard-no">/ 02</span><span className="badge">API · pandas · ML</span></div>
-                <div className="finding">
-                  <div className="fnum"><span data-count="38" data-suf=" hrs">38 hrs</span></div>
-                  <div className="flabel">The average video&apos;s entire life on the Trending page lasts under two days — then it <em className="serif">vanishes</em>.</div>
-                </div>
-                <h3>YouTube Trending Analytics</h3>
-                <p className="pcard-desc">Forensics on 40,000 trending videos across 10 regions: what actually predicts a spot on the board, how long it survives, and which signals are pure noise.</p>
-                <div className="tagrow">
-                  <span className="tag">YouTube API</span><span className="tag">pandas</span><span className="tag">scikit-learn</span><span className="tag">Plotly</span>
-                </div>
-                <span className="cardlink">Read the case study <span className="arrow">↗</span></span>
-              </Link>
-
-              <Link className="pcard dcard" href="/projects/data/grocery" data-reveal data-reveal-delay="2">
-                <div className="pcard-top"><span className="pcard-no">/ 03</span><span className="badge">Retailer APIs · DuckDB · Python</span></div>
-                <div className="finding">
-                  <div className="fnum"><span data-count="1.82" data-pre="$">$1.82</span></div>
-                  <div className="flabel">The gap on a 50-item basket — a near dead-heat. Of 104 identical products, half cost <em className="serif">exactly</em> the same. The real money hides in the specials.</div>
-                </div>
-                <h3>Woolworths vs Coles Price Analytics</h3>
-                <p className="pcard-desc">Same-day prices from both retailers&apos; public web APIs, fuzzy-matched into identical product pairs and compared in a DuckDB warehouse — basket totals, per-100g unit prices, and $15 same-product outliers.</p>
-                <div className="tagrow">
-                  <span className="tag">Python</span><span className="tag">DuckDB</span><span className="tag">rapidfuzz</span><span className="tag">Entity Resolution</span>
-                </div>
-                <span className="cardlink">Read the case study <span className="arrow">↗</span></span>
-              </Link>
-
-              <Link className="pcard dcard" href="/projects/data/saas" data-reveal data-reveal-delay="3">
-                <div className="pcard-top"><span className="pcard-no">/ 04</span><span className="badge">dbt · DuckDB · SQL</span></div>
-                <div className="finding">
-                  <div className="fnum"><span data-count="37" data-suf="%">37%</span></div>
-                  <div className="flabel">of the discount-promo cohort was still a customer by month six — neighbouring cohorts kept ~71%. Cheap signups, <em className="serif">expensive</em> churn.</div>
-                </div>
-                <h3>SaaS Sales &amp; Revenue Analytics</h3>
-                <p className="pcard-desc">MRR, churn, NRR and CLV computed from 12.5K invoices through a tested dbt pipeline — 8 models, 44 data tests — with a cohort retention heatmap as the centrepiece.</p>
-                <div className="tagrow">
-                  <span className="tag">dbt</span><span className="tag">SQL</span><span className="tag">DuckDB</span><span className="tag">BigQuery</span>
-                </div>
-                <span className="cardlink">Read the case study <span className="arrow">↗</span></span>
-              </Link>
-
+      {/* Family B. One study set as a full-width statement, so the page does
+          not repeat the same spread four times. */}
+      {entries.slice(1, 2).map((e, i) => (
+        <Reveal key={e.id}>
+          <section className="mx-auto max-w-[1400px] border-t border-[#14120F]/15 px-5 py-20 md:px-10 md:py-28">
+            <Figure e={e} className="text-[clamp(4.5rem,15vw,12rem)]" />
+            <p className="mt-6 max-w-[30ch] text-[clamp(1.5rem,3.4vw,2.6rem)] font-medium leading-[1.15] tracking-[-0.025em]">
+              {e.claim}
+            </p>
+            <div className="mt-12 grid gap-8 md:grid-cols-12">
+              <div className="md:col-span-6">
+                <h2 className="text-[1.5rem] font-semibold tracking-[-0.02em]">{e.title}</h2>
+                <p className="mt-1.5 text-[12.5px] text-[#C13E00]" style={mono}>{e.sub}</p>
+                <p className="mt-5 max-w-[52ch] text-[15.5px] leading-relaxed text-[#5A544C]">{e.blurb}</p>
+              </div>
+              <div className="flex flex-col justify-between gap-6 md:col-span-6 md:items-end">
+                <div className="md:text-right"><MethodLine e={e} /></div>
+                <ReadLink e={e} index={i + 1} />
+              </div>
             </div>
+          </section>
+        </Reveal>
+      ))}
 
-            <Link className="index-more" href="/projects/all" data-reveal>
-              <span className="index-more-n">{dataProjects.length + softwareProjects.length}</span>
-              <span className="index-more-t">projects across both disciplines, in one index</span>
-              <span className="index-more-go">All projects <span className="arrow">↗</span></span>
+      {/* Family C. Three columns, tighter, so the figure sits inside a rhythm
+          rather than always dominating a half. */}
+      {entries.slice(2, 3).map((e, i) => (
+        <Reveal key={e.id}>
+          <section className="mx-auto max-w-[1400px] border-t border-[#14120F]/15 px-5 py-20 md:px-10 md:py-28">
+            <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
+              <div className="lg:col-span-3">
+                <Figure e={e} className="text-[clamp(3rem,6.5vw,5rem)]" />
+                <h2 className="mt-6 text-[1.35rem] font-semibold leading-tight tracking-[-0.02em]">{e.title}</h2>
+                <p className="mt-1.5 text-[12.5px] text-[#C13E00]" style={mono}>{e.sub}</p>
+              </div>
+              <div className="lg:col-span-5">
+                <p className="max-w-[28ch] text-[clamp(1.25rem,2.2vw,1.75rem)] font-medium leading-[1.25] tracking-[-0.018em]">
+                  {e.claim}
+                </p>
+              </div>
+              <div className="lg:col-span-4">
+                <p className="max-w-[46ch] text-[15px] leading-relaxed text-[#5A544C]">{e.blurb}</p>
+                <div className="mt-6"><MethodLine e={e} /></div>
+                <div className="mt-7"><ReadLink e={e} index={i + 2} /></div>
+              </div>
+            </div>
+          </section>
+        </Reveal>
+      ))}
+
+      {/* Family A returns, two studies away from its first use. */}
+      {entries.slice(3).map((e, i) => (
+        <Reveal key={e.id}>
+          <section className="mx-auto max-w-[1400px] border-t border-[#14120F]/15 px-5 py-20 md:px-10 md:py-28">
+            <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
+              <div className="lg:col-span-5">
+                <Figure e={e} className="text-[clamp(4rem,11vw,9rem)]" />
+              </div>
+              <div className="lg:col-span-7">
+                <p className="max-w-[26ch] text-[clamp(1.4rem,2.6vw,2.1rem)] font-medium leading-[1.2] tracking-[-0.02em]">
+                  {e.claim}
+                </p>
+                <h2 className="mt-10 text-[1.5rem] font-semibold tracking-[-0.02em]">{e.title}</h2>
+                <p className="mt-1.5 text-[12.5px] text-[#C13E00]" style={mono}>{e.sub}</p>
+                <p className="mt-5 max-w-[58ch] text-[15.5px] leading-relaxed text-[#5A544C]">{e.blurb}</p>
+                <div className="mt-7"><MethodLine e={e} /></div>
+                <div className="mt-8"><ReadLink e={e} index={i + 3} /></div>
+              </div>
+            </div>
+          </section>
+        </Reveal>
+      ))}
+
+      <footer className="border-t border-[#14120F]/15 bg-[#EAEAE6]">
+        <div className="mx-auto flex max-w-[1400px] flex-col gap-8 px-5 py-14 md:flex-row md:items-end md:justify-between md:px-10">
+          <div>
+            <p className="text-[clamp(1.75rem,3vw,2.5rem)] font-semibold leading-[1] tracking-[-0.03em]">Open to work.</p>
+            <p className="mt-3 text-[13px] text-[#5A544C]" style={mono}>
+              Data Analyst, Analytics Engineer and Software roles. Sydney, AU.
+            </p>
+            <Link
+              href="/projects/software"
+              className="mt-5 inline-block border-b border-[#14120F]/30 pb-0.5 text-[13px] transition-colors hover:border-[#C13E00] hover:text-[#C13E00]"
+              style={mono}
+            >
+              Software projects <span aria-hidden="true">&rarr;</span>
             </Link>
           </div>
-        </section>
-
-        <section className="block tight">
-          <div className="wrap center">
-            <p className="kicker acid" data-reveal style={{ justifyContent: 'center' }}>Also a builder</p>
-            <h2 className="section-title mt-s" data-reveal data-reveal-delay="1">Want to see what I ship in code?</h2>
-            <div className="mt-l" data-reveal data-reveal-delay="2">
-              <Link className="btn primary" href="/projects/software" data-magnetic>
-                View Software Projects <span className="arrow">↗</span>
-              </Link>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <footer className="site-foot">
-        <div className="wrap">
-          <div className="foot-grid">
-            <div>
-              <div className="foot-cta">Let&apos;s talk<br /><span className="dim">data.</span></div>
-              <p className="mono faint" style={{ marginTop: '18px', fontSize: '12px', letterSpacing: '0.05em' }}>
-                Open to Data Analyst &amp; Analytics Engineer roles · Sydney, AU
-              </p>
-            </div>
-            <div className="foot-col">
-              <h4>Navigate</h4>
-              <Link href="/">Home</Link>
-              <Link href="/projects/software">Software Projects</Link>
-              <Link href="/blog">Blog</Link>
-              <Link href="/about">About</Link>
-              <Link href="/stats">Site Analytics ↗</Link>
-            </div>
-            <div className="foot-col">
-              <h4>Elsewhere</h4>
-              <a href="https://github.com/MelvinDY" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-              <a href="https://www.linkedin.com/in/melvin-yogiana/" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
-              <a href="mailto:melvindarialyogiana@gmail.com">Email ↗</a>
-            </div>
-          </div>
-          <div className="foot-bottom">
-            <span>© 2026 Melvin Darial Yogiana</span>
-            <span>Built in Sydney · <span className="acid-text">open to work</span></span>
+          <div className="flex flex-wrap gap-x-7 gap-y-3" style={mono}>
+            {[
+              ['GitHub', 'https://github.com/MelvinDY'],
+              ['LinkedIn', 'https://www.linkedin.com/in/melvin-yogiana/'],
+              ['Email', 'mailto:melvindarialyogiana@gmail.com'],
+            ].map(([label, href]) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[13px] text-[#5A544C] transition-colors hover:text-[#C13E00]"
+              >
+                {label} <span aria-hidden="true">&rarr;</span>
+              </a>
+            ))}
           </div>
         </div>
       </footer>
