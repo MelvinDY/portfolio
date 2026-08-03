@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 
 interface TeHeaderProps {
-  activePage?: 'data' | 'software' | 'blog' | 'about'
+  activePage?: 'data' | 'software' | 'all' | 'blog' | 'about'
 }
 
 export default function TeHeader({ activePage }: TeHeaderProps) {
@@ -20,6 +20,9 @@ export default function TeHeader({ activePage }: TeHeaderProps) {
         <nav className="nav">
           <Link href="/projects/data" className={activePage === 'data' ? 'active' : ''}>Data</Link>
           <Link href="/projects/software" className={activePage === 'software' ? 'active' : ''}>Software</Link>
+          {/* The umbrella sits after the two disciplines it collects, so Data
+              keeps the lead position it earns. */}
+          <Link href="/projects/all" className={activePage === 'all' ? 'active' : ''}>All Projects</Link>
           <Link href="/blog" className={activePage === 'blog' ? 'active' : ''}>Blog</Link>
           <Link href="/about" className={activePage === 'about' ? 'active' : ''}>About</Link>
           <span className="sep" />
@@ -36,6 +39,7 @@ export default function TeHeader({ activePage }: TeHeaderProps) {
       <div className={`nav-mobile${open ? ' open' : ''}`}>
         <Link href="/projects/data" className={activePage === 'data' ? 'active' : ''} onClick={() => setOpen(false)}>Data</Link>
         <Link href="/projects/software" className={activePage === 'software' ? 'active' : ''} onClick={() => setOpen(false)}>Software</Link>
+        <Link href="/projects/all" className={activePage === 'all' ? 'active' : ''} onClick={() => setOpen(false)}>All Projects</Link>
         <Link href="/blog" className={activePage === 'blog' ? 'active' : ''} onClick={() => setOpen(false)}>Blog</Link>
         <Link href="/about" className={activePage === 'about' ? 'active' : ''} onClick={() => setOpen(false)}>About</Link>
         <Link href="/#contact" className="acid-text" onClick={() => setOpen(false)}>Contact</Link>

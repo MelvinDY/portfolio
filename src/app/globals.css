@@ -1254,6 +1254,197 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 .te-home .scard-links a.solid { background: var(--acid); color: #1c0d03; border-color: var(--acid); font-weight: 600; }
 .te-home .scard-links a.solid:hover { background: var(--acid-deep); color: #1c0d03; }
 
+/* ─── the shelf — everything past the featured four ───
+   Deliberately the opposite form to .pcard: no surface, no radius, no lift.
+   The featured projects are objects you look at; these are an index you scan.
+   Holding the two apart is what keeps "featured" meaningful as the list grows. */
+.te-home .shelf { --shelf-hover: rgba(255,236,218,0.03); }
+/* Labels the featured grid so the two tiers read as a deliberate pair rather
+   than a long list that happens to change shape halfway down. */
+.te-home .shelf-featured-label { margin: 0 0 22px; }
+.te-home .shelf-head { margin-bottom: clamp(26px, 3vw, 40px); }
+/* Sized well below h1.display (44–124px) so the tier reads as subordinate on
+   sight, before anyone reads a word of it. */
+.te-home .shelf-title-h { font-size: clamp(24px, 3vw, 34px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; margin: 16px 0 0; }
+.te-home .shelf-note { color: var(--ink-dim); font-size: 14.5px; line-height: 1.6; margin: 10px 0 0; max-width: 52ch; }
+
+.te-home .shelf-list { border-bottom: 1px solid var(--line); }
+.te-home .shelf-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: baseline; gap: 10px 26px;
+  padding: 20px 14px; margin-inline: -14px;
+  border-top: 1px solid var(--line);
+  transition: background .3s var(--ease);
+}
+.te-home .shelf-row:hover { background: var(--shelf-hover); }
+.te-home .shelf-row:focus-visible { outline: 1px solid var(--acid); outline-offset: -1px; }
+/* Featured work is marked by the number taking the accent — the same hierarchy
+   the discipline pages show with cards, without a second tag on every row. */
+.te-home .shelf-no { font-family: var(--font-mono); font-size: 12px; color: var(--ink-faint); letter-spacing: 0.1em; }
+.te-home .shelf-row.is-featured .shelf-no { color: var(--acid); }
+.te-home .shelf-count { font-family: var(--font-mono); font-size: 14px; color: var(--ink-faint); letter-spacing: 0.08em; vertical-align: middle; margin-left: 6px; }
+.te-home .shelf-main { min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.te-home .shelf-name { font-size: 17.5px; font-weight: 600; letter-spacing: -0.01em; transition: color .25s; }
+.te-home .shelf-row:hover .shelf-name { color: var(--acid); }
+/* The accent is spent here only when the marker is worth it — an award, a
+   status — never as decoration on every row. */
+.te-home .shelf-badge { font-family: var(--font-mono); font-style: normal; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--acid); margin-left: 12px; white-space: nowrap; }
+.te-home .shelf-blurb { color: var(--ink-dim); font-size: 14px; line-height: 1.55; max-width: 62ch; }
+.te-home .shelf-stack { font-family: var(--font-mono); font-size: 11px; color: var(--ink-faint); letter-spacing: 0.04em; text-align: right; white-space: nowrap; }
+/* The row says where it sends you rather than offering a nondescript arrow. */
+.te-home .shelf-go { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; color: var(--ink-faint); white-space: nowrap; transition: color .25s; }
+.te-home .shelf-go .arrow { display: inline-block; transition: transform .3s var(--ease); }
+.te-home .shelf-row:hover .shelf-go { color: var(--acid); }
+.te-home .shelf-row:hover .shelf-go .arrow { transform: translate(3px, -3px); }
+
+/* The preview row on a discipline page: shaped like a shelf row on purpose, so
+   it reads as the first line of what is on the other side of the link. */
+.te-home .index-more {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: baseline; gap: 10px 20px;
+  padding: 20px 14px; margin-inline: -14px;
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  transition: background .3s var(--ease);
+}
+.te-home .index-more:hover { background: rgba(255,236,218,0.03); }
+.te-home .index-more:focus-visible { outline: 1px solid var(--acid); outline-offset: -1px; }
+.te-home .index-more-n { font-family: var(--font-mono); font-size: 12px; color: var(--acid); letter-spacing: 0.1em; }
+.te-home .index-more-t { color: var(--ink-dim); font-size: 15px; }
+.te-home .index-more-go { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; color: var(--ink-faint); white-space: nowrap; transition: color .25s; }
+.te-home .index-more-go .arrow { display: inline-block; transition: transform .3s var(--ease); }
+.te-home .index-more:hover .index-more-go { color: var(--acid); }
+.te-home .index-more:hover .index-more-go .arrow { transform: translate(3px, -3px); }
+
+.te-home .allp-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* ─── the "see more" button on a featured card ─── */
+.te-home .scard-more {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em;
+  color: var(--ink); background: none;
+  border: 1px solid var(--line-2); border-radius: 999px;
+  padding: 9px 16px; margin-top: 20px; cursor: pointer; align-self: flex-start;
+  transition: color .25s, border-color .25s, background .25s;
+}
+.te-home .scard-more:hover { color: var(--acid); border-color: var(--acid); background: rgba(255,94,31,0.06); }
+.te-home .scard-more:focus-visible { outline: 1px solid var(--acid); outline-offset: 3px; }
+.te-home .scard-more .arrow { display: inline-block; transition: transform .3s var(--ease); }
+.te-home .scard-more:hover .arrow { transform: translateX(3px); }
+
+/* ─── project sheet ─── */
+/* Scrim is warm rather than neutral black — a grey veil over this ground reads
+   as a different site's modal dropped on top. */
+.te-home .psheet-back {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(6,4,3,0.78); backdrop-filter: blur(4px);
+  display: flex; justify-content: flex-end;
+  animation: psheet-fade .22s ease both;
+}
+@keyframes psheet-fade { from { opacity: 0 } to { opacity: 1 } }
+
+.te-home .psheet {
+  width: min(760px, 94vw); height: 100%;
+  display: flex; flex-direction: column;
+  background: var(--surface-2); border-left: 1px solid var(--line-2);
+  box-shadow: -30px 0 80px rgba(0,0,0,0.55);
+  animation: psheet-in .34s var(--ease) both;
+}
+@keyframes psheet-in { from { transform: translateX(28px); opacity: 0 } to { transform: none; opacity: 1 } }
+
+.te-home .psheet-head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 20px;
+  padding: 28px clamp(20px, 4vw, 38px) 20px;
+  border-bottom: 1px solid var(--line);
+}
+.te-home .psheet-title { font-size: clamp(28px, 4vw, 44px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.05; margin: 12px 0 0; }
+.te-home .psheet-x {
+  flex-shrink: 0; width: 34px; height: 34px; line-height: 1;
+  background: none; border: 1px solid var(--line); border-radius: 8px;
+  color: var(--ink-dim); font-size: 13px; cursor: pointer;
+  transition: color .25s, border-color .25s;
+}
+.te-home .psheet-x:hover { color: var(--acid); border-color: var(--acid); }
+.te-home .psheet-x:focus-visible { outline: 1px solid var(--acid); outline-offset: 2px; }
+
+.te-home .psheet-body { flex: 1; overflow-y: auto; padding: clamp(20px, 4vw, 32px) clamp(20px, 4vw, 38px) 32px; }
+
+.te-home .psheet-figure {
+  position: relative; aspect-ratio: 16 / 9; margin: 0;
+  border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--bg-2);
+}
+.te-home .psheet-cap { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-faint); margin: 10px 0 0; line-height: 1.5; }
+.te-home .psheet-thumbs { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.te-home .psheet-thumb {
+  position: relative; width: 88px; aspect-ratio: 16 / 9; flex-shrink: 0;
+  border: 1px solid var(--line); border-radius: 6px; overflow: hidden;
+  background: var(--bg-2); cursor: pointer; padding: 0; opacity: 0.5;
+  transition: opacity .25s, border-color .25s;
+}
+.te-home .psheet-thumb:hover { opacity: 0.85; }
+.te-home .psheet-thumb.on { opacity: 1; border-color: var(--acid); }
+.te-home .psheet-thumb:focus-visible { outline: 1px solid var(--acid); outline-offset: 2px; }
+
+.te-home .psheet-cols { display: grid; grid-template-columns: minmax(0, 1fr) 208px; gap: clamp(24px, 4vw, 40px); margin-top: 28px; }
+.te-home .psheet-main { min-width: 0; }
+/* Running text held near 65 characters even though the sheet is wider. */
+.te-home .psheet-summary { font-size: 16px; line-height: 1.7; color: var(--ink-dim); margin: 0; max-width: 62ch; }
+.te-home .psheet-pull {
+  font-size: 19px; line-height: 1.5; font-style: italic; color: var(--ink);
+  margin: 22px 0 0; padding-left: 18px; border-left: 2px solid var(--acid); max-width: 52ch;
+}
+.te-home .psheet-sub { margin: 30px 0 14px; }
+.te-home .psheet-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 11px; }
+.te-home .psheet-list li { position: relative; padding-left: 20px; color: var(--ink-dim); font-size: 14.5px; line-height: 1.6; max-width: 62ch; }
+.te-home .psheet-list li::before { content: ""; position: absolute; left: 0; top: 9px; width: 6px; height: 1px; background: var(--acid); }
+
+.te-home .psheet-rail { min-width: 0; }
+.te-home .psheet-facts { margin: 0 0 26px; display: flex; flex-direction: column; gap: 14px; }
+.te-home .psheet-facts dt { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint); }
+.te-home .psheet-facts dd { margin: 5px 0 0; font-size: 14.5px; color: var(--ink); }
+.te-home .psheet-rail .stackrow { display: flex; flex-wrap: wrap; gap: 7px; margin: 0; }
+
+.te-home .psheet-foot {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  padding: 18px clamp(20px, 4vw, 38px);
+  border-top: 1px solid var(--line); background: var(--surface);
+}
+.te-home .psheet-foot a {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: var(--font-mono); font-size: 12px; color: var(--ink-dim);
+  padding: 9px 15px; border: 1px solid var(--line); border-radius: 999px;
+  transition: color .25s, border-color .25s, background .25s;
+}
+.te-home .psheet-foot a:hover { color: var(--acid); border-color: var(--acid); }
+.te-home .psheet-foot a.solid { background: var(--acid); color: #1c0d03; border-color: var(--acid); font-weight: 600; }
+.te-home .psheet-foot a.solid:hover { background: var(--acid-deep); color: #1c0d03; }
+.te-home .psheet-foot a:focus-visible { outline: 1px solid var(--acid); outline-offset: 3px; }
+
+/* Narrow: the sheet becomes a full-height panel and the rail drops under the
+   narrative rather than being squeezed into an unreadable column. */
+@media (max-width: 820px) {
+  .te-home .psheet { width: 100%; border-left: none; }
+  .te-home .psheet-cols { grid-template-columns: minmax(0, 1fr); gap: 30px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .te-home .psheet-back, .te-home .psheet { animation: none; }
+  .te-home .scard-more, .te-home .scard-more .arrow, .te-home .psheet-x { transition: none; }
+  .te-home .scard-more:hover .arrow { transform: none; }
+}
+
+@media (max-width: 820px) {
+  /* Nothing is dropped — the stack moves under the blurb and wraps. */
+  .te-home .shelf-row { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .te-home .shelf-stack { grid-column: 2 / -1; text-align: left; white-space: normal; }
+  .te-home .shelf-badge { margin-left: 0; display: block; margin-top: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .te-home .shelf-row, .te-home .shelf-go, .te-home .shelf-name,
+  .te-home .index-more, .te-home .index-more-go { transition: none; }
+  .te-home .shelf-row:hover .shelf-go .arrow,
+  .te-home .index-more:hover .index-more-go .arrow { transform: none; }
+}
+
 /* case study */
 .te-home .case-main { position: relative; z-index: 1; }
 .te-home .case-hero { padding: clamp(120px, 16vw, 190px) 0 clamp(48px, 7vw, 90px); border-bottom: 1px solid var(--line); }

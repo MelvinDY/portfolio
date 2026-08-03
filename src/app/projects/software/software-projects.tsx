@@ -1,158 +1,247 @@
 "use client"
 
+import { useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
-import TeHeader from '../../components/te-header'
-import { useTeEffects } from '../../lib/use-te-effects'
+import LightHeader from '../../components/light-header'
+import LightSheet from '../../components/light-sheet'
+import Reveal from '../../components/reveal'
+import { softwareProjects } from '../../data/project-index'
+import { projectDetails } from '../../data/project-details'
 
-export default function SoftwareProjectsPage() {
-  useTeEffects()
+/**
+ * The software index, as a printed catalogue.
+ *
+ * Adopted from Path B. Deliberately light while the rest of the site is dark:
+ * that is a page-level decision, so this page carries its own header and
+ * footer rather than the dark TeHeader. Section 4.11's theme lock is about not
+ * flipping mid-page, which this does not do.
+ *
+ * Colour is locked. Ground #F3F3F1 is a cool off-white, chosen because 4.2
+ * bans the warm cream family that an unconsidered light variant lands on. The
+ * brand orange #ff5e1f measures about 3.1:1 here, so it appears only at
+ * display sizes and on rules, and small text uses #C13E00 at about 4.9:1.
+ * Shape is locked: every corner is square.
+ *
+ * Two record families alternate. Builds with a screenshot are plate-led;
+ * builds without one lead with their pull line on a tinted panel. There are no
+ * placeholder frames: a missing screenshot produces a typographic moment
+ * instead of a hole, which is also why nothing here needs a stock photo.
+ */
+
+const mono = { fontFamily: 'var(--font-mono), ui-monospace, monospace' } as const
+const display = { fontFamily: 'var(--font-space-grotesk), system-ui, sans-serif' } as const
+
+/** 18 words. Section 4.7 caps hero subtext at 20. */
+const HERO_SUB =
+  'Four builds I shipped, plus three more in the index. Stack, source and live demos on every one.'
+
+export default function SoftwareProjects() {
+  const [open, setOpen] = useState<string | null>(null)
+
+  const featured = softwareProjects.filter(p => p.featured)
+  const rest = softwareProjects.filter(p => !p.featured)
+  const lead = featured[0]
+  const leadShot = projectDetails[lead.id]?.shots?.[0]
+
+  const detailFor = (id: string) => projectDetails[id]
 
   return (
-    <div className="te-home">
-      <TeHeader activePage="software" />
+    <div className="min-h-[100dvh] bg-[#F3F3F1] text-[#14120F] antialiased" style={display}>
+      <LightHeader active="/projects/software" />
 
-      <main>
-        <section className="subhero">
-          <div className="wrap">
-            <div className="crumb" data-reveal>
-              <Link href="/">home</Link><span>/</span><span className="now">software projects</span>
-            </div>
-            <h1 className="display" data-reveal data-reveal-delay="1">
-              Software<br /><span className="outline">Projects</span>
+      {/* Hero. Asymmetric split, real asset, CTA above the fold. */}
+      <section className="mx-auto flex min-h-[calc(100dvh-4rem)] max-w-[1400px] items-center px-5 py-16 md:px-10">
+        <div className="grid w-full gap-10 lg:grid-cols-12 lg:gap-14">
+          <div className="lg:col-span-7">
+            <h1 className="text-[clamp(2.75rem,7.5vw,6rem)] font-semibold leading-[0.9] tracking-[-0.045em]">
+              Selected
+              <br />
+              software work
             </h1>
-            <div className="subhero-foot">
-              <p className="lead" data-reveal data-reveal-delay="2">
-                Things I&apos;ve shipped — a community platform, an{' '}
-                <span className="acid-text">award-winning</span> hackathon build, an AI Q&amp;A
-                engine and a production student-housing site. Stack and source on every card.
-              </p>
-              <div className="subhero-meta" data-reveal data-reveal-delay="2">
-                <div className="sm"><div className="v" data-count="4">4</div><div className="l">Builds</div></div>
-                <div className="sm"><div className="v" data-count="2" data-suf="×">0</div><div className="l">Award wins</div></div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="tight">
-          <div className="wrap">
-            <div className="index-grid">
-
-              <div className="pcard scard" data-reveal>
-                <div className="pcard-top">
-                  <span className="pcard-no">/ 01</span>
-                  <span className="winner mono">✷ UNIHACK 2026 · Most Fun + Best Design</span>
-                </div>
-                <h3>Peersuade</h3>
-                <div className="pcard-sub">Real-time debate &amp; persuasion game</div>
-                <p className="pcard-desc">A live multiplayer game where players argue wildly random prompts and an audience swings the vote in real time. Took home two UNIHACK 2026 categories — judged on fun and design.</p>
-                <div className="stackrow">
-                  <span className="tag">React</span><span className="tag">TypeScript</span><span className="tag">WebSocket</span><span className="tag">Node.js</span><span className="tag">Tailwind</span>
-                </div>
-                <div className="scard-links">
-                  <a className="solid" href="https://politics-game.vercel.app/" target="_blank" rel="noopener noreferrer">Live Demo ↗</a>
-                  <a href="https://github.com/MelvinDY" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-                  <a href="https://devpost.com/software/peersuade" target="_blank" rel="noopener noreferrer">Devpost ↗</a>
-                  <a href="https://medium.com/unihack-blog/unihack-2026-the-full-list-of-winners-and-honorable-mentions-a68e8b120dc3" target="_blank" rel="noopener noreferrer">Winners ↗</a>
-                </div>
-              </div>
-
-              <div className="pcard scard" data-reveal data-reveal-delay="1">
-                <div className="pcard-top">
-                  <span className="pcard-no">/ 02</span>
-                  <span className="badge">Team of 10</span>
-                </div>
-                <h3>Ignite</h3>
-                <div className="pcard-sub">PPIA UNSW networking platform</div>
-                <p className="pcard-desc">The official platform for PPIA UNSW — member profiles, event tooling and a directory connecting the Indonesian student community. Built and shipped with a team of ten contributors on a modular architecture.</p>
-                <div className="stackrow">
-                  <span className="tag">TypeScript</span><span className="tag">React</span><span className="tag">Supabase</span><span className="tag">PostgreSQL</span><span className="tag">Node.js</span>
-                </div>
-                <div className="scard-links">
-                  <a className="solid" href="https://github.com/MelvinDY/ignite" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-                </div>
-              </div>
-
-              <div className="pcard scard" data-reveal data-reveal-delay="2">
-                <div className="pcard-top">
-                  <span className="pcard-no">/ 03</span>
-                  <span className="badge">COMP3900 · Capstone</span>
-                </div>
-                <h3>AI Confluence Q&amp;A Helper</h3>
-                <div className="pcard-sub">RAG assistant over team docs</div>
-                <p className="pcard-desc">A retrieval-augmented assistant that answers natural-language questions over a team&apos;s Confluence workspace with cited sources. UNSW software-engineering capstone, built agile in a team of five.</p>
-                <div className="stackrow">
-                  <span className="tag">Python</span><span className="tag">FastAPI</span><span className="tag">React</span><span className="tag">RAG</span><span className="tag">OpenAI</span>
-                </div>
-                <div className="scard-links">
-                  <a className="solid" href="https://github.com/unsw-cse-comp99-3900/capstone-project-25t3-3900-w18a-cherry" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-                </div>
-              </div>
-
-              <div className="pcard scard" data-reveal data-reveal-delay="3">
-                <div className="pcard-top">
-                  <span className="pcard-no">/ 04</span>
-                  <span className="badge">Production</span>
-                </div>
-                <h3>Rate My Accom NSW</h3>
-                <div className="pcard-sub">Student accommodation reviews</div>
-                <p className="pcard-desc">A review platform for NSW student housing — university-email verification, multi-dimensional ratings and a security pass covering XSS/CSRF protection and rate limiting. Production-ready, fully tested.</p>
-                <div className="stackrow">
-                  <span className="tag">Next.js 14</span><span className="tag">TypeScript</span><span className="tag">Zod</span><span className="tag">React Hook Form</span><span className="tag">Jest</span>
-                </div>
-                <div className="scard-links">
-                  <a className="solid" href="https://ratemyaccom-beryl.vercel.app/" target="_blank" rel="noopener noreferrer">Live Demo ↗</a>
-                  <a href="https://github.com/MelvinDY/ratemyaccom" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </section>
-
-        <section className="block tight">
-          <div className="wrap center">
-            <p className="kicker acid" data-reveal style={{ justifyContent: 'center' }}>Also an analyst</p>
-            <h2 className="section-title mt-s" data-reveal data-reveal-delay="1">Prefer to see the data work?</h2>
-            <div className="mt-l" data-reveal data-reveal-delay="2">
-              <Link className="btn primary" href="/projects/data" data-magnetic>
-                View Data Projects <span className="arrow">↗</span>
+            <p className="mt-8 max-w-[42ch] text-[17px] leading-relaxed text-[#5A544C]">{HERO_SUB}</p>
+            <div className="mt-10 flex flex-wrap items-center gap-4">
+              <a
+                href={lead.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-[#ff5e1f] px-7 py-3.5 text-[14.5px] font-semibold text-[#1c0d03] transition-transform active:scale-[0.98]"
+              >
+                See it live
+              </a>
+              <Link
+                href="/projects/all"
+                className="border-b-2 border-[#14120F]/25 pb-1 text-[14.5px] font-semibold transition-colors hover:border-[#C13E00] hover:text-[#C13E00]"
+              >
+                All projects
               </Link>
             </div>
           </div>
-        </section>
-      </main>
 
-      <footer className="site-foot">
-        <div className="wrap">
-          <div className="foot-grid">
-            <div>
-              <div className="foot-cta">Let&apos;s<br /><span className="dim">build.</span></div>
-              <p className="mono faint" style={{ marginTop: '18px', fontSize: '12px', letterSpacing: '0.05em' }}>
-                Full-stack developer · UNSW Computer Science · Sydney, AU
-              </p>
+          {leadShot && (
+            <div className="lg:col-span-5">
+              <figure className="m-0">
+                <div className="relative aspect-[4/5] overflow-hidden border border-[#14120F]/12 bg-[#EAEAE6]">
+                  <Image
+                    src={leadShot.src}
+                    alt={leadShot.alt}
+                    fill
+                    sizes="(max-width:1024px) 92vw, 40vw"
+                    className="object-cover object-center"
+                    priority
+                  />
+                </div>
+                <figcaption className="mt-3 text-[11.5px] text-[#8A8378]" style={mono}>
+                  {lead.title}, {detailFor(lead.id)?.sub.toLowerCase()}
+                </figcaption>
+              </figure>
             </div>
-            <div className="foot-col">
-              <h4>Navigate</h4>
-              <Link href="/">Home</Link>
-              <Link href="/projects/data">Data Projects</Link>
-              <Link href="/blog">Blog</Link>
-              <Link href="/about">About</Link>
-              <Link href="/stats">Site Analytics ↗</Link>
-            </div>
-            <div className="foot-col">
-              <h4>Elsewhere</h4>
-              <a href="https://github.com/MelvinDY" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-              <a href="https://www.linkedin.com/in/melvin-yogiana/" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
-              <a href="mailto:melvindarialyogiana@gmail.com">Email ↗</a>
-            </div>
+          )}
+        </div>
+      </section>
+
+      {/* The catalogue. */}
+      <section className="mx-auto max-w-[1400px] px-5 md:px-10">
+        {featured.map((p, i) => {
+          const d = detailFor(p.id)
+          const shotOf = d?.shots?.[0]
+          const n = String(i + 1).padStart(2, '0')
+
+          return (
+            <Reveal key={p.id}>
+              <article className="border-t-2 border-[#14120F] pt-7 pb-16 md:pb-24">
+                <div className="flex items-baseline justify-between gap-6">
+                  <span className="text-[13px] tabular-nums text-[#C13E00]" style={mono}>{n}</span>
+                  {p.note && <span className="text-right text-[11px] text-[#8A8378]" style={mono}>{p.note}</span>}
+                </div>
+
+                <h2 className="mt-5 text-[clamp(2.25rem,5vw,4rem)] font-semibold leading-[0.95] tracking-[-0.035em]">
+                  {p.title}
+                </h2>
+                {d && <p className="mt-2 text-[13px] text-[#C13E00]" style={mono}>{d.sub}</p>}
+
+                {shotOf ? (
+                  <div className="relative mt-9 aspect-[21/9] overflow-hidden border border-[#14120F]/12 bg-[#EAEAE6]">
+                    <Image
+                      src={shotOf.src}
+                      alt={shotOf.alt}
+                      fill
+                      sizes="(max-width:1400px) 92vw, 1320px"
+                      className="object-cover object-top"
+                    />
+                  </div>
+                ) : (
+                  d?.pull && (
+                    <div className="mt-9 bg-[#EAEAE6] px-7 py-12 md:px-14 md:py-16">
+                      <p className="max-w-[24ch] text-[clamp(1.5rem,3.2vw,2.5rem)] font-medium leading-[1.15] tracking-[-0.02em]">
+                        {d.pull}
+                      </p>
+                    </div>
+                  )
+                )}
+
+                <div className="mt-8 grid gap-6 md:grid-cols-12 md:gap-8">
+                  <p className="max-w-[60ch] text-[16px] leading-relaxed text-[#5A544C] md:col-span-7">{p.blurb}</p>
+                  <div className="flex flex-col gap-4 md:col-span-5 md:items-end">
+                    <p className="text-[12px] leading-relaxed text-[#8A8378] md:text-right" style={mono}>
+                      {p.stack.join(', ')}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-4" style={mono}>
+                      {d && (
+                        <button
+                          onClick={() => setOpen(p.id)}
+                          className="border border-[#14120F]/25 px-4 py-2 text-[12.5px] transition-colors hover:border-[#C13E00] hover:text-[#C13E00]"
+                        >
+                          See more
+                        </button>
+                      )}
+                      <a
+                        href={p.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="border-b border-[#14120F]/30 pb-0.5 text-[13px] transition-colors hover:border-[#C13E00] hover:text-[#C13E00]"
+                      >
+                        {p.linkLabel} <span aria-hidden="true">&rarr;</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </Reveal>
+          )
+        })}
+      </section>
+
+      {/* Back of the book. A third layout family. */}
+      <section className="mx-auto max-w-[1400px] px-5 pb-24 md:px-10">
+        <Reveal>
+          <div className="border-t-2 border-[#14120F] pt-7">
+            <h2 className="text-[1.9rem] font-semibold tracking-[-0.025em]">Also on the record</h2>
+            <p className="mt-3 max-w-[52ch] text-[15.5px] leading-relaxed text-[#5A544C]">
+              Real work without a write-up. Each link goes straight to the source.
+            </p>
+            <ul className="mt-9 border-b border-[#14120F]/15">
+              {rest.map((p, i) => (
+                <li key={p.id}>
+                  <a
+                    href={p.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group grid grid-cols-1 items-baseline gap-x-8 gap-y-2 border-t border-[#14120F]/15 py-6 transition-colors hover:bg-[#EAEAE6] md:grid-cols-[auto_minmax(0,1fr)_auto_auto] md:px-3"
+                  >
+                    <span className="text-[12px] tabular-nums text-[#8A8378]" style={mono}>
+                      {String(featured.length + i + 1).padStart(2, '0')}
+                    </span>
+                    <span className="text-[1.15rem] font-semibold transition-colors group-hover:text-[#C13E00]">
+                      {p.title}
+                      {p.note && (
+                        <em className="ml-3 text-[10.5px] not-italic uppercase tracking-[0.1em] text-[#C13E00]" style={mono}>
+                          {p.note}
+                        </em>
+                      )}
+                    </span>
+                    <span className="text-[11.5px] text-[#8A8378] md:text-right" style={mono}>
+                      {p.stack.slice(0, 3).join(', ')}
+                    </span>
+                    <span className="text-[11.5px] text-[#5A544C]" style={mono}>
+                      {p.linkLabel} <span aria-hidden="true">&rarr;</span>
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="foot-bottom">
-            <span>© 2026 Melvin Darial Yogiana</span>
-            <span>Built in Sydney · <span className="acid-text">open to work</span></span>
+        </Reveal>
+      </section>
+
+      <footer className="border-t border-[#14120F]/15 bg-[#EAEAE6]">
+        <div className="mx-auto flex max-w-[1400px] flex-col gap-8 px-5 py-14 md:flex-row md:items-end md:justify-between md:px-10">
+          <div>
+            <p className="text-[clamp(1.75rem,3vw,2.5rem)] font-semibold leading-[1] tracking-[-0.03em]">Open to work.</p>
+            <p className="mt-3 text-[13px] text-[#5A544C]" style={mono}>
+              Data Analyst, Analytics Engineer and Software roles. Sydney, AU.
+            </p>
+            <Link href="/projects/data" className="mt-5 inline-block border-b border-[#14120F]/30 pb-0.5 text-[13px] transition-colors hover:border-[#C13E00] hover:text-[#C13E00]" style={mono}>
+              Data projects <span aria-hidden="true">&rarr;</span>
+            </Link>
+          </div>
+          <div className="flex flex-wrap gap-x-7 gap-y-3" style={mono}>
+            {[
+              ['GitHub', 'https://github.com/MelvinDY'],
+              ['LinkedIn', 'https://www.linkedin.com/in/melvin-yogiana/'],
+              ['Email', 'mailto:melvindarialyogiana@gmail.com'],
+            ].map(([label, href]) => (
+              <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="text-[13px] text-[#5A544C] transition-colors hover:text-[#C13E00]">
+                {label} <span aria-hidden="true">&rarr;</span>
+              </a>
+            ))}
           </div>
         </div>
       </footer>
+
+      {open && projectDetails[open] && (
+        <LightSheet detail={projectDetails[open]} onClose={() => setOpen(null)} />
+      )}
     </div>
   )
 }

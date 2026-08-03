@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import TeHeader from '../../components/te-header'
+import { dataProjects, softwareProjects } from '../../data/project-index'
 import { useTeEffects } from '../../lib/use-te-effects'
 
 export default function DataProjectsPage() {
@@ -37,6 +38,7 @@ export default function DataProjectsPage() {
 
         <section className="tight">
           <div className="wrap">
+            <p className="kicker acid shelf-featured-label" data-reveal>Featured</p>
             <div className="index-grid">
 
               <Link className="pcard dcard" href="/projects/data/labour-market" data-reveal>
@@ -96,6 +98,12 @@ export default function DataProjectsPage() {
               </Link>
 
             </div>
+
+            <Link className="index-more" href="/projects/all" data-reveal>
+              <span className="index-more-n">{dataProjects.length + softwareProjects.length}</span>
+              <span className="index-more-t">projects across both disciplines, in one index</span>
+              <span className="index-more-go">All projects <span className="arrow">↗</span></span>
+            </Link>
           </div>
         </section>
 
