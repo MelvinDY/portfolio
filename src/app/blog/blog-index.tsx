@@ -1,131 +1,190 @@
 "use client"
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import TeHeader from '../components/te-header'
-import { useTeEffects } from '../lib/use-te-effects'
-import { PostCard } from '../types/blog'
+import LightHeader from '../components/light-header'
+import type { PostCard } from '../types/blog'
 
-const TAG_BUTTONS = [
-  { label: 'All', value: 'all' },
-  { label: 'Data Analysis', value: 'data-analysis' },
-  { label: 'Software Engineering', value: 'software-engineering' },
-  { label: 'Data Engineering', value: 'data-engineering' },
-  { label: 'Hackathon', value: 'hackathon' },
-  { label: 'Random', value: 'random' },
-]
+/**
+ * The blog index, as a reading list.
+ *
+ * Ten posts is not an archive, it is a reading list. At that size the controls
+ * should almost disappear, because scrolling the whole thing is faster than
+ * deciding how to filter it. So search and tags collapse into one quiet row
+ * and the list itself takes the weight, with every post showing its date,
+ * title, excerpt, tags and read time so a reader can judge it without
+ * clicking.
+ *
+ * Two accessibility details worth keeping. The search field carries a visible
+ * label rather than relying on its placeholder, because Section 4.6 bans
+ * placeholder-as-label outright. And focus lands visibly: the search row shows
+ * a ring on focus-within and every control has its own focus-visible state,
+ * rather than the input suppressing its outline.
+ *
+ * Palette and type scale locked to the projects section: same site.
+ */
+
+const mono = { fontFamily: 'var(--font-mono), ui-monospace, monospace' } as const
+const display = { fontFamily: 'var(--font-space-grotesk), system-ui, sans-serif' } as const
+
+const TAGS = [
+  ['all', 'All'],
+  ['data-analysis', 'Data analysis'],
+  ['software-engineering', 'Software engineering'],
+  ['data-engineering', 'Data engineering'],
+  ['hackathon', 'Hackathon'],
+  ['random', 'Random'],
+] as const
 
 export default function BlogIndex({ posts }: { posts: PostCard[] }) {
-  useTeEffects()
   const [query, setQuery] = useState('')
-  const [activeTag, setActiveTag] = useState('all')
+  const [tag, setTag] = useState('all')
 
-  const visible = posts.filter(p => {
+  const visible = useMemo(() => {
     const term = query.trim().toLowerCase()
-    const matchText = !term || p.text.includes(term) || p.tags.includes(term)
-    const matchTag = activeTag === 'all' || p.tags.split(',').includes(activeTag)
-    return matchText && matchTag
-  })
+    return posts.filter(p => {
+      const matchText = !term || p.text.includes(term) || p.tags.includes(term)
+      const matchTag = tag === 'all' || p.tags.split(',').includes(tag)
+      return matchText && matchTag
+    })
+  }, [posts, query, tag])
 
   return (
-    <div className="te-home">
-      <TeHeader activePage="blog" />
+    <div className="min-h-[100dvh] bg-[#F3F3F1] text-[#14120F] antialiased" style={display}>
+      <LightHeader active="/blog" />
 
-      <main>
-        <section className="blog-hero">
-          <div className="wrap">
-            <div className="crumb" data-reveal>
-              <Link href="/">home</Link><span>/</span><span className="now">blog</span>
-            </div>
-            <h1 className="display" data-reveal data-reveal-delay="1">
-              Writing<br /><span className="outline">&amp; notes</span>
+      <section className="mx-auto max-w-[1400px] px-5 pt-16 pb-12 md:px-10 md:pt-24">
+        <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
+          <div className="lg:col-span-7">
+            <h1 className="text-[clamp(2.5rem,6.5vw,5rem)] font-semibold leading-[0.93] tracking-[-0.045em]">
+              Writing
+              <br />
+              and notes.
             </h1>
-            <p className="lead" data-reveal data-reveal-delay="2">
-              Honest write-ups on data, web development, hackathon weekends and the occasional lesson learned the hard way.{' '}
-              <span className="acid-text">Search it, filter it, read it.</span>
+          </div>
+          <div className="lg:col-span-5">
+            <p className="max-w-[42ch] text-[16px] leading-relaxed text-[#5A544C]">
+              Build notes on data and web work, hackathon weekends, and the occasional lesson
+              learned the hard way.
             </p>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section>
-          <div className="wrap">
-            <div className="blog-controls" data-reveal>
-              <div className="search">
-                <span className="si">⌕</span>
-                <input
-                  type="text"
-                  placeholder="search posts…"
-                  autoComplete="off"
-                  aria-label="Search posts"
-                  value={query}
-                  onChange={e => setQuery(e.target.value)}
-                />
-              </div>
-              <div className="tagfilter">
-                {TAG_BUTTONS.map(tb => (
-                  <button
-                    key={tb.value}
-                    className={`tagbtn${activeTag === tb.value ? ' on' : ''}`}
-                    onClick={() => setActiveTag(tb.value)}
-                  >
-                    {tb.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="post-count"><span>{visible.length}</span> posts</div>
-
-            <div className="postlist">
-              {visible.map(p => (
-                <Link key={p.href} className="post" href={p.href}>
-                  <div className="p-date">{p.date}<span className="rt">{p.rt}</span></div>
-                  <div>
-                    <h3>{p.title}</h3>
-                    <p className="p-ex">{p.excerpt}</p>
-                    <div className="p-tags">
-                      {p.tagLabels.map(t => <span key={t} className="tag">{t}</span>)}
-                    </div>
-                  </div>
-                  <span className="p-arrow">↗</span>
-                </Link>
-              ))}
-            </div>
-
-            {visible.length === 0 && (
-              <div className="no-results show">No posts match that search — try another term or clear the filters.</div>
-            )}
+      <section className="mx-auto max-w-[1400px] px-5 pb-24 md:px-10">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-4 border-y border-[#14120F]/15 py-4">
+          <div className="flex min-w-[14rem] flex-1 items-center gap-3 focus-within:outline focus-within:outline-1 focus-within:outline-offset-4 focus-within:outline-[#ff5e1f]">
+            <label
+              htmlFor="post-search"
+              className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-[#8A8378]"
+              style={mono}
+            >
+              Search
+            </label>
+            <input
+              id="post-search"
+              type="search"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              className="w-full bg-transparent text-[14px] text-[#14120F] outline-none placeholder:text-[#8A8378]"
+              style={mono}
+            />
           </div>
-        </section>
-      </main>
 
-      <footer className="site-foot">
-        <div className="wrap">
-          <div className="foot-grid">
-            <div>
-              <div className="foot-cta">Got a<br /><span className="dim">question?</span></div>
-              <p className="mono faint" style={{ marginTop: '18px', fontSize: '12px', letterSpacing: '0.05em' }}>
-                I write about what I build · Sydney, AU
-              </p>
-            </div>
-            <div className="foot-col">
-              <h4>Navigate</h4>
-              <Link href="/">Home</Link>
-              <Link href="/projects/data">Data Projects</Link>
-              <Link href="/projects/software">Software Projects</Link>
-              <Link href="/about">About</Link>
-              <Link href="/stats">Site Analytics ↗</Link>
-            </div>
-            <div className="foot-col">
-              <h4>Elsewhere</h4>
-              <a href="https://github.com/MelvinDY" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-              <a href="https://www.linkedin.com/in/melvin-yogiana/" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
-              <a href="mailto:melvindarialyogiana@gmail.com">Email ↗</a>
-            </div>
+          <div className="flex flex-wrap gap-x-5 gap-y-2" style={mono}>
+            {TAGS.map(([v, label]) => (
+              <button
+                key={v}
+                onClick={() => setTag(v)}
+                aria-pressed={tag === v}
+                className={`text-[11.5px] transition-colors hover:text-[#C13E00] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-[#ff5e1f] ${tag === v ? 'text-[#C13E00]' : 'text-[#8A8378]'}`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
-          <div className="foot-bottom">
-            <span>© 2026 Melvin Darial Yogiana</span>
-            <span>Built in Sydney · <span className="acid-text">open to work</span></span>
+
+          <span className="text-[11.5px] tabular-nums text-[#8A8378]" style={mono} aria-live="polite">
+            {visible.length} of {posts.length}
+          </span>
+        </div>
+
+        {visible.length === 0 ? (
+          <p className="py-16 text-[15px] text-[#5A544C]">
+            Nothing matches that. Try another term, or clear the filter.
+          </p>
+        ) : (
+          <div className="border-b border-[#14120F]/15">
+            {visible.map(p => (
+              <Link
+                key={p.href}
+                href={p.href}
+                className="group grid grid-cols-1 items-baseline gap-x-10 gap-y-3 border-t border-[#14120F]/15 py-8 transition-colors hover:bg-[#EAEAE6] md:grid-cols-[9rem_minmax(0,1fr)_auto] md:px-3"
+              >
+                <span className="text-[11.5px] text-[#8A8378]" style={mono}>
+                  {p.date}
+                  <span className="ml-3 text-[#C13E00]">{p.rt}</span>
+                </span>
+
+                <span className="min-w-0">
+                  <span className="block text-[clamp(1.15rem,1.9vw,1.5rem)] font-semibold tracking-[-0.02em] transition-colors group-hover:text-[#C13E00]">
+                    {p.title}
+                  </span>
+                  <span className="mt-2.5 block max-w-[64ch] text-[15px] leading-relaxed text-[#5A544C]">
+                    {p.excerpt}
+                  </span>
+                  <span className="mt-3 flex flex-wrap gap-x-4 gap-y-1" style={mono}>
+                    {p.tagLabels.map(t => (
+                      <span key={t} className="text-[11px] text-[#8A8378]">{t}</span>
+                    ))}
+                  </span>
+                </span>
+
+                <span
+                  aria-hidden="true"
+                  className="text-[14px] text-[#8A8378] transition-transform group-hover:translate-x-1 group-hover:text-[#C13E00]"
+                >
+                  &rarr;
+                </span>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <footer className="border-t border-[#14120F]/15 bg-[#EAEAE6]">
+        <div className="mx-auto flex max-w-[1400px] flex-col gap-8 px-5 py-14 md:flex-row md:items-end md:justify-between md:px-10">
+          <div>
+            <p className="text-[clamp(1.75rem,3vw,2.5rem)] font-semibold leading-[1] tracking-[-0.03em]">
+              I write about what I build.
+            </p>
+            <p className="mt-3 text-[13px] text-[#5A544C]" style={mono}>
+              Data, web work and the occasional hackathon. Sydney, AU.
+            </p>
+            <Link
+              href="/projects/all"
+              className="mt-5 inline-block border-b border-[#14120F]/30 pb-0.5 text-[13px] transition-colors hover:border-[#C13E00] hover:text-[#C13E00]"
+              style={mono}
+            >
+              All projects <span aria-hidden="true">&rarr;</span>
+            </Link>
+          </div>
+          <div className="flex flex-wrap gap-x-7 gap-y-3" style={mono}>
+            {[
+              ['GitHub', 'https://github.com/MelvinDY'],
+              ['LinkedIn', 'https://www.linkedin.com/in/melvin-yogiana/'],
+              ['Email', 'mailto:melvindarialyogiana@gmail.com'],
+            ].map(([label, href]) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[13px] text-[#5A544C] transition-colors hover:text-[#C13E00]"
+              >
+                {label} <span aria-hidden="true">&rarr;</span>
+              </a>
+            ))}
           </div>
         </div>
       </footer>
