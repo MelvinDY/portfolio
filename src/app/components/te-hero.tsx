@@ -10,13 +10,22 @@ import { usePulse } from '../lib/use-pulse'
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
-const INK = '#F2EAE0'
 const ACID = '#ff5e1f'
 
+/** The colour the manifesto words ink up to, read from the live token rather
+ *  than hardcoded. It used to be '#F2EAE0', which is invisible on a light
+ *  ground: the words animated to near-white on near-white. The timing, stagger
+ *  and easing of that tween are unchanged, only the colour it resolves. */
+const inkToken = () => {
+  const root = document.querySelector('.te-home')
+  const v = root ? getComputedStyle(root).getPropertyValue('--ink').trim() : ''
+  return v || '#F2EAE0'
+}
+
 const MANIFESTO: { t: string; acid?: boolean }[] = [
-  { t: 'Raw' }, { t: 'data' }, { t: 'in' }, { t: '—' },
+  { t: 'Raw' }, { t: 'data' }, { t: 'in,' }, { t: 'then' },
   { t: 'decisions', acid: true }, { t: 'out.' },
-  { t: 'Ideas' }, { t: 'in' }, { t: '—' },
+  { t: 'Ideas' }, { t: 'in,' }, { t: 'then' },
   { t: 'shipped' }, { t: 'products', acid: true }, { t: 'out.' },
 ]
 
@@ -47,7 +56,7 @@ const DIR = [
   {
     no: '№ 02', title: 'Software Projects', meta: '4 builds',
     href: '/projects/software', cursor: 'open ↗', kind: 'link' as const,
-    contents: ['OnlyCode — hackathon winner', 'RateMyAccom', 'PPIA UNSW Ignite', 'Stall Wars'],
+    contents: ['OnlyCode, hackathon winner', 'RateMyAccom', 'PPIA UNSW Ignite', 'Stall Wars'],
   },
   {
     no: '№ 03', title: 'The Data Room', meta: 'live analytics',
@@ -114,7 +123,7 @@ export default function TeHero() {
         .to('.h3-plate, .h3-plate-acid, .h3-scrim', { opacity: 0, ease: 'power1.in', duration: 2 }, 2.2)
         // act ii — manifesto fades in, words ink up one by one, then lifts away
         .fromTo('.h3-b', { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, ease: 'power1.out', duration: 1.2 }, 2.2)
-        .to('.h3-w', { color: (i, t) => (t as HTMLElement).dataset.fill || INK, duration: 0.35, stagger: 0.26 }, 3.0)
+        .to('.h3-w', { color: (i, t) => (t as HTMLElement).dataset.fill || inkToken(), duration: 0.35, stagger: 0.26 }, 3.0)
         .to('.h3-b', { opacity: 0, y: -70, ease: 'power1.in', duration: 1.2 }, 6.6)
         // act iii — the directory
         .set('.h3-c', { pointerEvents: 'auto' }, 7.3)
@@ -202,11 +211,11 @@ export default function TeHero() {
      so the HUD never renders empty and never shifts. */
   const hudLive = pulse
     ? `Vol. 01 · ${pulse.live} reading now · ${pulse.viewsToday} ${pulse.viewsToday === 1 ? 'view' : 'views'} today`
-    : 'Vol. 01 · 33.8688°S — 151.2093°E'
+    : 'Vol. 01 · 33.8688°S, 151.2093°E'
 
   const place = pulse?.city ?? (pulse?.country ? regionName(pulse.country) : null)
   const greeting = pulse
-    ? `reader № ${pulse.rank} today${place ? ` — hello, ${place} 👋` : ''}`
+    ? `reader № ${pulse.rank} today${place ? `, hello ${place} 👋` : ''}`
     : ''
 
   const previewItems = (i: number) => {
@@ -235,7 +244,7 @@ export default function TeHero() {
 
       {/* folio */}
       <div className="h3-hud mono" aria-hidden="true">
-        <span className="h3-hud-tl">Melvin Yogiana — Portfolio</span>
+        <span className="h3-hud-tl">Melvin Yogiana, Portfolio</span>
         <span className="h3-hud-bl">
           {pulse && <i className="h3-hud-dot" />}
           {hudLive}
@@ -246,7 +255,7 @@ export default function TeHero() {
       <div className="h3-stage">
         {/* act i — the name */}
         <div className="h3-scene h3-a">
-          <p className="h3-pre mono">[ data analyst · full-stack dev — sydney, au ]</p>
+          <p className="h3-pre mono">[ data analyst · full-stack dev, sydney au ]</p>
           <h1 className="h3-name">
             {/*
               The visible name is split per-character for the GSAP reveal and
@@ -275,7 +284,7 @@ export default function TeHero() {
               <span
                 key={i}
                 className={`h3-w${w.acid ? ' h3-w-acid' : ''}`}
-                data-fill={w.acid ? ACID : INK}
+                data-fill={w.acid ? ACID : undefined}
               >
                 {w.t}{' '}
               </span>
