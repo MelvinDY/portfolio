@@ -880,50 +880,11 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 
 /* act iii — the directory */
 .te-home .h3-dirk { font-size: 11.5px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--ink-faint); margin: 0 0 22px; }
-.te-home .h3-dir { width: min(720px, 100%); display: flex; flex-direction: column; text-align: left; }
-.te-home .h3-drow {
-  display: grid;
-  grid-template-columns: auto 1fr auto auto;
-  align-items: center;
-  gap: 20px;
-  padding: 19px 6px;
-  border-top: 1px solid var(--line);
-  transition: padding 0.35s var(--ease), border-color 0.35s;
-}
-.te-home .h3-drow:last-child { border-bottom: 1px solid var(--line); }
-.te-home .h3-drow:hover { padding-left: 18px; border-color: var(--line-2); }
-.te-home .h3-dno { font-size: 11px; color: var(--ink-faint); letter-spacing: 0.1em; }
 .te-home .h3-dt { font-size: clamp(20px, 2.6vw, 32px); font-weight: 600; letter-spacing: -0.015em; transition: color 0.3s; }
-.te-home .h3-dm { font-size: 11px; color: var(--ink-faint); letter-spacing: 0.08em; }
 .te-home .h3-darr { color: var(--ink-dim); font-size: 20px; transition: transform 0.3s var(--ease), color 0.3s; }
-.te-home .h3-drow:hover .h3-dt { color: var(--acid); }
-.te-home .h3-drow:hover .h3-darr { color: var(--acid); transform: translate(3px, -3px); }
 
 /* contents card — the index answers back when you hover a row. Needs real room
    beside the 720px directory, so it only appears once there is some. */
-.te-home .h3-prev {
-  position: absolute;
-  right: clamp(20px, 4vw, 64px);
-  top: 50%;
-  width: 250px;
-  text-align: left;
-  padding: 16px 18px;
-  border: 1px solid var(--line);
-  border-left: 1px solid var(--acid);
-  background: rgba(21,17,16,0.72);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  opacity: 0;
-  transform: translate(10px, -50%);
-  transition: opacity 0.35s var(--ease), transform 0.35s var(--ease);
-  pointer-events: none;
-}
-.te-home .h3-prev.on { opacity: 1; transform: translate(0, -50%); }
-.te-home .h3-prev-k { display: block; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--acid); margin-bottom: 12px; }
-.te-home .h3-prev ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
-.te-home .h3-prev li { font-size: 11.5px; line-height: 1.4; color: var(--ink-dim); padding-left: 14px; position: relative; word-break: break-word; }
-.te-home .h3-prev li::before { content: "→"; position: absolute; left: 0; color: var(--ink-faint); }
-@media (max-width: 1180px) { .te-home .h3-prev { display: none; } }
 
 /* A 16:9 plate inside a ~0.46-aspect phone hero, sized `cover`, crops to the
    middle ~26% of the image — a slice of anonymous slope with no ridgeline in
@@ -949,7 +910,6 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 @media (max-width: 760px) {
   .te-home .h3-frag { display: none; }
   .te-home .h3-hud-bl { display: none; }
-  .te-home .h3-dm { display: none; }
   .te-home .h3-man { max-width: 16ch; }
 }
 
@@ -958,7 +918,7 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 .te-home .h3-static .h3-stage { position: static; }
 .te-home .h3-static .h3-scene { position: static; opacity: 1; pointer-events: auto; padding-block: 36px; }
 .te-home .h3-static .h3-scan, .te-home .h3-static .h3-hud-br,
-.te-home .h3-static .h3-spot, .te-home .h3-static .h3-prev { display: none; }
+.te-home .h3-static .h3-spot { display: none; }
 /* the static hero stacks all three acts, so it runs far taller than a screen.
    Pin the plate to the first viewport instead of letting its bottom-anchored
    mask strand the mountain at the foot of a very long page. */
@@ -1787,4 +1747,116 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
       rgba(243,243,241,0.45) 62%,
       rgba(243,243,241,0.15) 82%,
       transparent 100%);
+}
+
+
+/* ─── home index, path A + pop-out (preview until picked) ───
+   Shared base: no ordinals, one hairline between rows, contents printed rather
+   than hidden behind a pointer. Only transform, opacity and colour animate, so
+   nothing here triggers layout on hover. */
+.te-home .ix-open { width: min(780px, 100%); display: flex; flex-direction: column; text-align: left; }
+.te-home .ix-open-row {
+  display: block; position: relative; padding: 18px 6px;
+  border-top: 1px solid var(--line);
+  transition: border-color 0.35s;
+}
+.te-home .ix-open-row:last-child { border-bottom: 1px solid var(--line); }
+.te-home .ix-open-head { display: grid; grid-template-columns: 1fr auto auto; align-items: baseline; gap: 16px; }
+.te-home .ix-open-meta { font-size: 11px; color: var(--ink-faint); letter-spacing: 0.08em; }
+.te-home .ix-open-list {
+  display: block; margin-top: 7px; font-size: 12px; line-height: 1.6;
+  color: var(--ink-dim); max-width: 62ch; transition: color 0.3s;
+}
+.te-home .ix-open-row:hover, .te-home .ix-open-row:focus-visible { border-color: var(--line-2); }
+.te-home .ix-open-row:hover .h3-dt, .te-home .ix-open-row:focus-visible .h3-dt { color: var(--acid); }
+.te-home .ix-open-row:hover .h3-darr, .te-home .ix-open-row:focus-visible .h3-darr {
+  color: var(--acid); transform: translate(3px, -3px);
+}
+
+/* A1 — the card comes to the row. Anchored inside the row so it tracks what
+   summoned it, instead of floating in a fixed corner. */
+.te-home .ix-card {
+  position: absolute; left: calc(100% + 28px); top: 50%;
+  width: 236px; display: flex; flex-direction: column; gap: 5px;
+  padding: 14px 16px; border: 1px solid var(--line); border-left: 2px solid var(--acid);
+  background: var(--surface); box-shadow: 0 10px 30px var(--ink-ghost);
+  opacity: 0; transform: translate(-6px, -50%); pointer-events: none;
+  transition: opacity 0.28s var(--ease), transform 0.28s var(--ease);
+}
+.te-home .ix-card-k {
+  font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--ink-faint); margin-bottom: 4px;
+}
+.te-home .ix-card-i { font-size: 11.5px; line-height: 1.5; color: var(--ink-dim); }
+.te-home .ix-pop-card .ix-open-row:hover .ix-card,
+.te-home .ix-pop-card .ix-open-row:focus-visible .ix-card {
+  opacity: 1; transform: translate(0, -50%);
+}
+/* No room beside the list, so the card simply never appears. The printed
+   contents under each title are the fallback, which is why they stay. */
+@media (max-width: 1240px) { .te-home .ix-card { display: none; } }
+
+/* A2 — the row lifts. The shadow is tinted to the page ground, never black. */
+.te-home .ix-pop-lift .ix-open-row {
+  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease),
+              opacity 0.3s var(--ease), border-color 0.35s;
+}
+.te-home .ix-pop-lift .ix-open-row:hover,
+.te-home .ix-pop-lift .ix-open-row:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 34px var(--ink-ghost);
+  background: var(--bg);
+}
+.te-home .ix-pop-lift .ix-open-row:hover .ix-open-list,
+.te-home .ix-pop-lift .ix-open-row:focus-visible .ix-open-list { color: var(--ink); }
+/* The other three recede so the lift reads as a rise, not a colour change. */
+.te-home .ix-pop-lift:has(.ix-open-row:hover) .ix-open-row:not(:hover) { opacity: 0.5; }
+
+/* A3 — the row opens in place. Both states are stacked in one grid cell and
+   cross-faded, so the row is always as tall as its taller state and opening
+   one never shoves the rows below out from under the cursor. */
+/* The rows still carry .h3-drow, but only as the selector the hero's entry
+   stagger targets. It has no styles of its own any more, so the grid below is
+   the whole definition rather than a correction of one. Columns and alignment
+   are stated explicitly because a single implicit column would centre the run
+   inside a cell sized for the open state. */
+.te-home .ix-pop-open .ix-open-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: start;
+  gap: 0;
+}
+.te-home .ix-pop-open .ix-open-list, .te-home .ix-pop-open .ix-col {
+  grid-area: 2 / 1; margin-top: 7px;
+  transition: opacity 0.26s var(--ease), transform 0.26s var(--ease);
+}
+.te-home .ix-pop-open .ix-col {
+  display: flex; flex-direction: column; gap: 3px;
+  font-size: 11.5px; line-height: 1.55; color: var(--ink);
+  opacity: 0; transform: translateY(4px);
+}
+.te-home .ix-pop-open .ix-open-row:hover .ix-run,
+.te-home .ix-pop-open .ix-open-row:focus-visible .ix-run { opacity: 0; transform: translateY(-4px); }
+.te-home .ix-pop-open .ix-open-row:hover .ix-col,
+.te-home .ix-pop-open .ix-open-row:focus-visible .ix-col { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .te-home .ix-card, .te-home .ix-pop-lift .ix-open-row,
+  .te-home .ix-pop-open .ix-open-list, .te-home .ix-pop-open .ix-col,
+  .te-home .ix-open-row .h3-darr { transition: none; }
+  .te-home .ix-pop-lift .ix-open-row:hover { transform: none; }
+  .te-home .ix-card { transform: translate(0, -50%); }
+}
+
+/* The index is the last act of a hero pinned to 100dvh, so its height is not
+   free: it has to fit whatever room the viewport gives it. Reserving the open
+   state costs about 145px over the closed run, which clears a full-height
+   window but overflows a short laptop one by up to 47px, clipping Contact.
+   Tighten the block rather than let the pin crop it. */
+@media (max-height: 760px) {
+  .te-home .ix-open-row { padding: 10px 6px; }
+  .te-home .ix-open-list, .te-home .ix-pop-open .ix-col { font-size: 11px; margin-top: 5px; }
+  .te-home .ix-pop-open .ix-col { gap: 1px; }
+  .te-home .h3-dt { font-size: clamp(18px, 2.1vw, 26px); }
+  .te-home .h3-dirk { margin-bottom: 14px; }
 }

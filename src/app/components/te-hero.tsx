@@ -1,11 +1,12 @@
 "use client"
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import Link from 'next/link'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import DungeonDot from './dungeon-dot'
 import { usePulse } from '../lib/use-pulse'
+import { HOME_INDEX, entryContents } from '../data/home-index'
 
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
@@ -49,33 +50,9 @@ const chars = (word: string) =>
     <span className="h3-ch" key={i}>{c}</span>
   ))
 
-/* The index rows, and what each one previews on hover. */
-const DIR = [
-  {
-    no: '№ 01', title: 'Data Projects', meta: '4 case studies',
-    href: '/projects/data', cursor: 'open ↗', kind: 'link' as const,
-    contents: ['Grocery pricing wars', 'Australian labour market', 'SaaS revenue pipeline', 'YouTube trending forensics'],
-  },
-  {
-    no: '№ 02', title: 'Software Projects', meta: '4 builds',
-    href: '/projects/software', cursor: 'open ↗', kind: 'link' as const,
-    contents: ['OnlyCode, hackathon winner', 'RateMyAccom', 'PPIA UNSW Ignite', 'Stall Wars'],
-  },
-  {
-    no: '№ 03', title: 'The Data Room', meta: 'live analytics',
-    href: '/stats', cursor: 'open ↗', kind: 'link' as const,
-    contents: [], // filled from the live pulse
-  },
-  {
-    no: '№ 04', title: 'Contact', meta: 'say hello',
-    href: '#contact', cursor: 'go ↓', kind: 'anchor' as const,
-    contents: ['melvindarialyogiana@gmail.com', 'github.com/MelvinDY', 'in/melvin-yogiana'],
-  },
-]
 
 export default function TeHero() {
   const scope = useRef<HTMLElement>(null)
-  const [preview, setPreview] = useState<number | null>(null)
   const pulse = usePulse()
 
   useIsomorphicLayoutEffect(() => {
@@ -221,15 +198,6 @@ export default function TeHero() {
     ? `reader № ${pulse.rank} today${place ? `, hello ${place} 👋` : ''}`
     : ''
 
-  const previewItems = (i: number) => {
-    if (i !== 2) return DIR[i].contents
-    if (!pulse) return ['live from this site’s own pipeline']
-    return [
-      `${pulse.live} reading right now`,
-      `${pulse.viewsToday} views today`,
-      `${pulse.visitorsToday} visitors today`,
-    ]
-  }
 
   return (
     <section className="hero3" id="top" ref={scope}>
@@ -297,43 +265,42 @@ export default function TeHero() {
           </p>
         </div>
 
-        {/* act iii — the index */}
+        {/* act iii — the index.
+            No ordinals: these are four kinds of destination, not four steps,
+            and numbering them asserted a sequence that was never there. The
+            contents are printed rather than held behind a hover, because the
+            card that used to hold them was display:none below 1180px, so the
+            most useful thing here was the thing a phone could never reach.
+            Pointing at a row cross-fades that run into a column. Both states
+            share a grid cell, so a row is always as tall as its open state and
+            opening one never shoves the rows below out from under the cursor. */}
         <div className="h3-scene h3-c">
           <p className="h3-dirk mono">[ the index ]</p>
-          <nav className="h3-dir" aria-label="Quick links" onMouseLeave={() => setPreview(null)}>
-            {DIR.map((row, i) => {
+          <nav className="ix-open ix-pop-open" aria-label="Quick links">
+            {HOME_INDEX.map(entry => {
+              const items = entryContents(entry, pulse)
               const props = {
-                className: 'h3-drow',
-                'data-cursor': row.cursor,
-                onMouseEnter: () => setPreview(i),
-                onFocus: () => setPreview(i),
-                onBlur: () => setPreview(null),
+                className: 'h3-drow ix-open-row',
+                'data-cursor': entry.cursor,
                 children: (
                   <>
-                    <span className="h3-dno mono">{row.no}</span>
-                    <span className="h3-dt">{row.title}</span>
-                    <span className="h3-dm mono">{row.meta}</span>
-                    <span className="h3-darr">↗</span>
+                    <span className="ix-open-head">
+                      <span className="h3-dt">{entry.title}</span>
+                      <span className="ix-open-meta mono">{entry.meta}</span>
+                      <span className="h3-darr">↗</span>
+                    </span>
+                    <span className="ix-open-list mono ix-run">{items.join(', ')}</span>
+                    <span className="ix-col mono" aria-hidden="true">
+                      {items.map(item => <span key={item}>{item}</span>)}
+                    </span>
                   </>
                 ),
               }
-              return row.kind === 'link'
-                ? <Link key={row.no} href={row.href} {...props} />
-                : <a key={row.no} href={row.href} {...props} />
+              return entry.nav === 'link'
+                ? <Link key={entry.title} href={entry.href} {...props} />
+                : <a key={entry.title} href={entry.href} {...props} />
             })}
           </nav>
-
-          {/* contents card — the index gets a table of contents on hover */}
-          <aside className={`h3-prev mono${preview != null ? ' on' : ''}`} aria-hidden="true">
-            {preview != null && (
-              <>
-                <span className="h3-prev-k">[ {DIR[preview].no.toLowerCase()} / contents ]</span>
-                <ul>
-                  {previewItems(preview).map(item => <li key={item}>{item}</li>)}
-                </ul>
-              </>
-            )}
-          </aside>
         </div>
       </div>
     </section>
