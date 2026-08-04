@@ -271,12 +271,13 @@ export default function TeHero() {
             contents are printed rather than held behind a hover, because the
             card that used to hold them was display:none below 1180px, so the
             most useful thing here was the thing a phone could never reach.
-            Pointing at a row cross-fades that run into a column. Both states
-            share a grid cell, so a row is always as tall as its open state and
-            opening one never shoves the rows below out from under the cursor. */}
+            Pointing at a row brings a card alongside it, anchored inside the
+            row so it arrives beside whatever summoned it and leaves with it.
+            Where there is no room for the card the printed run is already
+            carrying the same information, so nothing is lost. */}
         <div className="h3-scene h3-c">
           <p className="h3-dirk mono">[ the index ]</p>
-          <nav className="ix-open ix-pop-open" aria-label="Quick links">
+          <nav className="ix-open ix-pop-card" aria-label="Quick links">
             {HOME_INDEX.map(entry => {
               const items = entryContents(entry, pulse)
               const props = {
@@ -289,9 +290,10 @@ export default function TeHero() {
                       <span className="ix-open-meta mono">{entry.meta}</span>
                       <span className="h3-darr">↗</span>
                     </span>
-                    <span className="ix-open-list mono ix-run">{items.join(', ')}</span>
-                    <span className="ix-col mono" aria-hidden="true">
-                      {items.map(item => <span key={item}>{item}</span>)}
+                    <span className="ix-open-list mono">{items.join(', ')}</span>
+                    <span className="ix-card mono" aria-hidden="true">
+                      <span className="ix-card-k">{entry.meta}</span>
+                      {items.map(item => <span key={item} className="ix-card-i">{item}</span>)}
                     </span>
                   </>
                 ),
