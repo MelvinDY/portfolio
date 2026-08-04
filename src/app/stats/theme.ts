@@ -14,7 +14,7 @@ export const HAIRLINE = 'rgba(20,18,15,0.12)'
 export const INK = '#14120F'
 export const MUTED = '#5A544C'
 export const FAINT = '#8A8378'
-/** Accent for text and hairlines: 5.6:1 on the surface. */
+/** Accent for text and hairlines: 4.78:1 on the surface. */
 export const BRAND = '#C13E00'
 /** Same accent, display weight. Large type and non-text marks only: 3.1:1. */
 export const BRAND_LOUD = '#ff5e1f'

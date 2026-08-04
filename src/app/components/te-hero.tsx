@@ -10,17 +10,20 @@ import { usePulse } from '../lib/use-pulse'
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
-const ACID = '#ff5e1f'
-
-/** The colour the manifesto words ink up to, read from the live token rather
- *  than hardcoded. It used to be '#F2EAE0', which is invisible on a light
- *  ground: the words animated to near-white on near-white. The timing, stagger
- *  and easing of that tween are unchanged, only the colour it resolves. */
-const inkToken = () => {
+/** Read a live theme token, with the dark-theme value as the fallback.
+ *
+ *  Both colours here used to be hardcoded, and both broke on the light ground
+ *  for the same reason: the ink was '#F2EAE0', so the words animated to
+ *  near-white on near-white, and the accent was '#ff5e1f', which reads 2.75:1
+ *  on this surface and fails even the 3:1 large-text bar. The timing, stagger
+ *  and easing of those tweens are unchanged; only the colour they resolve to. */
+const token = (name: string, fallback: string) => {
   const root = document.querySelector('.te-home')
-  const v = root ? getComputedStyle(root).getPropertyValue('--ink').trim() : ''
-  return v || '#F2EAE0'
+  const v = root ? getComputedStyle(root).getPropertyValue(name).trim() : ''
+  return v || fallback
 }
+const inkToken = () => token('--ink', '#F2EAE0')
+const acidToken = () => token('--acid', '#ff5e1f')
 
 const MANIFESTO: { t: string; acid?: boolean }[] = [
   { t: 'Raw' }, { t: 'data' }, { t: 'in,' }, { t: 'then' },
@@ -123,7 +126,7 @@ export default function TeHero() {
         .to('.h3-plate, .h3-plate-acid, .h3-scrim', { opacity: 0, ease: 'power1.in', duration: 2 }, 2.2)
         // act ii — manifesto fades in, words ink up one by one, then lifts away
         .fromTo('.h3-b', { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, ease: 'power1.out', duration: 1.2 }, 2.2)
-        .to('.h3-w', { color: (i, t) => (t as HTMLElement).dataset.fill || inkToken(), duration: 0.35, stagger: 0.26 }, 3.0)
+        .to('.h3-w', { color: (i, t) => ((t as HTMLElement).dataset.fill === 'acid' ? acidToken() : inkToken()), duration: 0.35, stagger: 0.26 }, 3.0)
         .to('.h3-b', { opacity: 0, y: -70, ease: 'power1.in', duration: 1.2 }, 6.6)
         // act iii — the directory
         .set('.h3-c', { pointerEvents: 'auto' }, 7.3)
@@ -284,7 +287,9 @@ export default function TeHero() {
               <span
                 key={i}
                 className={`h3-w${w.acid ? ' h3-w-acid' : ''}`}
-                data-fill={w.acid ? ACID : undefined}
+                /* A marker, not a colour: the tween resolves it against the
+                   live theme so a hex cannot be baked in at render time. */
+                data-fill={w.acid ? 'acid' : undefined}
               >
                 {w.t}{' '}
               </span>
