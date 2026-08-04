@@ -122,6 +122,7 @@ export default function DataProjects() {
           </div>
           <div className="flex flex-wrap gap-x-7 gap-y-3" style={mono}>
             {[
+              ['Privacy', '/privacy'],
               ['GitHub', 'https://github.com/MelvinDY'],
               ['LinkedIn', 'https://www.linkedin.com/in/melvin-yogiana/'],
               ['Email', 'mailto:melvindarialyogiana@gmail.com'],
@@ -129,8 +130,8 @@ export default function DataProjects() {
               <a
                 key={label}
                 href={href}
-                target="_blank"
-                rel="noopener noreferrer"
+                target={href.startsWith('http') ? '_blank' : undefined}
+                rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
                 className="text-[13px] text-[#5A544C] transition-colors hover:text-[#C13E00]"
               >
                 {label} <span aria-hidden="true">&rarr;</span>

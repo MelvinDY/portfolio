@@ -162,6 +162,9 @@ export default function AboutTE() {
             <Link href="/blog" className="text-[13px] text-[#5A544C] transition-colors hover:text-[#C13E00]">
               Blog <span aria-hidden="true">&rarr;</span>
             </Link>
+            <Link href="/privacy" className="text-[13px] text-[#5A544C] transition-colors hover:text-[#C13E00]">
+              Privacy <span aria-hidden="true">&rarr;</span>
+            </Link>
           </div>
         </div>
       </footer>

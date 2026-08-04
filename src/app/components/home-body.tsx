@@ -268,6 +268,7 @@ export default function HomeBody() {
               <Link href="/blog">Blog</Link>
               <Link href="/about">About</Link>
               <Link href="/stats">Site Analytics ↗</Link>
+              <Link href="/privacy">Privacy</Link>
             </div>
             <div className="foot-col">
               <h4>Elsewhere</h4>
