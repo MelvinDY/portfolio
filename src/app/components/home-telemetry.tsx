@@ -43,7 +43,7 @@ function Num({ value }: { value: number | null }) {
     return () => cancelAnimationFrame(raf)
   }, [value])
 
-  return <>{display == null ? '—' : display.toLocaleString('en-AU')}</>
+  return <>{display == null ? '-' : display.toLocaleString('en-AU')}</>
 }
 
 /* 30-day views pulse — single-series area chart, crosshair on hover */
@@ -84,7 +84,7 @@ function Pulse({ series }: { series: Point[] }) {
       <div className="tm-pulse-head mono">
         <span>[ pulse ] page views · daily</span>
         <span className="tm-pulse-read">
-          {h ? `${label(h.t)} — ${h.views.toLocaleString('en-AU')} ${h.views === 1 ? 'view' : 'views'}` : `peak ${max.toLocaleString('en-AU')}`}
+          {h ? `${label(h.t)}, ${h.views.toLocaleString('en-AU')} ${h.views === 1 ? 'view' : 'views'}` : `peak ${max.toLocaleString('en-AU')}`}
         </span>
       </div>
       <div ref={wrapRef} style={{ position: 'relative' }}>
@@ -158,7 +158,7 @@ export default function HomeTelemetry() {
         <div>
           <p className="lead tm-lead" data-rise>
             No Google Analytics, no third-party script. I built the pipeline that powers these
-            numbers — a <span className="acid-text">cookieless tracker</span>, a Postgres events
+            numbers, from a <span className="acid-text">cookieless tracker</span>, a Postgres events
             table, and the SQL that rolls it up. What you&apos;re reading right now is already in it.
           </p>
           <p className="tm-pipe mono" data-rise>

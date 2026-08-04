@@ -482,6 +482,54 @@ body.te-home-page {
   overflow-x: hidden;
 }
 
+/* ─── light skin for the home page ───
+   The te-home system is token-driven: 250 var() reads against 33 hardcoded
+   hex values. So a light home page is a palette swap on a wrapper, not a
+   rewrite. Applying .home-light to the page root reskins everything, and
+   applying it to a single <section> reskins only that subtree, because custom
+   properties cascade.
+
+   Nothing here touches a GSAP hook. data-rise, data-rise-group, data-lines,
+   data-ink and the pinned .hz shelf keep the same markup, the same classes and
+   the same CSS transitions, so the choreography and its timing are untouched.
+   Only the colours those transitions animate between change. */
+.te-home.home-light,
+.te-home .home-light,
+/* Split: the hero and the pinned shelf keep the dark stage the choreography
+   was designed on, and every section after it lights up. One switch, once,
+   which is the exception Section 4.11 allows.
+   Both sibling selectors are needed. ScrollTrigger's pin wraps .hz in a
+   .pin-spacer at runtime, so after GSAP initialises .hz is no longer a sibling
+   of the sections below it and the first selector silently stops matching.
+   Under reduced motion the hook returns before pinning and .hz stays a
+   sibling, so the first selector is the one that applies. */
+.te-home.home-split .hz ~ section,
+.te-home.home-split .pin-spacer ~ section,
+.te-home.home-split .site-foot {
+  --bg:        #F3F3F1;
+  --bg-2:      #EAEAE6;
+  --surface:   #EAEAE6;
+  --surface-2: #E2E1DB;
+  --line:      rgba(20,18,15,0.15);
+  --line-2:    rgba(20,18,15,0.26);
+  --ink:       #14120F;
+  --ink-dim:   #5A544C;
+  --ink-faint: #8A8378;
+  --acid-deep: #C13E00;
+  --acid-glow: rgba(255,94,31,0.14);
+  --ink-ghost: rgba(20,18,15,0.16);
+  --bg-fade:   rgba(243,243,241,0.75);
+  background: var(--bg);
+  color: var(--ink);
+}
+/* The grain and dot-grid overlays are tuned for a dark ground and read as
+   dirt on a light one. */
+.te-home.home-light::before { background-image: radial-gradient(rgba(20,18,15,0.05) 1px, transparent 1px); }
+.te-home.home-light::after { opacity: 0.02; mix-blend-mode: multiply; }
+body.te-home-page.home-light-page { background: #F3F3F1 !important; color: #14120F !important; }
+body.te-home-page.home-light-page::-webkit-scrollbar-track { background: #EAEAE6; }
+body.te-home-page.home-light-page::-webkit-scrollbar-thumb { background: #CFCCC5; border-color: #EAEAE6; }
+
 .te-home {
   --bg:        #0b0907;
   --bg-2:      #100d0a;
@@ -495,6 +543,10 @@ body.te-home-page {
   --acid:      #ff5e1f;
   --acid-deep: #e84a00;
   --acid-glow: rgba(255,94,31,0.16);
+  /* Rest state of the hero manifesto words, and the shelf edge fade. Both were
+     hardcoded dark, which a palette swap cannot reach. */
+  --ink-ghost: rgba(242,234,224,0.15);
+  --bg-fade:   rgba(11,9,7,0.75);
   --font-display: var(--font-space-grotesk, 'Space Grotesk', system-ui, sans-serif);
   --font-serif: var(--font-newsreader, 'Newsreader', Georgia, serif);
   --maxw: 1280px;
@@ -897,7 +949,7 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
   max-width: 22ch;
   margin: 0;
 }
-.te-home .h3-w { color: rgba(242,234,224,0.15); }
+.te-home .h3-w { color: var(--ink-ghost); }
 .te-home .h3-w-acid { font-family: var(--font-serif); font-style: italic; font-weight: 400; padding-right: 0.05em; }
 
 /* act iii — the directory */
@@ -1081,7 +1133,7 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 
 /* 02 — work: horizontal shelf (pinned, scrubbed sideways) */
 .te-home .hz { position: relative; margin-top: clamp(80px, 11vw, 150px); overflow: hidden; }
-.te-home .hz-fade { position: absolute; top: 0; right: 0; bottom: 0; width: clamp(140px, 16vw, 260px); background: linear-gradient(to right, transparent, rgba(11, 9, 7, 0.75) 45%, var(--bg) 72%); pointer-events: none; z-index: 5; }
+.te-home .hz-fade { position: absolute; top: 0; right: 0; bottom: 0; width: clamp(140px, 16vw, 260px); background: linear-gradient(to right, transparent, var(--bg-fade) 45%, var(--bg) 72%); pointer-events: none; z-index: 5; }
 .te-home .hz.hz-static .hz-fade { display: none; }
 .te-home .hz-pin { height: 100svh; display: flex; flex-direction: column; justify-content: center; gap: clamp(20px, 4vh, 44px); padding-top: 76px; }
 .te-home .hz-pin .sh { margin-bottom: 0; }
@@ -1749,3 +1801,61 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 
 
 
+
+/* ─── home skins ───
+   Three light layouts over one palette. Every rule below changes spacing,
+   scale, grid shape or rules. None of them touch transform, transition,
+   clip-path or opacity on .gs-prep, .gs-in, .gs-prep-line, .lr-in, .iw or the
+   .hz shelf, so the choreography and its timing are byte-identical across all
+   three. What differs is the room the animation plays in. */
+
+/* A — BROADSHEET: contained column, editorial rhythm, one idea per band. */
+.te-home.home-broadsheet .wrap { max-width: 1080px; }
+.te-home.home-broadsheet .sec { padding-top: clamp(110px, 15vw, 210px); }
+.te-home.home-broadsheet .sh { gap: 18px; margin-bottom: clamp(48px, 6vw, 80px); }
+.te-home.home-broadsheet .sh-rule-s { display: none; }
+.te-home.home-broadsheet .ab2-grid { grid-template-columns: 1fr; gap: clamp(36px, 5vw, 64px); align-items: start; }
+.te-home.home-broadsheet .ab2-head { font-size: clamp(44px, 7.5vw, 96px); line-height: 0.98; }
+.te-home.home-broadsheet .ink { font-size: clamp(21px, 2.6vw, 34px); max-width: 30ch; line-height: 1.45; }
+.te-home.home-broadsheet .mods { grid-template-columns: 1fr; gap: 0; margin-top: clamp(56px, 7vw, 96px); }
+.te-home.home-broadsheet .mod { border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 30px 0; background: none; }
+.te-home.home-broadsheet .mod:last-child { border-bottom: 1px solid var(--line); }
+.te-home.home-broadsheet .mod p { font-size: 17px; max-width: 62ch; }
+.te-home.home-broadsheet .rdout { display: flex; flex-wrap: wrap; gap: clamp(32px, 6vw, 80px); border: 0; padding: clamp(48px,6vw,72px) 0 0; }
+.te-home.home-broadsheet .rd { border: 0; padding: 0; }
+.te-home.home-broadsheet .rd-v { font-size: clamp(40px, 6vw, 72px); }
+.te-home.home-broadsheet .aw-row { padding: 28px 0; }
+.te-home.home-broadsheet .aw-t { font-size: clamp(20px, 2.6vw, 30px); }
+
+
+/* ─── the hero plate on a light ground ───
+   The engraving is composited with mix-blend-mode: screen, which lightens.
+   Screening anything over a near-white ground yields near-white, so on the
+   light skins the plate was mathematically invisible: the picture had not been
+   removed, it had been blended out of existence.
+
+   The artwork carries both polarities, roughly 25% very dark pixels and 20%
+   very light, so it does not need inverting. Screen on a dark ground reveals
+   its highlights; multiply on a light ground reveals its shadows. Same file,
+   opposite polarity, legible either way.
+
+   The scrim is a near-black ellipse that exists to hold type contrast over the
+   lit hatching. On light it has to darken nothing and lighten instead, so it
+   becomes the page ground at the same stops rather than the dark one. */
+.te-home.home-light .h3-plate {
+  mix-blend-mode: multiply;
+  opacity: 0.30;
+}
+.te-home.home-light .h3-plate-acid {
+  mix-blend-mode: multiply;
+  opacity: 0.16;
+}
+.te-home.home-light .h3-scrim {
+  background:
+    radial-gradient(ellipse 120% 42% at 50% 62%,
+      rgba(243,243,241,0.93) 0%,
+      rgba(243,243,241,0.80) 34%,
+      rgba(243,243,241,0.45) 62%,
+      rgba(243,243,241,0.15) 82%,
+      transparent 100%);
+}
