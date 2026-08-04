@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import { useTeEffects } from '../lib/use-te-effects'
 import { useHomeGsap } from '../lib/use-home-gsap'
-import TeHeader from '../components/te-header'
+import LightHeader from '../components/light-header'
 import TeHero from '../components/te-hero'
 import TeCursor from '../components/te-cursor'
 import HomeTelemetry from '../components/home-telemetry'
@@ -68,7 +68,7 @@ export default function HomeBody() {
   return (
     <div className="te-home home-light home-broadsheet">
       <TeCursor />
-      <TeHeader />
+      <LightHeader overlay />
       <ScrollProgress />
 
       <main>

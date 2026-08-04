@@ -7,12 +7,6 @@ export function useTeEffects() {
     document.body.classList.add('te-home-page')
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-    // Header scroll
-    const head = document.querySelector<HTMLElement>('.te-home .site-head')
-    const onScroll = () => { if (head) head.classList.toggle('scrolled', window.scrollY > 24) }
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-
     // Reveal on scroll
     const revs = Array.from(document.querySelectorAll<Element>('.te-home [data-reveal]'))
     const show = (el: Element) => el.classList.add('in')
@@ -139,7 +133,6 @@ export function useTeEffects() {
 
     return () => {
       document.body.classList.remove('te-home-page')
-      window.removeEventListener('scroll', onScroll)
       window.removeEventListener('load', sweep)
       window.removeEventListener('scroll', sweep)
       clearTimeout(revealTimeout)

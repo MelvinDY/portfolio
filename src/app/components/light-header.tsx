@@ -1,18 +1,22 @@
 "use client"
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
 /**
- * Header for the light catalogue page.
+ * The site header. One component for every page, so the nav cannot drift.
  *
- * The site's TeHeader is built for the dark ground and cannot simply be
- * recoloured, so this is its light counterpart. Same links, same order, same
- * labels: Section 11.C says nav labels stay stable across a redesign for SEO
- * and for muscle memory.
+ * Same links, same order, same labels everywhere: Section 11.C says nav labels
+ * stay stable across a redesign for SEO and for muscle memory.
  *
  * One line at 64px on desktop, per 4.7. Below md it collapses to a disclosure
- * rather than hiding the nav entirely, which is what the preview did.
+ * rather than hiding the nav entirely.
+ *
+ * `overlay` is for the home page alone. That page opens on a full-bleed hero
+ * whose height the scroll animation measures, so the header floats instead of
+ * taking 64px out of the flow, and it stays transparent until you scroll off
+ * the hero rather than laying a hairline across the artwork. Appearance once
+ * scrolled is identical to the in-flow version.
  */
 
 const NAV = [
@@ -25,11 +29,30 @@ const NAV = [
 
 const mono = { fontFamily: 'var(--font-mono), ui-monospace, monospace' } as const
 
-export default function LightHeader({ active }: { active?: string }) {
+export default function LightHeader({ active, overlay = false }: { active?: string; overlay?: boolean }) {
   const [open, setOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    if (!overlay) return
+    const onScroll = () => setScrolled(window.scrollY > 24)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [overlay])
+
+  /* Off the hero, or open on mobile, the plate is the same one every other
+     page wears. Over the hero it is invisible. */
+  const plated = !overlay || scrolled || open
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[#14120F]/12 bg-[#F3F3F1]/92 backdrop-blur-md">
+    <header
+      className={`${overlay ? 'fixed inset-x-0 top-0' : 'sticky top-0'} z-40 border-b transition-colors duration-300 ${
+        plated
+          ? 'border-[#14120F]/12 bg-[#F3F3F1]/92 backdrop-blur-md'
+          : 'border-transparent bg-transparent'
+      }`}
+    >
       <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between gap-6 px-5 md:px-10">
         <Link href="/" className="text-[15px] font-semibold tracking-tight" onClick={() => setOpen(false)}>
           Melvin<span className="text-[#C13E00]">.</span>
