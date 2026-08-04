@@ -6,14 +6,14 @@ import Heatmap, { type HeatCell } from './heatmap'
 import LiveWire from './live-wire'
 import { SqlButton, SqlDrawer } from './sql-panel'
 import {
-  BAD, BRAND, C1, C2, CARD, COMPARE, FAINT, GOOD, HAIRLINE, INK, MUTED, SERIES_COLORS, SURFACE,
+  BAD, BRAND, BRAND_LOUD, C1, C2, CARD, COMPARE, FAINT, GOOD, HAIRLINE, INK, MUTED, SERIES_COLORS, SURFACE,
   compact, countryName, flag, fmt, type SqlMeta,
 } from './theme'
 
 /* ─── types ─── */
-type Point = { t: string; views: number; visitors: number; bounced: number }
+export type Point = { t: string; views: number; visitors: number; bounced: number }
 
-interface StatsData {
+export interface StatsData {
   configured: boolean
   error?: string
   range?: string
@@ -69,61 +69,8 @@ function useWidth<T extends HTMLElement>() {
   return { ref, width: w }
 }
 
-/* ─── sparkline — the tile's own metric over the window, recessive by design ─── */
-function Sparkline({ values, color }: { values: number[]; color: string }) {
-  if (values.length < 2) return null
-  const W = 62
-  const H = 20
-  const max = Math.max(...values)
-  const min = Math.min(...values)
-  const span = max - min || 1
-  const x = (i: number) => (i / (values.length - 1)) * (W - 2) + 1
-  const y = (v: number) => H - 2 - ((v - min) / span) * (H - 4)
-  const d = values.map((v, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('')
-  const lastI = values.length - 1
-
-  return (
-    <svg className="spark" width={W} height={H} aria-hidden="true" focusable="false">
-      <path d={d} fill="none" stroke={color} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" opacity={0.65} />
-      <circle cx={x(lastI)} cy={y(values[lastI])} r={2.2} fill={color} />
-    </svg>
-  )
-}
-
-/* ─── stat tile ─── */
-function StatTile({
-  label, value, delta, deltaSuffix = '%', upIsGood = true, index, spark, sparkColor, onSql,
-}: {
-  label: string
-  value: string
-  delta?: number | null
-  deltaSuffix?: string
-  upIsGood?: boolean
-  index: number
-  spark?: number[]
-  sparkColor?: string
-  onSql?: () => void
-}) {
-  const good = delta != null && (upIsGood ? delta >= 0 : delta <= 0)
-  return (
-    <div className="tile rise" style={{ animationDelay: `${index * 60}ms` }}>
-      <div className="tile-top">
-        <div className="microlabel" style={{ marginBottom: 0 }}>{label}</div>
-        {onSql && <SqlButton onClick={onSql} />}
-      </div>
-      <div className="tile-mid">
-        <div className="tile-value">{value}</div>
-        {spark && spark.length > 1 && <Sparkline values={spark} color={sparkColor ?? MUTED} />}
-      </div>
-      <div className="tile-delta" style={{ color: delta == null ? FAINT : good ? GOOD : BAD }}>
-        {delta == null ? '—' : `${delta >= 0 ? '+' : ''}${delta}${deltaSuffix} vs prev period`}
-      </div>
-    </div>
-  )
-}
-
 /* ─── time series (views area + visitors line + dashed prior window) ─── */
-function TimeSeries({
+export function TimeSeries({
   series, prevSeries, unit,
 }: {
   series: Point[]
@@ -226,7 +173,7 @@ function TimeSeries({
           {/* crosshair + markers with surface ring */}
           {h && (
             <g>
-              <line x1={x(hover!)} x2={x(hover!)} y1={M.top} y2={M.top + ih} stroke="rgba(255,255,255,0.22)" strokeWidth={1} />
+              <line x1={x(hover!)} x2={x(hover!)} y1={M.top} y2={M.top + ih} stroke="rgba(20,18,15,0.30)" strokeWidth={1} />
               <circle cx={x(hover!)} cy={y(h.views)} r={4} fill={C1} stroke={SURFACE} strokeWidth={2} />
               <circle cx={x(hover!)} cy={y(h.visitors)} r={4} fill={C2} stroke={SURFACE} strokeWidth={2} />
             </g>
@@ -257,7 +204,7 @@ function TimeSeries({
         <tbody>
           {series.map((d, i) => (
             <tr key={d.t}>
-              <td>{d.t}</td><td>{d.views}</td><td>{d.visitors}</td><td>{hasPrev ? prevSeries[i].views : '—'}</td>
+              <td>{d.t}</td><td>{d.views}</td><td>{d.visitors}</td><td>{hasPrev ? prevSeries[i].views : 'no data'}</td>
             </tr>
           ))}
         </tbody>
@@ -267,7 +214,7 @@ function TimeSeries({
 }
 
 /* ─── bar list (nominal categories → single hue, value at row end) ─── */
-function BarList({
+export function BarList({
   items, format = (s: string) => s, emptyNote,
 }: {
   items: Array<{ x: string; y: number }>
@@ -294,7 +241,7 @@ function BarList({
 }
 
 /* ─── devices: single stacked bar, 2px surface gaps, legend ─── */
-function DeviceSplit({ devices }: { devices: Array<{ x: string; y: number }> }) {
+export function DeviceSplit({ devices }: { devices: Array<{ x: string; y: number }> }) {
   const order = ['desktop', 'mobile', 'tablet']
   const sorted = order.map(k => devices.find(d => d.x === k)).filter(Boolean) as Array<{ x: string; y: number }>
   const total = sorted.reduce((s, d) => s + d.y, 0)
@@ -361,12 +308,17 @@ export default function StatsPage() {
   }, [sqlById])
 
   const series = data?.series ?? []
-  const spark = {
-    views: series.map(d => d.views),
-    visitors: series.map(d => d.visitors),
-    bounce: series.map(d => (d.visitors > 0 ? Math.round((d.bounced / d.visitors) * 100) : 0)),
-    perVisitor: series.map(d => (d.visitors > 0 ? +(d.views / d.visitors).toFixed(2) : 0)),
-  }
+
+  /* The four headline numbers. `delta` is null when there is no prior period to
+     compare against, which the strip renders as words rather than a dash. */
+  const readouts = t && p
+    ? [
+        { label: 'Views', value: compact(t.views), delta: pct(t.views, p.views), suffix: '%', upIsGood: true },
+        { label: 'Visitors', value: compact(t.visitors), delta: pct(t.visitors, p.visitors), suffix: '%', upIsGood: true },
+        { label: 'Bounce', value: `${t.bounceRate}%`, delta: p.visitors > 0 ? t.bounceRate - p.bounceRate : null, suffix: 'pp', upIsGood: false },
+        { label: 'Views / visitor', value: `${t.viewsPerVisitor}`, delta: null, suffix: '', upIsGood: true },
+      ]
+    : []
 
   return (
     <div className="stats-page">
@@ -405,23 +357,9 @@ export default function StatsPage() {
 
         {!loading && data?.configured && t && !data.error && (
           <div style={{ opacity: refetching ? 0.55 : 1, transition: 'opacity 200ms ease' }}>
-            {/* hero */}
-            <div className="rise" style={{ marginBottom: 44 }}>
-              <div className="microlabel" style={{ color: BRAND, marginBottom: 14 }}>
-                first-party · cookieless · anonymised daily
-              </div>
-              <h1 className="hero-title">
-                Who&apos;s been reading<br /><span style={{ color: BRAND }}>the work.</span>
-              </h1>
-              <p className="hero-sub">
-                Every number on this page comes from an analytics pipeline built into this site —
-                a 60-line tracker, a Postgres table, and SQL. No third parties, no cookies.
-                Every panel will show you the query behind it.
-              </p>
-            </div>
-
-            {/* filter row — scopes everything below */}
-            <div className="range-row rise" style={{ animationDelay: '40ms' }}>
+            {/* No hero. This is an instrument, not a landing page: the filter row
+                doubles as the status line, and the first chart is above the fold. */}
+            <div className="range-row rise">
               {RANGES.map(r => (
                 <button
                   key={r.key}
@@ -431,74 +369,72 @@ export default function StatsPage() {
                   {r.label}
                 </button>
               ))}
-              <span className="range-note">Australia/Sydney</span>
+              <span className="range-note">
+                {data.timing
+                  ? `${data.timing.queryCount} queries · ${data.timing.totalMs}ms · Australia/Sydney`
+                  : 'Australia/Sydney'}
+              </span>
             </div>
 
-            {/* KPI row */}
-            <div className="tile-grid">
-              <StatTile
-                index={0} label="Page views" value={compact(t.views)}
-                delta={pct(t.views, p!.views)} spark={spark.views} sparkColor={C1}
-                onSql={() => openSql(['totals', 'prev'])}
-              />
-              <StatTile
-                index={1} label="Unique visitors" value={compact(t.visitors)}
-                delta={pct(t.visitors, p!.visitors)} spark={spark.visitors} sparkColor={C2}
-                onSql={() => openSql(['totals', 'prev'])}
-              />
-              <StatTile
-                index={2} label="Bounce rate" value={`${t.bounceRate}%`}
-                delta={p!.visitors > 0 ? t.bounceRate - p!.bounceRate : null}
-                deltaSuffix="pp" upIsGood={false} spark={spark.bounce} sparkColor={MUTED}
-                onSql={() => openSql(['totals', 'series'])}
-              />
-              <StatTile
-                index={3} label="Views / visitor" value={`${t.viewsPerVisitor}`}
-                delta={null} spark={spark.perVisitor} sparkColor={MUTED}
-                onSql={() => openSql(['totals'])}
-              />
-            </div>
-
-            {/* traffic chart */}
-            <section className="card rise" style={{ animationDelay: '120ms', marginBottom: 20 }}>
-              <div className="card-head">
-                <span className="microlabel" style={{ marginBottom: 0 }}>Traffic</span>
-                <div className="head-right">
-                  <div className="legend">
-                    <span className="legend-item"><span className="legend-line" style={{ background: C1 }} />Views</span>
-                    <span className="legend-item"><span className="legend-line" style={{ background: C2 }} />Visitors</span>
-                    <span className="legend-item"><span className="legend-line legend-dash" />Prev</span>
+            {/* Headline numbers as a strip, not four cards: no elevation to earn.
+                When the prior window is empty the absence is stated once below,
+                not repeated in all four cells. */}
+            <div className="ins-strip">
+              {readouts.map(r => (
+                <div className="ins-cell" key={r.label}>
+                  <div className="ins-v">{r.value}</div>
+                  <div className="ins-l">{r.label}</div>
+                  <div
+                    className="ins-d"
+                    style={{ color: r.delta == null ? 'transparent' : (r.upIsGood ? r.delta >= 0 : r.delta <= 0) ? GOOD : BAD }}
+                  >
+                    {r.delta == null ? ' ' : `${r.delta >= 0 ? '+' : ''}${r.delta}${r.suffix}`}
                   </div>
-                  <SqlButton onClick={() => openSql(['series', 'prevSeries'])} />
                 </div>
-              </div>
-              {series.length > 0 ? (
-                <TimeSeries series={series} prevSeries={data.prevSeries ?? []} unit={unit} />
-              ) : (
-                <div className="empty-note">No traffic in this window yet</div>
-              )}
-            </section>
-
-            {/* live wire */}
-            <div style={{ marginBottom: 20 }}>
-              <LiveWire onLive={setLiveNow} onOpenSql={setDrawer} />
+              ))}
             </div>
+            {readouts.length > 0 && readouts.every(r => r.delta == null) && (
+              <p className="ins-nocompare">
+                Nothing in the preceding {RANGES.find(r => r.key === range)?.label.toLowerCase()} window to compare against, so no change is shown.
+              </p>
+            )}
 
-            {/* rhythm */}
-            <section className="card rise" style={{ animationDelay: '150ms', marginBottom: 20 }}>
-              <div className="card-head">
-                <span className="microlabel" style={{ marginBottom: 0 }}>Rhythm</span>
-                <div className="head-right">
-                  <span className="unit-note">views · weekday × hour</span>
-                  <SqlButton onClick={() => openSql(['heatmap'])} />
+            <div className="ins-grid">
+              <section className="card ins-full rise">
+                <div className="card-head">
+                  <span className="microlabel" style={{ marginBottom: 0 }}>Traffic</span>
+                  <div className="head-right">
+                    <div className="legend">
+                      <span className="legend-item"><span className="legend-line" style={{ background: C1 }} />Views</span>
+                      <span className="legend-item"><span className="legend-line" style={{ background: C2 }} />Visitors</span>
+                      <span className="legend-item"><span className="legend-line legend-dash" />Prev</span>
+                    </div>
+                    <SqlButton onClick={() => openSql(['series', 'prevSeries'])} />
+                  </div>
                 </div>
-              </div>
-              <Heatmap cells={data.heatmap ?? []} />
-            </section>
+                {series.length > 0 ? (
+                  <TimeSeries series={series} prevSeries={data.prevSeries ?? []} unit={unit} />
+                ) : (
+                  <div className="empty-note">No traffic in this window yet</div>
+                )}
+              </section>
 
-            {/* breakdown grid */}
-            <div className="break-grid">
-              <section className="card rise" style={{ animationDelay: '160ms' }}>
+              <div className="ins-full">
+                <LiveWire onLive={setLiveNow} onOpenSql={setDrawer} />
+              </div>
+
+              <section className="card rise">
+                <div className="card-head">
+                  <span className="microlabel" style={{ marginBottom: 0 }}>Rhythm</span>
+                  <div className="head-right">
+                    <span className="unit-note">views · weekday × hour</span>
+                    <SqlButton onClick={() => openSql(['heatmap'])} />
+                  </div>
+                </div>
+                <Heatmap cells={data.heatmap ?? []} />
+              </section>
+
+              <section className="card rise">
                 <div className="card-head">
                   <span className="microlabel" style={{ marginBottom: 0 }}>Top pages</span>
                   <div className="head-right"><span className="unit-note">views</span><SqlButton onClick={() => openSql(['pages'])} /></div>
@@ -506,7 +442,7 @@ export default function StatsPage() {
                 <BarList items={data.pages ?? []} emptyNote="No pageviews yet" />
               </section>
 
-              <section className="card rise" style={{ animationDelay: '200ms' }}>
+              <section className="card rise">
                 <div className="card-head">
                   <span className="microlabel" style={{ marginBottom: 0 }}>Referrers</span>
                   <div className="head-right"><span className="unit-note">visitors</span><SqlButton onClick={() => openSql(['referrers'])} /></div>
@@ -518,7 +454,7 @@ export default function StatsPage() {
                 />
               </section>
 
-              <section className="card rise" style={{ animationDelay: '240ms' }}>
+              <section className="card rise">
                 <div className="card-head">
                   <span className="microlabel" style={{ marginBottom: 0 }}>Countries</span>
                   <div className="head-right"><span className="unit-note">visitors</span><SqlButton onClick={() => openSql(['countries'])} /></div>
@@ -530,7 +466,7 @@ export default function StatsPage() {
                 />
               </section>
 
-              <section className="card rise" style={{ animationDelay: '280ms' }}>
+              <section className="card ins-full rise">
                 <div className="card-head">
                   <span className="microlabel" style={{ marginBottom: 0 }}>Devices &amp; browsers</span>
                   <div className="head-right"><span className="unit-note">visitors</span><SqlButton onClick={() => openSql(['devices', 'browsers'])} /></div>
@@ -542,22 +478,15 @@ export default function StatsPage() {
             </div>
 
             {!hasAny && (
-              <div className="collecting rise" style={{ animationDelay: '320ms' }}>
+              <div className="collecting rise">
                 <span className="live-dot" style={{ position: 'static' }} />
-                The pipeline is live and listening — charts fill in as visits arrive.
+                The pipeline is live and listening. Charts fill in as visits arrive.
               </div>
             )}
 
-            {/* footer note */}
             <div className="foot-note">
-              Built in-house · Next.js route handler → Neon Postgres · visitors are a salted
+              Built in-house · Next.js route handler to Neon Postgres · visitors are a salted
               hash that rotates every 24h · no cookies, no fingerprinting, nothing to consent to
-              {data.timing && (
-                <>
-                  <br />
-                  this view is {data.timing.queryCount} queries issued in parallel · {data.timing.totalMs} ms wall
-                </>
-              )}
             </div>
           </div>
         )}
@@ -571,7 +500,7 @@ export default function StatsPage() {
 }
 
 /* ─── styles ─── */
-const css = `
+export const css = `
 .stats-page {
   min-height: 100vh;
   background: ${SURFACE};
@@ -582,7 +511,7 @@ const css = `
 
 .stats-header {
   position: sticky; top: 0; z-index: 50;
-  background: rgba(9,9,11,0.85); backdrop-filter: blur(12px);
+  background: rgba(243,243,241,0.85); backdrop-filter: blur(12px);
   border-bottom: 1px solid ${HAIRLINE};
 }
 .stats-header-in { display: flex; align-items: center; justify-content: space-between; height: 56px; gap: 16px; }
@@ -601,7 +530,7 @@ const css = `
   color: ${MUTED}; border: 1px solid ${HAIRLINE}; border-radius: 999px; padding: 5px 12px;
 }
 .live-dot {
-  width: 7px; height: 7px; border-radius: 50%; background: ${BRAND};
+  width: 7px; height: 7px; border-radius: 50%; background: ${BRAND_LOUD};
   animation: pulse 2s ease-in-out infinite; flex-shrink: 0;
 }
 @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.35 } }
@@ -619,8 +548,39 @@ const css = `
   color: ${FAINT}; padding: 7px 14px; cursor: pointer; transition: color 150ms, border-color 150ms;
 }
 .range-btn:hover { color: ${INK}; }
-.range-btn.on { color: ${BRAND}; border-color: rgba(255,94,31,0.4); }
+.range-btn.on { color: ${BRAND}; border-color: rgba(193,62,0,0.45); }
 .range-note { margin-left: auto; font-family: var(--font-mono, monospace); font-size: 10px; letter-spacing: 0.08em; color: ${FAINT}; }
+
+/* ─── the instrument strip + grid ───
+   The headline numbers share one hairline-divided plate rather than sitting in
+   four separate cards: nothing here is elevated above anything else, so a 1px
+   rule carries the grouping and the card shadow is not spent on it. */
+.ins-strip {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1px; background: ${HAIRLINE};
+  border: 1px solid ${HAIRLINE}; border-radius: 6px; overflow: hidden;
+  margin-bottom: 16px;
+}
+.ins-cell { background: ${CARD}; padding: 15px 18px 16px; }
+.ins-v { font-size: 28px; font-weight: 700; line-height: 1.05; letter-spacing: -0.01em; }
+.ins-l {
+  font-family: var(--font-mono, monospace); font-size: 10px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: ${FAINT}; margin-top: 6px;
+}
+.ins-d { font-family: var(--font-mono, monospace); font-size: 10.5px; margin-top: 5px; min-height: 1em; }
+.ins-nocompare {
+  font-family: var(--font-mono, monospace); font-size: 10.5px; letter-spacing: 0.04em;
+  color: ${FAINT}; margin: -6px 0 16px;
+}
+/* start, not stretch: a short panel ends where its content ends. Stretching it
+   to match a taller neighbour only moves the empty space inside the card. */
+.ins-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.ins-full { grid-column: 1 / -1; }
+@media (max-width: 900px) {
+  .ins-strip { grid-template-columns: repeat(2, 1fr); }
+  .ins-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 420px) { .ins-strip { grid-template-columns: 1fr; } }
 
 .tile-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
 @media (max-width: 980px) { .tile-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -655,7 +615,7 @@ const css = `
 
 .sql-back {
   position: fixed; inset: 0; z-index: 200;
-  background: rgba(4,4,6,0.72); backdrop-filter: blur(3px);
+  background: rgba(20,18,15,0.42); backdrop-filter: blur(3px);
   display: flex; align-items: flex-end; justify-content: center;
   animation: fade 180ms ease both;
 }
@@ -663,9 +623,9 @@ const css = `
 .sql-sheet {
   width: min(1080px, 100%); max-height: 86vh;
   display: flex; flex-direction: column;
-  background: #0d0d11; border: 1px solid rgba(255,255,255,0.12); border-bottom: none;
+  background: #F7F7F5; border: 1px solid rgba(20,18,15,0.14); border-bottom: none;
   border-radius: 10px 10px 0 0; padding: 22px clamp(18px, 4vw, 30px) 0;
-  box-shadow: 0 -20px 60px rgba(0,0,0,0.6);
+  box-shadow: 0 -20px 60px rgba(20,18,15,0.18);
   animation: sheet-up 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 @keyframes sheet-up { from { transform: translateY(24px); opacity: 0 } to { transform: none; opacity: 1 } }
@@ -676,7 +636,7 @@ const css = `
   color: ${MUTED}; width: 30px; height: 30px; cursor: pointer; flex-shrink: 0;
   font-size: 13px; line-height: 1; transition: color 150ms, border-color 150ms;
 }
-.sql-x:hover { color: ${INK}; border-color: rgba(255,255,255,0.24); }
+.sql-x:hover { color: ${INK}; border-color: rgba(20,18,15,0.30); }
 .sql-tabs { display: flex; gap: 4px; margin-top: 14px; flex-wrap: wrap; }
 .sql-tab {
   font-family: var(--font-mono, monospace); font-size: 11px;
@@ -684,7 +644,7 @@ const css = `
   color: ${FAINT}; padding: 6px 11px; cursor: pointer; transition: color 150ms, border-color 150ms;
 }
 .sql-tab:hover { color: ${INK}; }
-.sql-tab.on { color: ${BRAND}; border-color: rgba(255,94,31,0.4); }
+.sql-tab.on { color: ${BRAND}; border-color: rgba(193,62,0,0.45); }
 .sql-note { color: ${MUTED}; font-size: 13.5px; line-height: 1.6; margin: 14px 0 0; max-width: 74ch; }
 .sql-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 16px 0 12px; }
 .sql-chip {
@@ -696,7 +656,7 @@ const css = `
   letter-spacing: 0.1em; background: none; border: 1px solid ${HAIRLINE}; border-radius: 4px;
   color: ${MUTED}; padding: 5px 12px; cursor: pointer; transition: color 150ms, border-color 150ms;
 }
-.sql-copy:hover { color: ${BRAND}; border-color: rgba(255,94,31,0.4); }
+.sql-copy:hover { color: ${BRAND}; border-color: rgba(193,62,0,0.45); }
 .sql-body { overflow: auto; flex: 1; margin: 0 -6px; padding: 0 6px; }
 .sql-pre {
   margin: 0; font-family: var(--font-mono, monospace); font-size: 12.5px; line-height: 1.75;
@@ -705,7 +665,7 @@ const css = `
 .sql-line { display: flex; }
 .sql-ln {
   width: 2.4em; flex-shrink: 0; text-align: right; padding-right: 14px;
-  color: rgba(255,255,255,0.16); user-select: none;
+  color: rgba(20,18,15,0.22); user-select: none;
 }
 .sql-foot {
   border-top: 1px solid ${HAIRLINE}; margin: 0 -6px; padding: 14px 6px 18px;
@@ -719,9 +679,9 @@ const css = `
    so a burst clusters and a quiet night opens up. Mono is what the database
    saw; the serif italic is the page talking to you. */
 .wire-card {
-  --rail: rgba(242,234,224,0.10);
-  --rail-visit: rgba(242,234,224,0.30);
-  --sep: rgba(242,234,224,0.18);
+  --rail: rgba(20,18,15,0.13);
+  --rail-visit: rgba(20,18,15,0.34);
+  --sep: rgba(20,18,15,0.20);
   --row-pad: 13px;
 }
 .wire-head-right { display: flex; align-items: baseline; gap: 14px; }
@@ -733,14 +693,14 @@ const css = `
 /* the poll, on screen */
 .wire-pulse {
   position: relative; height: 1px; margin: -2px 0 18px;
-  background: rgba(255,255,255,0.05); overflow: hidden;
+  background: rgba(20,18,15,0.06); overflow: hidden;
 }
 .wire-tick {
   position: absolute; top: 0; bottom: 0; left: 0; width: 0;
   background: var(--sep); animation: wire-tick linear both;
 }
 @keyframes wire-tick { from { width: 0 } to { width: 100% } }
-.wire-pulse.is-idle .wire-tick { animation: none; width: 100%; background: rgba(242,234,224,0.06); }
+.wire-pulse.is-idle .wire-tick { animation: none; width: 100%; background: rgba(20,18,15,0.07); }
 
 .wire { list-style: none; margin: 0; padding: 0; }
 .wire-row {
@@ -804,7 +764,7 @@ const css = `
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .wire-path.t-fresh { color: ${INK}; }
-.wire-path.t-recent { color: #c9c2bb; }
+.wire-path.t-recent { color: #3E382F; }
 .wire-row.is-new .wire-path { animation: path-in 620ms cubic-bezier(0.16, 1, 0.3, 1) both; }
 @keyframes path-in { from { opacity: 0; transform: translateX(-4px) } to { opacity: 1; transform: none } }
 
@@ -815,7 +775,7 @@ const css = `
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .wire-meta > span:not(:first-child)::before {
-  content: '·'; margin: 0 7px; color: rgba(255,255,255,0.18);
+  content: '·'; margin: 0 7px; color: rgba(20,18,15,0.22);
 }
 .wire-ref { color: ${MUTED}; }
 .wire-you {
@@ -846,7 +806,7 @@ const css = `
 .wire-resume { color: ${BRAND}; }
 .wire-more { color: ${MUTED}; }
 .wire-more:hover, .wire-more:focus-visible, .wire-resume:hover { color: ${BRAND}; }
-.wire-more:focus-visible, .wire-resume:focus-visible { outline: 1px solid rgba(255,94,31,0.5); outline-offset: 3px; }
+.wire-more:focus-visible, .wire-resume:focus-visible { outline: 1px solid rgba(193,62,0,0.55); outline-offset: 3px; }
 .wire-more-n { color: ${FAINT}; }
 
 /* Narrow: the gutter tightens but nothing is dropped — the meta line wraps
@@ -873,7 +833,7 @@ const css = `
 }
 .heat-hour { justify-content: center; padding-bottom: 4px; }
 .heat-cell {
-  aspect-ratio: 1; border-radius: 2px; background: rgba(255,255,255,0.045);
+  aspect-ratio: 1; border-radius: 2px; background: rgba(20,18,15,0.05);
   min-height: 11px;
 }
 .heat-legend {
@@ -887,9 +847,9 @@ const css = `
 
 .chart-tooltip {
   position: absolute; top: 10px; pointer-events: none;
-  background: #1a1a21; border: 1px solid rgba(255,255,255,0.12); border-radius: 5px;
+  background: #F7F7F5; border: 1px solid rgba(20,18,15,0.14); border-radius: 5px;
   padding: 10px 14px; font-family: var(--font-mono, monospace); font-size: 12px; color: ${INK};
-  box-shadow: 0 8px 24px rgba(0,0,0,0.5); min-width: 140px; z-index: 10;
+  box-shadow: 0 8px 24px rgba(20,18,15,0.16); min-width: 140px; z-index: 10;
 }
 .tt-row { display: flex; align-items: center; margin-top: 3px; color: ${MUTED}; }
 .tt-row strong { color: ${INK}; font-weight: 600; }
@@ -948,6 +908,6 @@ const css = `
   .wire-row.is-new .wire-path,
   .wire-now .wire-node { animation: none; }
   /* The hairline still marks the interval, it just stops sweeping it. */
-  .wire-tick { animation: none; width: 100%; background: rgba(242,234,224,0.08); }
+  .wire-tick { animation: none; width: 100%; background: rgba(20,18,15,0.09); }
 }
 `

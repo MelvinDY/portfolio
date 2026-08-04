@@ -207,7 +207,7 @@ export default function LiveWire({
               {youCount === 1 ? 'one of these is you' : `${youCount} of these are you`}
             </span>
           )}
-          {meta && <SqlButton onClick={() => onOpenSql([{ ...meta, title: 'The wire', note: 'Recent pageviews, newest first. The `you` column is a comparison against a hash recomputed for your request — the hash itself never leaves the server. `who` is a rank over these rows alone: it groups one person’s consecutive views into the joined strokes on the rail, and means nothing outside this payload.' }])} />}
+          {meta && <SqlButton onClick={() => onOpenSql([{ ...meta, title: 'The wire', note: 'Recent pageviews, newest first. The `you` column is a comparison against a hash recomputed for your request, and the hash itself never leaves the server. `who` is a rank over these rows alone: it groups one person’s consecutive views into the joined strokes on the rail, and means nothing outside this payload.' }])} />}
         </div>
       </div>
 

@@ -49,7 +49,7 @@ export default function Heatmap({ cells }: { cells: HeatCell[] }) {
                   <div
                     key={`${row.dow}-${h}`}
                     className="heat-cell"
-                    title={`${row.label} ${hh(h)} — ${v} ${v === 1 ? 'view' : 'views'}`}
+                    title={`${row.label} ${hh(h)} · ${v} ${v === 1 ? 'view' : 'views'}`}
                     style={b < 0 ? undefined : { background: C1, opacity: STEPS[b] }}
                   />
                 )

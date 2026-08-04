@@ -27,14 +27,18 @@ const TOKEN = new RegExp(
   'gi',
 )
 
+/* Syntax tones for the light code sheet (#F7F7F5). These are not chart colors
+   and carry no data, so they are picked for reading contrast rather than for
+   the six-checks: every one clears 4.5:1 on that sheet. The pastels this
+   replaced were tuned for a dark editor and washed out entirely on paper. */
 const TONE = {
-  comment: '#5c5c66',
-  string: '#86efac',
-  cast: '#7dd3fc',
-  param: '#ff5e1f',
-  keyword: '#c4b5fd',
-  fn: '#7dd3fc',
-  number: '#fbbf24',
+  comment: '#8A8378',
+  string: '#0F7B4F',
+  cast: '#0F6FA8',
+  param: '#C13E00',
+  keyword: '#6D28D9',
+  fn: '#0F6FA8',
+  number: '#9A5B00',
 }
 
 function classify(m: RegExpExecArray): keyof typeof TONE {
@@ -176,7 +180,7 @@ export function SqlDrawer({
           <code>sql.query(text, params)</code> and ships the same string here, so it cannot drift
           from what actually ran. Every query on the page is issued at once, so the timings above
           overlap rather than stack
-          {totalMs != null && <> — the whole set settles in {totalMs} ms</>}.
+          {totalMs != null && <>, so the whole set settles in {totalMs} ms</>}.
         </div>
       </div>
     </div>
