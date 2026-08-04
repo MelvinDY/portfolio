@@ -149,6 +149,7 @@ export default function BlogPostTE({ post, next }: { post: BlogPost; next: BlogP
           <div className="flex flex-wrap gap-x-7 gap-y-3">
             {[
               ['All projects', '/projects/all'],
+              ['Privacy', '/privacy'],
               ['GitHub', 'https://github.com/MelvinDY'],
               ['Email', 'mailto:melvindarialyogiana@gmail.com'],
             ].map(([label, href]) => (
