@@ -825,6 +825,39 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 }
 .te-home .h3-b, .te-home .h3-c { opacity: 0; pointer-events: none; }
 
+/* ─── the entrance's start state, in CSS ───
+   These mirror the .from() values in te-hero.tsx exactly. The server-rendered
+   HTML carries data-intro="pending", so the very first paint already shows the
+   hero staged rather than finished. Previously the name painted in place, then
+   hydration ran and GSAP snapped it down out of its mask before animating it
+   back, which is a jumpy enter on the single most important thing on the page.
+
+   The hero is not blank while this waits: the plate, grid, scanline and rules
+   are all painted. Only the elements that are about to move are held. The
+   component flips the attribute to "running" the moment it takes over, and
+   GSAP's inline values match these, so nothing jumps at the handover.
+
+   No spinner, and no artificial hold. There is nothing to load here, so a
+   preloader would communicate nothing and would only push out LCP. */
+.te-home .hero3[data-intro="pending"] .h3-tick { opacity: 0; transform: scale(0); }
+.te-home .hero3[data-intro="pending"] .h3-hud > span { opacity: 0; transform: translateY(-12px); }
+.te-home .hero3[data-intro="pending"] .h3-pre { opacity: 0; transform: translateY(14px); }
+.te-home .hero3[data-intro="pending"] .h3-ch { transform: translateY(140%); }
+.te-home .hero3[data-intro="pending"] .h3-sub { opacity: 0; letter-spacing: 0.6em; }
+
+/* Reduced motion never reaches the timeline, and the effect clears the
+   attribute before returning, but state this too so the staged values can
+   never be what a reduced-motion reader is left looking at. */
+@media (prefers-reduced-motion: reduce) {
+  .te-home .hero3[data-intro="pending"] .h3-tick,
+  .te-home .hero3[data-intro="pending"] .h3-hud > span,
+  .te-home .hero3[data-intro="pending"] .h3-pre,
+  .te-home .hero3[data-intro="pending"] .h3-ch,
+  .te-home .hero3[data-intro="pending"] .h3-sub {
+    opacity: 1; transform: none; letter-spacing: inherit;
+  }
+}
+
 /* act i — the name */
 .te-home .h3-pre { font-size: 11.5px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--ink-faint); margin: 0 0 18px; }
 .te-home .h3-name { display: flex; flex-direction: column; align-items: center; margin: 0; will-change: transform; }
