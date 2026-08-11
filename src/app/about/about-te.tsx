@@ -97,6 +97,7 @@ export default function AboutTE() {
               href={s.href}
               target="_blank"
               rel="noopener noreferrer"
+              data-cursor={s.label === 'Email' ? 'say hello' : `${s.label.toLowerCase()} ↗`}
               className="border-b border-[#14120F]/30 pb-0.5 text-[13px] transition-colors hover:border-[#C13E00] hover:text-[#C13E00]"
             >
               {s.label} <span aria-hidden="true">&rarr;</span>

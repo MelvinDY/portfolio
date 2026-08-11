@@ -1,19 +1,33 @@
 "use client"
 
 import { useEffect, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 import gsap from 'gsap'
 
 /**
  * Trailing cursor dot that morphs into a labelled pill over any element
  * carrying a data-cursor attribute (e.g. data-cursor="open ↗").
  * Desktop pointers only; the native cursor stays visible.
+ *
+ * Mounted once in the root layout, so it is present on every route. It is
+ * additive rather than a replacement: nothing sets `cursor: none`, the real
+ * pointer is always there, and the effect sits behind (pointer:fine) and
+ * prefers-reduced-motion. Position is driven by gsap.quickTo rather than React
+ * state, so pointer movement never re-renders the tree.
  */
+
+/** The dungeon is a pointer-driven game. A second dot chasing the pointer
+ *  during play is noise, not personality. */
+const MUTED_ROUTES = ['/dungeon']
+
 export default function TeCursor() {
   const ref = useRef<HTMLDivElement>(null)
+  const pathname = usePathname()
+  const muted = MUTED_ROUTES.some(r => pathname === r || pathname.startsWith(`${r}/`))
 
   useEffect(() => {
     const el = ref.current
-    if (!el) return
+    if (!el || muted) return
     if (!window.matchMedia('(pointer:fine)').matches) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
@@ -47,7 +61,11 @@ export default function TeCursor() {
       window.removeEventListener('pointermove', onMove)
       document.documentElement.removeEventListener('mouseleave', onLeave)
     }
-  }, [])
+    /* Re-runs on navigation so the dot resets its label between routes rather
+       than carrying the last page's word into the next one. */
+  }, [muted, pathname])
+
+  if (muted) return null
 
   return (
     <div ref={ref} className="te-cursor" aria-hidden="true" style={{ display: 'none' }}>

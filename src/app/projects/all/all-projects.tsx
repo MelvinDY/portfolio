@@ -61,10 +61,14 @@ function Row({ p, n }: { p: IndexedProject; n: number }) {
     </>
   )
 
+  /* The cursor pill says where the row actually goes, derived from linkLabel
+     rather than hand-typed, so it stays true if the destination changes. */
+  const cue = `${p.linkLabel.toLowerCase()} ↗`
+
   return internal ? (
-    <Link className={cls} href={p.href}>{inner}</Link>
+    <Link className={cls} href={p.href} data-cursor={cue}>{inner}</Link>
   ) : (
-    <a className={cls} href={p.href} target="_blank" rel="noopener noreferrer">{inner}</a>
+    <a className={cls} href={p.href} target="_blank" rel="noopener noreferrer" data-cursor={cue}>{inner}</a>
   )
 }
 

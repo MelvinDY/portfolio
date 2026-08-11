@@ -119,6 +119,7 @@ export default function BlogIndex({ posts }: { posts: PostCard[] }) {
               <Link
                 key={p.href}
                 href={p.href}
+                data-cursor="read ↗"
                 className="group grid grid-cols-1 items-baseline gap-x-10 gap-y-3 border-t border-[#14120F]/15 py-8 transition-colors hover:bg-[#EAEAE6] md:grid-cols-[9rem_minmax(0,1fr)_auto] md:px-3"
               >
                 <span className="text-[11.5px] text-[#8A8378]" style={mono}>

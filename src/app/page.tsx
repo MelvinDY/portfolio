@@ -5,7 +5,6 @@ import { useTeEffects } from './lib/use-te-effects'
 import { useHomeGsap } from './lib/use-home-gsap'
 import LightHeader from './components/light-header'
 import TeHero from './components/te-hero'
-import TeCursor from './components/te-cursor'
 import HomeTelemetry from './components/home-telemetry'
 import ScrollProgress from './components/scroll-progress'
 
@@ -54,7 +53,6 @@ export default function HomePage() {
 
   return (
     <div className="te-home">
-      <TeCursor />
       {/* The header stays on the current shared one. The rest of this page is
           back on the pre-redesign version, where the GSAP choreography ran. */}
       <LightHeader overlay />
