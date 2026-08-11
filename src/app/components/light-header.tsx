@@ -72,6 +72,18 @@ export default function LightHeader({ active, overlay = false }: { active?: stri
           <Link href="/#contact" className="text-[12.5px] font-semibold text-[#14120F] transition-colors hover:text-[#C13E00]">
             Contact
           </Link>
+          {/* The one thing a recruiter arrives looking for, so it is the only
+              item in the bar that reads as a button rather than a link. It
+              points at /resume rather than straight at the file: the page
+              carries the same content in HTML, which is indexable and readable
+              on a phone, and offers the PDF from there. */}
+          <Link
+            href="/resume"
+            aria-current={active === '/resume' ? 'page' : undefined}
+            className="border border-[#14120F]/25 px-3 py-1.5 text-[12.5px] font-semibold text-[#14120F] transition-colors hover:border-[#C13E00] hover:text-[#C13E00]"
+          >
+            Resume
+          </Link>
         </nav>
 
         <button
@@ -87,7 +99,7 @@ export default function LightHeader({ active, overlay = false }: { active?: stri
 
       {open && (
         <nav className="border-t border-[#14120F]/12 bg-[#F3F3F1] px-5 pb-5 pt-2 md:hidden" style={mono}>
-          {[...NAV, { href: '/#contact', label: 'Contact' }].map(n => (
+          {[...NAV, { href: '/#contact', label: 'Contact' }, { href: '/resume', label: 'Resume' }].map(n => (
             <Link
               key={n.href}
               href={n.href}

@@ -1956,3 +1956,34 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
   .te-home .h3-dirk { margin-bottom: 14px; }
 }
 
+
+/* ─── print, for the resume PDF ───
+   /resume is rendered to public/melvin-yogiana-resume.pdf with headless Chrome,
+   so what prints here is what a recruiter downloads. A4 with a 14mm margin puts
+   the measure at roughly 180mm, which keeps the body near 90 characters.
+
+   The site paints its own grounds, and a light-on-light page still costs a full
+   sheet of toner if the background survives, so backgrounds are dropped and the
+   ink is forced to true black for contrast on paper. Sections carry
+   break-inside-avoid in the markup so a role never splits across a page break
+   mid-bullet. */
+@page {
+  size: A4;
+  margin: 14mm;
+}
+
+@media print {
+  html, body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  /* The floating chat launcher and any fixed page furniture are screen-only. */
+  .ai-chatbox-launcher,
+  [data-print-hide] {
+    display: none !important;
+  }
+  a {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+}
