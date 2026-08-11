@@ -482,30 +482,21 @@ body.te-home-page {
   overflow-x: hidden;
 }
 
-/* ─── light skin for the home page ───
-   The te-home system is token-driven: 250 var() reads against 33 hardcoded
-   hex values. So a light home page is a palette swap on a wrapper, not a
-   rewrite. Applying .home-light to the page root reskins everything, and
-   applying it to a single <section> reskins only that subtree, because custom
-   properties cascade.
+/* ─── light theme for the home page ───
+   The te-home system is token-driven: ~566 var() reads. So a light home page
+   is a palette swap on custom properties, not a rewrite.
+
+   Keyed on html.light, which next-themes writes (layout.tsx, attribute="class").
+   That means dark mode later is this same block with the other palette under
+   html.dark — no second migration, and no wrapper class for a component to
+   remember to apply. The .te-home base block below keeps the dark values, so
+   it is already the dark theme's palette.
 
    Nothing here touches a GSAP hook. data-rise, data-rise-group, data-lines,
    data-ink and the pinned .hz shelf keep the same markup, the same classes and
    the same CSS transitions, so the choreography and its timing are untouched.
    Only the colours those transitions animate between change. */
-.te-home.home-light,
-.te-home .home-light,
-/* Split: the hero and the pinned shelf keep the dark stage the choreography
-   was designed on, and every section after it lights up. One switch, once,
-   which is the exception Section 4.11 allows.
-   Both sibling selectors are needed. ScrollTrigger's pin wraps .hz in a
-   .pin-spacer at runtime, so after GSAP initialises .hz is no longer a sibling
-   of the sections below it and the first selector silently stops matching.
-   Under reduced motion the hook returns before pinning and .hz stays a
-   sibling, so the first selector is the one that applies. */
-.te-home.home-split .hz ~ section,
-.te-home.home-split .pin-spacer ~ section,
-.te-home.home-split .site-foot {
+html.light .te-home {
   --bg:        #F3F3F1;
   --bg-2:      #EAEAE6;
   --surface:   #EAEAE6;
@@ -529,16 +520,27 @@ body.te-home-page {
   --acid-glow: rgba(255,94,31,0.14);
   --ink-ghost: rgba(20,18,15,0.16);
   --bg-fade:   rgba(243,243,241,0.75);
+  /* The hero's three overlay instruments. On the dark ground they are a warm
+     near-white grid and the vivid accent; both disappear or clash on light, so
+     the grid becomes ink at the same alpha the dot-grid already uses, and the
+     spotlight and scanline take the deepened accent. */
+  --h3-grid-line: rgba(20,18,15,0.06);
+  --h3-spot-line: rgba(193,62,0,0.26);
+  --h3-scan-line: rgba(193,62,0,0.45);
+  --h3-scan-glow: rgba(193,62,0,0.16);
   background: var(--bg);
   color: var(--ink);
 }
 /* The grain and dot-grid overlays are tuned for a dark ground and read as
    dirt on a light one. */
-.te-home.home-light::before { background-image: radial-gradient(rgba(20,18,15,0.05) 1px, transparent 1px); }
-.te-home.home-light::after { opacity: 0.02; mix-blend-mode: multiply; }
-body.te-home-page.home-light-page { background: #F3F3F1 !important; color: #14120F !important; }
-body.te-home-page.home-light-page::-webkit-scrollbar-track { background: #EAEAE6; }
-body.te-home-page.home-light-page::-webkit-scrollbar-thumb { background: #CFCCC5; border-color: #EAEAE6; }
+html.light .te-home::before { background-image: radial-gradient(rgba(20,18,15,0.05) 1px, transparent 1px); }
+html.light .te-home::after { opacity: 0.02; mix-blend-mode: multiply; }
+/* body keeps its own ground so an overscroll bounce cannot flash the dark page
+   colour behind a light page. Driven by the theme class, so no component has to
+   toggle a body class in an effect the way the old home-body.tsx did. */
+html.light body.te-home-page { background: #F3F3F1 !important; color: #14120F !important; }
+html.light body.te-home-page::-webkit-scrollbar-track { background: #EAEAE6; }
+html.light body.te-home-page::-webkit-scrollbar-thumb { background: #CFCCC5; border-color: #EAEAE6; }
 
 .te-home {
   --bg:        #0b0907;
@@ -557,6 +559,12 @@ body.te-home-page.home-light-page::-webkit-scrollbar-thumb { background: #CFCCC5
      hardcoded dark, which a palette swap cannot reach. */
   --ink-ghost: rgba(242,234,224,0.15);
   --bg-fade:   rgba(11,9,7,0.75);
+  /* Hero overlay instruments — grid, pointer spotlight, scroll scanline. These
+     were hardcoded inline on their rules, which a palette swap cannot reach. */
+  --h3-grid-line: rgba(255,225,200,0.05);
+  --h3-spot-line: rgba(255,94,31,0.30);
+  --h3-scan-line: rgba(255,94,31,0.45);
+  --h3-scan-glow: rgba(255,94,31,0.2);
   --font-display: var(--font-space-grotesk, 'Space Grotesk', system-ui, sans-serif);
   --font-serif: var(--font-newsreader, 'Newsreader', Georgia, serif);
   --maxw: 1280px;
@@ -588,7 +596,7 @@ body.te-home-page.home-light-page::-webkit-scrollbar-thumb { background: #CFCCC5
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-.te-home ::selection { background: #ff5e1f; color: #1c0d03; }
+.te-home ::selection { background: var(--acid); color: var(--bg); }
 .te-home a { color: inherit; text-decoration: none; }
 
 body.te-home-page::-webkit-scrollbar { width: 9px; }
@@ -676,8 +684,8 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
   position: absolute; inset: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(255,225,200,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,225,200,0.05) 1px, transparent 1px);
+    linear-gradient(var(--h3-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--h3-grid-line) 1px, transparent 1px);
   background-size: 72px 72px;
   -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, #000 30%, transparent 85%);
   mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, #000 30%, transparent 85%);
@@ -759,8 +767,8 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
   opacity: 0;
   transition: opacity 0.45s var(--ease);
   background-image:
-    linear-gradient(rgba(255,94,31,0.30) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,94,31,0.30) 1px, transparent 1px);
+    linear-gradient(var(--h3-spot-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--h3-spot-line) 1px, transparent 1px);
   background-size: 72px 72px;
   -webkit-mask-image: radial-gradient(220px circle at var(--gx, 50%) var(--gy, 50%), #000 0%, transparent 72%);
   mask-image: radial-gradient(220px circle at var(--gx, 50%) var(--gy, 50%), #000 0%, transparent 72%);
@@ -772,8 +780,8 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
   position: absolute; left: 0; right: 0; top: 10%;
   height: 1px;
   pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgba(255,94,31,0.45), transparent);
-  box-shadow: 0 0 24px rgba(255,94,31,0.2);
+  background: linear-gradient(90deg, transparent, var(--h3-scan-line), transparent);
+  box-shadow: 0 0 24px var(--h3-scan-glow);
 }
 
 /* corner registration ticks */
@@ -878,10 +886,119 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 .te-home .h3-w { color: var(--ink-ghost); }
 .te-home .h3-w-acid { font-family: var(--font-serif); font-style: italic; font-weight: 400; padding-right: 0.05em; }
 
-/* act iii — the directory */
-.te-home .h3-dirk { font-size: 11.5px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--ink-faint); margin: 0 0 22px; }
-.te-home .h3-dt { font-size: clamp(20px, 2.6vw, 32px); font-weight: 600; letter-spacing: -0.015em; transition: color 0.3s; }
-.te-home .h3-darr { color: var(--ink-dim); font-size: 20px; transition: transform 0.3s var(--ease), color 0.3s; }
+/* ─── act iii: the index ───
+   The payoff of the pinned hero. The name has scaled past, the manifesto has
+   lifted away, and this is where the hero hands off to the site, so it has to
+   be scannable in about a second.
+
+   Read as a contents page, not a nav bar: the destination leads at display
+   scale, its weight sits right in mono, and one hairline separates rows. Rows
+   rather than cards because there is no elevation to communicate here, only
+   sequence down the page.
+
+   .h3-c, .h3-dirk and .h3-drow are targeted by the hero scrub timeline at
+   fixed positions (7.3 / 7.4 / 7.5). Renaming any of them silently kills the
+   act. The layout below is free to change; those three hooks are not. */
+/* The stage centres its text, but the directory below is a left-aligned
+   column. Matching the label to the column width and flushing it left lands it
+   on the same optical edge as the first destination. */
+.te-home .h3-dirk {
+  width: min(660px, 100%);
+  margin: 0 auto 22px;
+  text-align: left;
+  font-size: 11.5px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.te-home .h3-dir {
+  display: grid;
+  width: min(660px, 100%);
+  margin: 0 auto;
+  text-align: left;
+  /* One hairline system: a rule above the group, then one under each row. Not
+     border-top AND border-bottom per row, which double-draws every divider. */
+  border-top: 1px solid var(--line);
+}
+
+.te-home .h3-drow {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: baseline;
+  gap: clamp(12px, 2.5vw, 28px);
+  padding: clamp(15px, 2vw, 21px) 2px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+}
+
+/* Hover and focus draw an accent rule along the row. transform-only, so it
+   composites on the GPU and never reflows the pinned stage. Motivated: it is
+   the only feedback saying which destination is live under the pointer. */
+.te-home .h3-drow::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 1px;
+  background: var(--acid);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s var(--ease);
+}
+.te-home .h3-drow:hover::after,
+.te-home .h3-drow:focus-visible::after { transform: scaleX(1); }
+
+.te-home .h3-dt {
+  font-size: clamp(20px, 2.6vw, 32px);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  transition: color 0.3s;
+}
+.te-home .h3-drow:hover .h3-dt,
+.te-home .h3-drow:focus-visible .h3-dt { color: var(--acid); }
+
+.te-home .h3-dm {
+  font-size: 11.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  transition: color 0.3s;
+}
+.te-home .h3-drow:hover .h3-dm,
+.te-home .h3-drow:focus-visible .h3-dm { color: var(--ink-dim); }
+
+.te-home .h3-darr {
+  font-size: 15px;
+  color: var(--ink-faint);
+  transition: transform 0.35s var(--ease), color 0.3s;
+}
+.te-home .h3-drow:hover .h3-darr,
+.te-home .h3-drow:focus-visible .h3-darr {
+  color: var(--acid);
+  transform: translate(3px, -3px);
+}
+/* Contact is an in-page jump, so its arrow travels down rather than out. */
+.te-home .h3-drow:hover .h3-darr-down,
+.te-home .h3-drow:focus-visible .h3-darr-down { transform: translate(0, 3px); }
+
+.te-home .h3-drow:focus-visible { outline: none; }
+
+/* Below 720px the meta drops under the destination so the title keeps its
+   scale instead of being squeezed by a three-track row. */
+@media (max-width: 720px) {
+  .te-home .h3-dir { width: 100%; }
+  .te-home .h3-drow { grid-template-columns: 1fr auto; row-gap: 5px; }
+  .te-home .h3-dm { grid-column: 1; grid-row: 2; }
+  .te-home .h3-darr { grid-row: 1 / span 2; align-self: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .te-home .h3-drow::after,
+  .te-home .h3-dt,
+  .te-home .h3-dm,
+  .te-home .h3-darr { transition: none; }
+}
 
 /* contents card — the index answers back when you hover a row. Needs real room
    beside the 720px directory, so it only appears once there is some. */

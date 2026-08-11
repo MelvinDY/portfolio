@@ -81,7 +81,10 @@ export default function RootLayout({
   return (
     <html lang="en-AU" suppressHydrationWarning>
       <body className={cn("min-h-screen bg-background font-sans antialiased", inter.className, jetbrainsMono.variable, spaceGrotesk.variable, newsreader.variable)}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+        {/* enableSystem stays off until a dark palette exists. With it on, a
+            visitor whose OS prefers dark gets html.dark and a theme nothing is
+            styled for. Turn it back on when dark mode ships. */}
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           {children}
           <AiChatbox />
           <UtmBanner />
