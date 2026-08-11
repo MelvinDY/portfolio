@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "resume:pdf": "node scripts/build-resume-pdf.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

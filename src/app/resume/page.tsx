@@ -1,18 +1,32 @@
 import type { Metadata } from 'next'
-import ResumeSheet from './resume-sheet'
+import ResumeSheet, { VARIANTS, type Variant } from './resume-sheet'
 
-export const metadata: Metadata = {
-  title: 'Resume',
-  description:
-    'Resume for Melvin Darial Yogiana, a data analyst and full-stack developer in Sydney. Experience at Foresight Analytics and UNSW with Atlassian, selected projects, and a Computer Science degree from UNSW.',
-  alternates: { canonical: '/resume' },
-  openGraph: {
-    title: 'Resume, Melvin Darial Yogiana',
-    description: 'Data analyst and full-stack developer in Sydney. Experience, selected projects and education.',
-    url: '/resume',
-  },
+/* Next 16 hands searchParams over as a promise, the same shape blog/[slug]
+   already awaits for its params. Resolving the variant on the server keeps both
+   versions real URLs with their own metadata, and means the toggle is two links
+   rather than a client component. */
+type Props = { searchParams: Promise<{ for?: string }> }
+
+const resolve = (raw?: string): Variant => (raw === 'engineer' ? 'engineer' : 'data')
+
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const variant = resolve((await searchParams).for)
+  const v = VARIANTS[variant]
+
+  /* Distinct titles and descriptions so the two URLs do not read as duplicate
+     content, and canonical points at the version being viewed. */
+  return {
+    title: `Resume, ${v.label}`,
+    description: `${v.role} resume for Melvin Darial Yogiana, Sydney. Experience at Foresight Analytics and UNSW with Atlassian, selected projects, and a Computer Science degree from UNSW.`,
+    alternates: { canonical: v.href },
+    openGraph: {
+      title: `Melvin Darial Yogiana, ${v.label} resume`,
+      description: v.summary,
+      url: v.href,
+    },
+  }
 }
 
-export default function ResumePage() {
-  return <ResumeSheet />
+export default async function ResumePage({ searchParams }: Props) {
+  return <ResumeSheet variant={resolve((await searchParams).for)} />
 }
