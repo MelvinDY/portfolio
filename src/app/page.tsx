@@ -37,13 +37,15 @@ const Ink = ({ words }: { words: InkWord[] }) => (
   </p>
 )
 
-const SecHead = ({ no, name, meta }: { no: string; name: string; meta: string }) => (
+/* Section marks carried a number, a name and a slash comment. The numbers
+   asserted a sequence that does not exist, since nobody reads a portfolio in
+   order and section four is not a consequence of section three, and five
+   labelled eyebrows on a five-section page is four more than the page can
+   carry. Name and rule only. */
+const SecHead = ({ name }: { name: string }) => (
   <div className="sh mono" data-rise>
-    <span className="sh-no">[ {no} ]</span>
-    <i className="sh-rule" />
     <span className="sh-name">{name}</span>
-    <i className="sh-rule sh-rule-s" />
-    <span className="sh-meta">{meta}</span>
+    <i className="sh-rule" />
   </div>
 )
 
@@ -65,7 +67,7 @@ export default function HomePage() {
         {/* 01 — ABOUT */}
         <section id="about" className="sec">
           <div className="wrap">
-            <SecHead no="01" name="about" meta="//decoded" />
+            <SecHead name="about" />
             <div className="ab2-grid">
               <h2 className="ab2-head" data-lines aria-label="Half analyst. Half engineer. Fully curious.">
                 <span className="lr" aria-hidden="true"><span className="lr-in">Half analyst.</span></span>
@@ -114,14 +116,13 @@ export default function HomePage() {
           <div className="hz-fade" aria-hidden="true" />
           <div className="hz-pin">
             <div className="wrap">
-              <SecHead no="02" name="work" meta="//read sideways" />
+              <SecHead name="work" />
             </div>
             <div className="hz-track" data-cursor="read →">
               <article className="hz-panel hz-intro">
                 <p className="hz-kick">[ the spread ]</p>
                 <h3 className="hz-state">Two desks,<br /><em>one brain.</em></h3>
-                <p className="hz-note">One desk asks the questions, the other ships the answers. Keep scrolling. The shelf reads sideways.</p>
-                <span className="hz-cue mono">scroll on →</span>
+                <p className="hz-note">One desk asks the questions, the other ships the answers. The shelf reads sideways.</p>
               </article>
               <Link className="hz-panel wk-card" href="/projects/data" data-cursor="open ↗">
                 <div className="wk-top mono">
@@ -154,7 +155,7 @@ export default function HomePage() {
         {/* 03 — RECOGNITION */}
         <section id="awards" className="sec">
           <div className="wrap">
-            <SecHead no="03" name="recognition" meta="//rooms where it landed" />
+            <SecHead name="recognition" />
           </div>
           <div className="marquee" aria-hidden="true">
             <div className="marquee-track">
@@ -199,7 +200,7 @@ export default function HomePage() {
         {/* 04 — TELEMETRY */}
         <section id="telemetry" className="sec">
           <div className="wrap">
-            <SecHead no="04" name="telemetry" meta="//the site measures itself" />
+            <SecHead name="telemetry" />
             <HomeTelemetry />
           </div>
         </section>
@@ -207,7 +208,7 @@ export default function HomePage() {
         {/* 05 — CONTACT */}
         <section id="contact" className="sec">
           <div className="wrap">
-            <SecHead no="05" name="contact" meta="//channel open" />
+            <SecHead name="contact" />
             <h2 className="ct-head" data-lines aria-label="Let's make the data talk.">
               <span className="lr" aria-hidden="true"><span className="lr-in">Let&apos;s make</span></span>
               <span className="lr" aria-hidden="true"><span className="lr-in">the data <em className="ct-talk">talk.</em></span></span>

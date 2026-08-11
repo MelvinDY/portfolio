@@ -6,6 +6,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import DungeonDot from './dungeon-dot'
 import { fillToken } from '../lib/theme-tokens'
+import { usePulse, type Pulse } from '../lib/use-pulse'
 
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
@@ -35,8 +36,25 @@ const chars = (word: string) =>
     <span className="h3-ch" key={i}>{c}</span>
   ))
 
+const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`
+
+/**
+ * What the folio prints, and when.
+ *
+ * Three states rather than one string. Before the pulse lands there is nothing
+ * true to say, so it holds the volume mark. With nobody else on the site,
+ * "0 reading now" broadcasts an empty room, so the count is dropped and the
+ * day's views carry the line on their own. Only a real reader lights the dot.
+ */
+const folio = (p: Pulse | null) => {
+  if (!p) return 'Vol. 01'
+  const today = `${plural(p.viewsToday, 'view', 'views')} today`
+  return p.live > 0 ? `${plural(p.live, 'reading', 'reading')} now, ${today}` : today
+}
+
 export default function TeHero() {
   const scope = useRef<HTMLElement>(null)
+  const pulse = usePulse()
 
   useIsomorphicLayoutEffect(() => {
     const el = scope.current
@@ -130,11 +148,21 @@ export default function TeHero() {
       <i className="h3-tick bl" aria-hidden="true" />
       <i className="h3-tick br" aria-hidden="true" />
 
-      {/* folio */}
+      {/* Folio. The bottom mark used to print the Sydney coordinates, which is
+          decoration wearing the costume of data, and the bottom right told the
+          reader to scroll, which they were about to do anyway. The strip now
+          reports what the site actually knows about the room it is in.
+
+          The dot element is always rendered and only changes class when the
+          pulse lands, so the entrance timeline never loses a target mid-flight.
+          Still aria-hidden: this is folio furniture, and a number that changes
+          under a reader is worse than silence. */}
       <div className="h3-hud mono" aria-hidden="true">
         <span className="h3-hud-tl">Melvin Yogiana, Portfolio</span>
-        <span className="h3-hud-bl">Vol. 01 · 33.8688°S, 151.2093°E</span>
-        <span className="h3-hud-br">scroll to read ↓</span>
+        <span className="h3-hud-bl">
+          <i className={`h3-hud-dot${pulse && pulse.live > 0 ? ' on' : ''}`} />
+          {folio(pulse)}
+        </span>
       </div>
 
       <div className="h3-stage">
