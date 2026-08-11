@@ -802,7 +802,6 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 .te-home .h3-hud-tl { top: 84px; left: var(--pad); }
 .te-home .h3-hud-tr { top: 84px; right: var(--pad); }
 .te-home .h3-hud-bl { bottom: 20px; left: var(--pad); }
-.te-home .h3-hud-br { bottom: 20px; right: var(--pad); color: var(--acid); }
 .te-home .h3-pct { font-weight: 600; color: var(--ink); }
 
 /* fixed page-scroll instruments — HUD counter + right-edge rail dot */
@@ -899,12 +898,21 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
   transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
 }
 .te-home .h3-you.on { opacity: 1; transform: none; }
+/* The folio's live mark. Rendered at all times so the entrance timeline keeps
+   a stable target, and only lit once the pulse lands. This is the one dot on
+   the site that reports real state rather than decorating a label, which is
+   the only case where a coloured status dot earns its place. */
 .te-home .h3-hud-dot {
   display: inline-block; width: 5px; height: 5px; border-radius: 50%;
   background: var(--acid); margin-right: 8px; vertical-align: middle;
-  animation: te-pulse-dot 2.4s ease-in-out infinite;
+  opacity: 0; transition: opacity 0.5s var(--ease);
 }
+.te-home .h3-hud-dot.on { opacity: 1; animation: te-pulse-dot 2.4s ease-in-out infinite; }
 @keyframes te-pulse-dot { 0%,100% { opacity: 1 } 50% { opacity: 0.3 } }
+/* A blinking dot is exactly what reduced motion is asking about. */
+@media (prefers-reduced-motion: reduce) {
+  .te-home .h3-hud-dot.on { animation: none; }
+}
 
 /* act ii — the manifesto */
 /* ─── act ii: the manifesto ───
@@ -1088,7 +1096,7 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 .te-home .hero3.h3-static { height: auto; min-height: 100svh; padding: 110px 0 56px; }
 .te-home .h3-static .h3-stage { position: static; }
 .te-home .h3-static .h3-scene { position: static; opacity: 1; pointer-events: auto; padding-block: 36px; }
-.te-home .h3-static .h3-scan, .te-home .h3-static .h3-hud-br,
+.te-home .h3-static .h3-scan,
 .te-home .h3-static .h3-spot { display: none; }
 /* the static hero stacks all three acts, so it runs far taller than a screen.
    Pin the plate to the first viewport instead of letting its bottom-anchored
@@ -1118,12 +1126,11 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 
 /* section header strip */
 .te-home .sh { display: flex; align-items: center; gap: 14px; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: clamp(36px, 5vw, 64px); }
-.te-home .sh-no { color: var(--acid); white-space: nowrap; }
+/* Name then rule. The bracketed number and the slash comment are gone, along
+   with the short second rule that separated them, so the mark is one label and
+   one line running to the margin. */
 .te-home .sh-name { color: var(--ink); letter-spacing: 0.3em; white-space: nowrap; }
-.te-home .sh-meta { white-space: nowrap; }
 .te-home .sh-rule { flex: 1; height: 1px; background: var(--line); }
-.te-home .sh-rule-s { flex: 0 0 clamp(28px, 7vw, 110px); }
-@media (max-width: 640px) { .te-home .sh-meta { display: none; } .te-home .sh-rule-s { display: none; } }
 
 /* line-reveal wrappers */
 .te-home .lr { display: block; overflow: hidden; padding-block: 0.04em; }
@@ -1149,7 +1156,11 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 .te-home .ink-done .iw { color: var(--ink); }
 .te-home .ink-done .iw-acid { color: var(--acid); }
 
-.te-home .mods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: clamp(40px, 6vw, 72px); }
+/* Two disciplines pair, the ask spans. Three equal columns made the goal read
+   as a third skill rather than what it is, and equal weight was the wrong
+   shape as much as the banned one. */
+.te-home .mods { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: clamp(40px, 6vw, 72px); }
+.te-home .mods .mod:last-child { grid-column: 1 / -1; }
 .te-home .mod { position: relative; border: 1px solid var(--line); border-radius: 14px; padding: 26px 24px; background: var(--surface); transition: border-color 0.35s, transform 0.35s var(--ease); }
 .te-home .mod::before { content: ""; position: absolute; top: 10px; right: 12px; width: 10px; height: 10px; border-top: 1px solid var(--line-2); border-right: 1px solid var(--line-2); transition: border-color 0.35s; }
 .te-home .mod:hover { border-color: var(--line-2); transform: translateY(-4px); }
@@ -1216,7 +1227,6 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 .te-home .hz-state { font-size: clamp(34px, 4.6vw, 62px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.04; margin: 0 0 18px; }
 .te-home .hz-state em { font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--acid); }
 .te-home .hz-note { font-family: var(--font-serif); color: var(--ink-dim); font-size: clamp(16px, 1.4vw, 19px); line-height: 1.6; max-width: 34ch; margin: 0 0 22px; }
-.te-home .hz-cue { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); }
 .te-home .hz-end { border: 1px solid var(--line); border-radius: 18px; padding: clamp(26px, 4vw, 44px); background: var(--surface); transition: border-color 0.4s, transform 0.5s var(--ease); }
 .te-home .hz-end:hover { border-color: var(--acid); transform: translateY(-6px); }
 .te-home .hz-end:hover .cardlink { color: var(--acid); }
@@ -1895,7 +1905,6 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 .te-home.home-broadsheet .wrap { max-width: 1080px; }
 .te-home.home-broadsheet .sec { padding-top: clamp(110px, 15vw, 210px); }
 .te-home.home-broadsheet .sh { gap: 18px; margin-bottom: clamp(48px, 6vw, 80px); }
-.te-home.home-broadsheet .sh-rule-s { display: none; }
 .te-home.home-broadsheet .ab2-grid { grid-template-columns: 1fr; gap: clamp(36px, 5vw, 64px); align-items: start; }
 .te-home.home-broadsheet .ab2-head { font-size: clamp(44px, 7.5vw, 96px); line-height: 0.98; }
 .te-home.home-broadsheet .ink { font-size: clamp(21px, 2.6vw, 34px); max-width: 30ch; line-height: 1.45; }
