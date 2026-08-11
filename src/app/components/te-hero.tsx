@@ -47,6 +47,16 @@ export default function TeHero() {
     window.history.scrollRestoration = 'manual'
     window.scrollTo(0, 0)
 
+    /* Hand the entrance over from CSS to GSAP.
+       The markup ships as data-intro="pending", which is the entrance's own
+       start state written in CSS, so the server-rendered paint already has the
+       name below its mask. Without it the name painted in place, hydration ran
+       and .from() snapped it down, and it animated back: a jumpy enter, and the
+       one thing on the page a reader is most likely to be looking at.
+       Flipping the attribute stops those rules matching. GSAP's inline start
+       values are visually identical, so the handover is invisible. */
+    el.dataset.intro = 'running'
+
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       el.classList.add('h3-static')
       return
@@ -111,7 +121,7 @@ export default function TeHero() {
   }, [])
 
   return (
-    <section className="hero3" id="top" ref={scope}>
+    <section className="hero3" id="top" ref={scope} data-intro="pending">
       {/* instruments */}
       <div className="h3-grid" aria-hidden="true" />
       <div className="h3-scan" aria-hidden="true" />

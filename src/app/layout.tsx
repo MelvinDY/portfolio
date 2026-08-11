@@ -82,6 +82,19 @@ export default function RootLayout({
   return (
     <html lang="en-AU" suppressHydrationWarning>
       <body className={cn("min-h-screen bg-background font-sans antialiased", inter.className, jetbrainsMono.variable, spaceGrotesk.variable, newsreader.variable)}>
+        {/* The hero ships in its entrance start state so the name does not
+            paint, snap away and animate back. That state is cleared by the
+            component on hydration, so with scripting off it would never clear
+            and the name would stay hidden. This reveals it instead. */}
+        <noscript>
+          <style>{`.te-home .hero3[data-intro="pending"] .h3-tick,
+.te-home .hero3[data-intro="pending"] .h3-hud > span,
+.te-home .hero3[data-intro="pending"] .h3-pre,
+.te-home .hero3[data-intro="pending"] .h3-ch,
+.te-home .hero3[data-intro="pending"] .h3-sub {
+  opacity: 1 !important; transform: none !important; letter-spacing: normal !important;
+}`}</style>
+        </noscript>
         {/* enableSystem stays off until a dark palette exists. With it on, a
             visitor whose OS prefers dark gets html.dark and a theme nothing is
             styled for. Turn it back on when dark mode ships. */}
