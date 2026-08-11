@@ -8,17 +8,17 @@ const STORAGE_KEY = 'utm_banner_dismissed_v1'
 const VARIANTS: Record<string, { label: string; message: string; cta?: { text: string; href: string } }> = {
   linkedin: {
     label: 'linkedin',
-    message: "Came from LinkedIn? Good — this site is built to show exactly what I’d bring to a data or analytics engineering role.",
+    message: "Came from LinkedIn? Good. This site is built to show exactly what I’d bring to a data or analytics engineering role.",
     cta: { text: 'Jump to Data Projects ↗', href: '/projects/data' },
   },
   github: {
     label: 'github',
-    message: "Fellow dev spotted. Source code for every project is on GitHub — dig as deep as you like.",
+    message: "Fellow dev spotted. Source code for every project is on GitHub, so dig as deep as you like.",
     cta: { text: 'View Software Projects ↗', href: '/projects/software' },
   },
   google: {
     label: 'google',
-    message: "Found this through search — you must be looking for something specific. Here’s the short version.",
+    message: "Found this through search, so you must be looking for something specific. Here’s the short version.",
   },
 }
 

@@ -505,7 +505,7 @@ export function makeWorld(seed: number): World {
 
   const items: Item[] = [
     { id: 'brew', name: 'cold brew of vigor', desc: 'heals your most wounded hero for 10', pos: freeTile(den), effect: 'heal' },
-    { id: 'duck', name: 'rubber duck of debugging', desc: 'explains the problem — both heroes gain 6 shield', pos: freeTile(guard), effect: 'shield' },
+    { id: 'duck', name: 'rubber duck of debugging', desc: 'explains the problem, both heroes gain 6 shield', pos: freeTile(guard), effect: 'shield' },
   ]
 
   return { dun, units, items }

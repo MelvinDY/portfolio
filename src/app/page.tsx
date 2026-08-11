@@ -14,7 +14,7 @@ const ABOUT_INK: InkWord[] = [
   { t: 'I’m' }, { t: 'a' }, { t: 'Computer' }, { t: 'Science' }, { t: 'graduate' },
   { t: 'from' }, { t: 'UNSW' }, { t: 'who' }, { t: 'got' }, { t: 'hooked' }, { t: 'on' },
   { t: 'the' }, { t: 'moment' }, { t: 'a' }, { t: 'chart' }, { t: 'makes' }, { t: 'a' },
-  { t: 'room' }, { t: 'go' }, { t: '“oh”', acid: true }, { t: '—' }, { t: 'so' },
+  { t: 'room' }, { t: 'go' }, { t: '“oh”,', acid: true }, { t: 'so' },
   { t: 'I' }, { t: 'wrangle' }, { t: 'data' }, { t: 'into' },
   { t: 'honest', acid: true }, { t: 'insight,', acid: true }, { t: 'and' },
   { t: 'build' }, { t: 'the' }, { t: 'software' }, { t: 'that' }, { t: 'puts' },
@@ -77,7 +77,7 @@ export default function HomePage() {
             <div className="mods" data-rise-group>
               <article className="mod">
                 <span className="mod-k">[ /data ]</span>
-                <p>SQL, Python (pandas / numpy), dbt and dashboards. I care about the boring parts — clean joins, sane definitions, and a number you can actually defend in a meeting.</p>
+                <p>SQL, Python (pandas / numpy), dbt and dashboards. I care about the boring parts: clean joins, sane definitions, and a number you can actually defend in a meeting.</p>
               </article>
               <article className="mod">
                 <span className="mod-k">[ /software ]</span>
@@ -85,7 +85,7 @@ export default function HomePage() {
               </article>
               <article className="mod">
                 <span className="mod-k">[ /the_goal ]</span>
-                <p>A Data Analyst / Analytics Engineer seat in Sydney where I can own a question end-to-end — from the raw extract to the slide that changes a decision.</p>
+                <p>A Data Analyst / Analytics Engineer seat in Sydney where I can own a question end-to-end, from the raw extract to the slide that changes a decision.</p>
               </article>
             </div>
             <div className="rdout" data-rise>
@@ -120,7 +120,7 @@ export default function HomePage() {
               <article className="hz-panel hz-intro">
                 <p className="hz-kick">[ the spread ]</p>
                 <h3 className="hz-state">Two desks,<br /><em>one brain.</em></h3>
-                <p className="hz-note">One desk asks the questions, the other ships the answers. Keep scrolling — the shelf reads sideways.</p>
+                <p className="hz-note">One desk asks the questions, the other ships the answers. Keep scrolling. The shelf reads sideways.</p>
                 <span className="hz-cue mono">scroll on →</span>
               </article>
               <Link className="hz-panel wk-card" href="/projects/data" data-cursor="open ↗">
@@ -129,7 +129,7 @@ export default function HomePage() {
                   <span>4 case studies</span>
                 </div>
                 <h3>Data<br />Projects</h3>
-                <p>Dashboards, pricing wars, trending-video forensics and a revenue pipeline — each written as a data story, not a README.</p>
+                <p>Dashboards, pricing wars, trending-video forensics and a revenue pipeline, each written as a data story, not a README.</p>
                 <span className="cardlink mono">enter the data desk <span className="arrow">↗</span></span>
               </Link>
               <Link className="hz-panel wk-card" href="/projects/software" data-cursor="open ↗">
@@ -158,14 +158,14 @@ export default function HomePage() {
           </div>
           <div className="marquee" aria-hidden="true">
             <div className="marquee-track">
-              <span>FIRST PLACE — CSESOC HACKATHON 2025</span><span className="m-dot">✶</span>
-              <span>UNIHACK 2026 — MOST FUN IDEA</span><span className="m-dot">✶</span>
-              <span>UNIHACK 2026 — BEST DESIGN</span><span className="m-dot">✶</span>
+              <span>FIRST PLACE, CSESOC HACKATHON 2025</span><span className="m-dot">✶</span>
+              <span>UNIHACK 2026, MOST FUN IDEA</span><span className="m-dot">✶</span>
+              <span>UNIHACK 2026, BEST DESIGN</span><span className="m-dot">✶</span>
               <span>UNSW INTERNATIONAL STUDENT AWARD</span><span className="m-dot">✶</span>
               <span>GOLDEN RUBBISH BIN AWARD</span><span className="m-dot">✶</span>
-              <span>FIRST PLACE — CSESOC HACKATHON 2025</span><span className="m-dot">✶</span>
-              <span>UNIHACK 2026 — MOST FUN IDEA</span><span className="m-dot">✶</span>
-              <span>UNIHACK 2026 — BEST DESIGN</span><span className="m-dot">✶</span>
+              <span>FIRST PLACE, CSESOC HACKATHON 2025</span><span className="m-dot">✶</span>
+              <span>UNIHACK 2026, MOST FUN IDEA</span><span className="m-dot">✶</span>
+              <span>UNIHACK 2026, BEST DESIGN</span><span className="m-dot">✶</span>
               <span>UNSW INTERNATIONAL STUDENT AWARD</span><span className="m-dot">✶</span>
               <span>GOLDEN RUBBISH BIN AWARD</span><span className="m-dot">✶</span>
             </div>
@@ -179,7 +179,7 @@ export default function HomePage() {
               </li>
               <li className="aw-row">
                 <span className="aw-yr2 mono">[ 2026 ]</span>
-                <div className="aw-t"><h4>Most Fun Idea &amp; Best Design</h4><p>UNIHACK 2026 · Peersuade — two category wins</p></div>
+                <div className="aw-t"><h4>Most Fun Idea &amp; Best Design</h4><p>UNIHACK 2026 · Peersuade, two category wins</p></div>
                 <span className="aw-tag2 mono">✶ double</span>
               </li>
               <li className="aw-row">
@@ -189,7 +189,7 @@ export default function HomePage() {
               </li>
               <li className="aw-row">
                 <span className="aw-yr2 mono">[ 2025 ]</span>
-                <div className="aw-t"><h4>Golden Rubbish Bin Award — Most Absurd Idea with Best Execution</h4><p>Terrible Ideas Hackathon · Stall Wars · the prize nobody plans for</p></div>
+                <div className="aw-t"><h4>Golden Rubbish Bin Award, Most Absurd Idea with Best Execution</h4><p>Terrible Ideas Hackathon · Stall Wars · the prize nobody plans for</p></div>
                 <span className="aw-tag2 mono">🗑 legend</span>
               </li>
             </ul>
@@ -215,7 +215,7 @@ export default function HomePage() {
             <p className="lead ct-lead" data-rise>
               Open to <span className="acid-text">Data Analyst</span>,{' '}
               <span className="acid-text">Analytics Engineer</span> &amp; graduate roles in
-              Sydney — and always up for a good problem. Pick a channel.
+              Sydney, and always up for a good problem. Pick a channel.
             </p>
             <div className="ct-grid" data-rise-group>
               <a className="ct-card" href="mailto:melvindarialyogiana@gmail.com" data-copy="melvindarialyogiana@gmail.com" data-cursor="copy">
