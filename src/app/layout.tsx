@@ -5,6 +5,7 @@ import { Inter, JetBrains_Mono, Space_Grotesk, Newsreader } from "next/font/goog
 import "./globals.css"
 import type React from "react"
 import AiChatbox from "./components/ai-chatbox"
+import TeCursor from "./components/te-cursor"
 import UtmBanner from "./components/utm-banner"
 import AnalyticsTracker from "./components/analytics-tracker"
 import PersonJsonLd from "./components/person-jsonld"
@@ -86,6 +87,10 @@ export default function RootLayout({
             styled for. Turn it back on when dark mode ships. */}
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           {children}
+          {/* Mounted here rather than per page so the dot survives navigation.
+              It self-gates on (pointer:fine) and reduced motion, and returns
+              null on the routes that do their own pointer work. */}
+          <TeCursor />
           <AiChatbox />
           <UtmBanner />
         </ThemeProvider>

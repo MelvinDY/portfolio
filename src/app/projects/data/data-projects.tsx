@@ -94,6 +94,7 @@ export default function DataProjects() {
 
                 <Link
                   href={e.href}
+                  data-cursor="case study ↗"
                   className="mt-5 w-fit border-b border-[#14120F]/30 pb-0.5 text-[12.5px] transition-colors hover:border-[#C13E00] hover:text-[#C13E00]"
                   style={mono}
                 >

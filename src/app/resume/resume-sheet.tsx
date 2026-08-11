@@ -124,6 +124,7 @@ export default function ResumeSheet({ variant }: { variant: Variant }) {
           </div>
           <a
             href={v.pdf}
+            data-cursor="download ↓"
             className="bg-[#C13E00] px-5 py-2.5 text-[13px] font-semibold text-[#F3F3F1] transition-transform active:scale-[0.98]"
             download
           >

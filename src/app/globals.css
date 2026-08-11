@@ -1671,24 +1671,46 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
    CONTEXT CURSOR — trailing dot that morphs into labels
    ============================================================ */
 
-.te-home .te-cursor { position: fixed; top: 0; left: 0; z-index: 9000; pointer-events: none; opacity: 0; transition: opacity 0.25s; }
-.te-home .te-cursor.vis { opacity: 1; }
-.te-home .tc-pill {
+/* ─── the trailing cursor dot ───
+   Unscoped from .te-home, because the component is mounted in the root layout
+   and follows the pointer on every route. It used to inherit --acid and --ease
+   from the home page wrapper, which resolved to nothing anywhere else, so the
+   markup rendered and stayed invisible. Both now come from tokens the cursor
+   owns, declared on :root so a future dark theme overrides them in one place.
+
+   Additive, never a replacement: nothing here sets `cursor: none`, and the
+   element is aria-hidden and pointer-events: none. */
+:root {
+  --tc-accent: #C13E00;
+  /* Was #1c0d03 on the accent, written for the dark ground where the accent is
+     a bright #ff5e1f. Against the deepened light-theme accent that is about
+     2.8:1 for 11px bold, so the label reads as a smudge. Light ink is ~6:1. */
+  --tc-ink: #F3F3F1;
+  --tc-glow: rgba(193, 62, 0, 0.3);
+  --tc-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.te-cursor { position: fixed; top: 0; left: 0; z-index: 9000; pointer-events: none; opacity: 0; transition: opacity 0.25s; }
+.te-cursor.vis { opacity: 1; }
+.tc-pill {
   display: inline-flex; align-items: center;
   transform: translate(14px, 18px);
   height: 10px; min-width: 10px;
   border-radius: 999px;
-  background: var(--acid);
-  color: #1c0d03;
+  background: var(--tc-accent);
+  color: var(--tc-ink);
   font-family: var(--font-mono);
   font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
   white-space: nowrap;
-  box-shadow: 0 0 16px rgba(255,94,31,0.35);
-  transition: height 0.3s var(--ease), padding 0.3s var(--ease);
+  box-shadow: 0 0 16px var(--tc-glow);
+  transition: height 0.3s var(--tc-ease), padding 0.3s var(--tc-ease);
 }
-.te-home .tc-label { opacity: 0; max-width: 0; overflow: hidden; transition: opacity 0.2s, max-width 0.3s var(--ease); }
-.te-home .te-cursor.on .tc-pill { height: 30px; padding: 0 13px; }
-.te-home .te-cursor.on .tc-label { opacity: 1; max-width: 220px; }
+.tc-label { opacity: 0; max-width: 0; overflow: hidden; transition: opacity 0.2s, max-width 0.3s var(--tc-ease); }
+.te-cursor.on .tc-pill { height: 30px; padding: 0 13px; }
+.te-cursor.on .tc-label { opacity: 1; max-width: 220px; }
+
+/* The dot is decoration, not content. It should never print. */
+@media print { .te-cursor { display: none !important; } }
 
 /* ============================================================
    AI ASSISTANT — ⌘K command palette

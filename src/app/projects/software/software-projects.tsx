@@ -160,6 +160,7 @@ export default function SoftwareProjects() {
                       {d && (
                         <button
                           onClick={() => setOpen(p.id)}
+                          data-cursor="details"
                           className="border border-[#14120F]/25 px-4 py-2 text-[12.5px] transition-colors hover:border-[#C13E00] hover:text-[#C13E00]"
                         >
                           See more
@@ -169,6 +170,7 @@ export default function SoftwareProjects() {
                         href={p.href}
                         target="_blank"
                         rel="noopener noreferrer"
+                        data-cursor={`${p.linkLabel.toLowerCase()} ↗`}
                         className="border-b border-[#14120F]/30 pb-0.5 text-[13px] transition-colors hover:border-[#C13E00] hover:text-[#C13E00]"
                       >
                         {p.linkLabel} <span aria-hidden="true">&rarr;</span>
@@ -197,6 +199,7 @@ export default function SoftwareProjects() {
                     href={p.href}
                     target="_blank"
                     rel="noopener noreferrer"
+                    data-cursor={`${p.linkLabel.toLowerCase()} ↗`}
                     className="group grid grid-cols-1 items-baseline gap-x-8 gap-y-2 border-t border-[#14120F]/15 py-6 transition-colors hover:bg-[#EAEAE6] md:grid-cols-[auto_minmax(0,1fr)_auto_auto] md:px-3"
                   >
                     <span className="text-[12px] tabular-nums text-[#8A8378]" style={mono}>
