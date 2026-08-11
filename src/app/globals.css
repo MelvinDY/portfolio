@@ -1957,10 +1957,11 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 }
 
 
-/* ─── print, for the resume PDF ───
-   /resume is rendered to public/melvin-yogiana-resume.pdf with headless Chrome,
-   so what prints here is what a recruiter downloads. A4 with a 14mm margin puts
-   the measure at roughly 180mm, which keeps the body near 90 characters.
+/* ─── print, for the resume PDFs ───
+   Both variants of /resume are rendered to public/ with headless Chrome by
+   `npm run resume:pdf`, so what prints here is what a recruiter downloads. A4
+   with a 14mm margin puts the measure at roughly 180mm, which keeps the body
+   near 90 characters.
 
    The site paints its own grounds, and a light-on-light page still costs a full
    sheet of toner if the background survives, so backgrounds are dropped and the
