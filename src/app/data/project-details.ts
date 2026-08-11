@@ -117,6 +117,31 @@ export const projectDetails: Record<string, ProjectDetail> = {
     shots: [],
   },
 
+  haven: {
+    id: 'haven',
+    title: 'Haven',
+    sub: 'Consent-first sharing, enforced in the schema',
+    summary:
+      'An Android app for two people who both choose a period of openness: where they are right now, a safe-arrival check-in, how they are feeling. The interesting part is not the feature list, it is that the consent rules are structural. The architecture cannot express a one-way share, so the app cannot be turned into a monitoring tool by someone who wants one.',
+    pull: 'The strongest privacy guarantee is the table you decided not to create.',
+    highlights: [
+      'Sharing is pair-symmetric by construction: the server only serves a shared feature while both partners hold an active grant, and a one-way share endpoint does not exist',
+      'No locations table anywhere. Live position sits in an in-memory TTL store, overwritten in place, so a breach or a subpoena reaches one current point rather than a history',
+      'A Consent Service checks every read of shared data against per-user, per-feature, revocable grants',
+      'Either partner can revoke instantly, or dissolve the pair and wipe the shared data unilaterally, with no approval from the other side',
+      'Phone-OTP into a signed JWT where the identity is a hashed phone number, with a per-user WebSocket hub and FCM push for backgrounded devices',
+    ],
+    year: '2026',
+    status: 'In development',
+    stack: ['Kotlin', 'Jetpack Compose', 'Ktor', 'Exposed', 'PostgreSQL', 'WebSockets', 'Docker'],
+    links: [
+      { label: 'GitHub', href: 'https://github.com/MelvinDY/Haven', primary: true },
+    ],
+    /* The repo carries four screenshots under docs/screenshots. They are not
+       copied into /public yet, and the sheet drops the gallery rather than
+       showing a placeholder frame. */
+    shots: [],
+  },
   ratemyaccom: {
     id: 'ratemyaccom',
     title: 'Rate My Accom NSW',

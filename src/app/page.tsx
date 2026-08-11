@@ -12,8 +12,8 @@ import ScrollProgress from './components/scroll-progress'
 type InkWord = { t: string; acid?: boolean }
 
 const ABOUT_INK: InkWord[] = [
-  { t: 'I’m' }, { t: 'a' }, { t: 'Computer' }, { t: 'Science' }, { t: 'student' },
-  { t: 'at' }, { t: 'UNSW' }, { t: 'who' }, { t: 'got' }, { t: 'hooked' }, { t: 'on' },
+  { t: 'I’m' }, { t: 'a' }, { t: 'Computer' }, { t: 'Science' }, { t: 'graduate' },
+  { t: 'from' }, { t: 'UNSW' }, { t: 'who' }, { t: 'got' }, { t: 'hooked' }, { t: 'on' },
   { t: 'the' }, { t: 'moment' }, { t: 'a' }, { t: 'chart' }, { t: 'makes' }, { t: 'a' },
   { t: 'room' }, { t: 'go' }, { t: '“oh”', acid: true }, { t: '—' }, { t: 'so' },
   { t: 'I' }, { t: 'wrangle' }, { t: 'data' }, { t: 'into' },

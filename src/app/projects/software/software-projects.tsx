@@ -32,15 +32,25 @@ import { projectDetails } from '../../data/project-details'
 const mono = { fontFamily: 'var(--font-mono), ui-monospace, monospace' } as const
 const display = { fontFamily: 'var(--font-space-grotesk), system-ui, sans-serif' } as const
 
-/** 18 words. Section 4.7 caps hero subtext at 20. */
+const featuredProjects = softwareProjects.filter(p => p.featured)
+const restProjects = softwareProjects.filter(p => !p.featured)
+
+/* The counts are derived rather than written out. They were hardcoded, and the
+   moment the selection changed the hero claimed three in the index when there
+   were four. Copy that counts things should read the things. */
+const WORD = ['no', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight']
+
+/* 18 words. Section 4.7 caps hero subtext at 20.
+   It used to promise "source and live demos on every one", which stopped being
+   true the moment a private repo and an in-development build joined the set. */
 const HERO_SUB =
-  'Four builds I shipped, plus three more in the index. Stack, source and live demos on every one.'
+  `${WORD[featuredProjects.length]} builds up close, plus ${WORD[restProjects.length].toLowerCase()} more in the index. Every one lists its stack and links out.`
 
 export default function SoftwareProjects() {
   const [open, setOpen] = useState<string | null>(null)
 
-  const featured = softwareProjects.filter(p => p.featured)
-  const rest = softwareProjects.filter(p => !p.featured)
+  const featured = featuredProjects
+  const rest = restProjects
   const lead = featured[0]
   const leadShot = projectDetails[lead.id]?.shots?.[0]
 

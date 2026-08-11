@@ -29,6 +29,29 @@ import { hero, socials, story, facts, entries, toolbox } from '../data/about'
 const mono = { fontFamily: 'var(--font-mono), ui-monospace, monospace' } as const
 const display = { fontFamily: 'var(--font-space-grotesk), system-ui, sans-serif' } as const
 
+/**
+ * What each role actually involved. These lines existed in the data all along
+ * and were never rendered, so the page listed job titles and left the work
+ * itself invisible. A recruiter reads this section to find out what someone
+ * did, so it is the one thing that cannot be implied.
+ *
+ * The hanging rule marker is the same one the project sheet uses for its
+ * highlights, in this page's deepened accent rather than the dark-ground one.
+ * Body sits at 14px on --ink-dim, which is a readable size and passes AA,
+ * rather than joining the mono micro-type tier.
+ */
+const Points = ({ items }: { items: string[] }) =>
+  items.length === 0 ? null : (
+    <ul className="mt-3.5 flex flex-col gap-2">
+      {items.map(p => (
+        <li key={p} className="relative max-w-[64ch] pl-5 text-[14px] leading-relaxed text-[#5A544C]">
+          <span aria-hidden="true" className="absolute left-0 top-[10px] h-px w-2.5 bg-[#C13E00]" />
+          {p}
+        </li>
+      ))}
+    </ul>
+  )
+
 export default function AboutTE() {
   const work = entries.filter(e => e.kind === 'work')
   const study = entries.filter(e => e.kind === 'education')
@@ -91,14 +114,15 @@ export default function AboutTE() {
             {work.map(e => (
               <li
                 key={`${e.org}-${e.year}`}
-                className="grid grid-cols-1 gap-x-8 gap-y-1 border-t border-[#14120F]/15 py-5 md:grid-cols-[4.5rem_minmax(0,1fr)]"
+                className="grid grid-cols-1 gap-x-8 gap-y-1 border-t border-[#14120F]/15 py-6 md:grid-cols-[4.5rem_minmax(0,1fr)] md:py-7"
               >
-                <span className="text-[12px] tabular-nums text-[#8A8378]" style={mono}>{e.year}</span>
+                <span className="text-[12px] tabular-nums text-[#736C60]" style={mono}>{e.year}</span>
                 <div>
                   <p className="text-[15px] font-semibold">{e.role}</p>
                   <p className="mt-0.5 text-[13.5px] text-[#5A544C]">{e.org}</p>
-                  <p className="mt-1.5 text-[11px] text-[#8A8378]" style={mono}>{e.period}</p>
-                  {e.tags && <p className="mt-2.5 text-[11px] text-[#8A8378]" style={mono}>{e.tags.join(', ')}</p>}
+                  <p className="mt-1.5 text-[11.5px] text-[#736C60]" style={mono}>{e.period}</p>
+                  <Points items={e.points} />
+                  {e.tags && <p className="mt-3.5 text-[11.5px] text-[#736C60]" style={mono}>{e.tags.join(', ')}</p>}
                 </div>
               </li>
             ))}
@@ -111,21 +135,22 @@ export default function AboutTE() {
             {study.map(e => (
               <li
                 key={`${e.org}-${e.year}`}
-                className="grid grid-cols-1 gap-x-8 gap-y-1 border-t border-[#14120F]/15 py-5 md:grid-cols-[4.5rem_minmax(0,1fr)]"
+                className="grid grid-cols-1 gap-x-8 gap-y-1 border-t border-[#14120F]/15 py-6 md:grid-cols-[4.5rem_minmax(0,1fr)] md:py-7"
               >
-                <span className="text-[12px] tabular-nums text-[#8A8378]" style={mono}>{e.year}</span>
+                <span className="text-[12px] tabular-nums text-[#736C60]" style={mono}>{e.year}</span>
                 <div>
                   <p className="text-[15px] font-semibold">{e.role}</p>
                   <p className="mt-0.5 text-[13.5px] text-[#5A544C]">{e.org}</p>
-                  <p className="mt-1.5 text-[11px] text-[#8A8378]" style={mono}>{e.period}</p>
+                  <p className="mt-1.5 text-[11.5px] text-[#736C60]" style={mono}>{e.period}</p>
+                  <Points items={e.points} />
                   {e.awards && (
-                    <ul className="mt-3 flex flex-col gap-1.5">
+                    <ul className="mt-3.5 flex flex-col gap-1.5">
                       {e.awards.map(a => (
                         <li key={a.title} className="text-[13px] text-[#C13E00]">{a.title}</li>
                       ))}
                     </ul>
                   )}
-                  {e.status && <p className="mt-2.5 text-[11px] text-[#8A8378]" style={mono}>{e.status}</p>}
+                  {e.status && <p className="mt-3 text-[11.5px] text-[#736C60]" style={mono}>{e.status}</p>}
                 </div>
               </li>
             ))}

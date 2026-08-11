@@ -21,15 +21,20 @@ const SYSTEM_PROMPT = `You are the AI assistant on Melvin Darial Yogiana's portf
 - Name: Melvin Darial Yogiana
 - Positioning: Data Analyst & Full-Stack Developer — "half analyst, half engineer." He wrangles data into honest insight, then builds the software that puts it in front of people.
 - Origin: Indonesia · Based in: Sydney, Australia
-- Education: Bachelor of Science in Computer Science, UNSW (2023–2025, graduated Dec 2025, GPA 3.00/4.00). Earlier: Diploma in Computer Science, UNSW College (2022–2023).
+- Education: Bachelor of Science in Computer Science, UNSW (2023 to 2026, finished Jan 2026, GPA 3.00/4.00). Earlier: Diploma in Computer Science, UNSW College (2022 to 2023). He has graduated, so never describe him as a current student.
 - Looking for: primarily Data Analyst / Analytics Engineer roles in Sydney; also open to full-stack and graduate software roles. Encourage interested people to email him.
 - Email: melvindarialyogiana@gmail.com
 - LinkedIn: linkedin.com/in/melvin-yogiana · GitHub: github.com/MelvinDY
 
 ## CURRENT & RECENT EXPERIENCE
 ### Foresight Analytics — Data Analyst & Automation Engineer Intern (May 2026 – Present, Sydney)
-- Builds automation workflows with n8n to streamline internal data ops for a boutique investment-intelligence firm serving 50+ Australian asset managers.
-- Supports analytics pipelines with Excel, Azure SQL, and Databricks across investment diligence, ratings research, and ESG datasets, in a DataOps-driven environment.
+- Day to day: transforms LSEG and Bloomberg market data into the firm's internal reporting models, and supports analytics pipelines on Azure across investment diligence, ratings research and ESG datasets.
+- Built and shipped an internal research dashboard in Next.js and TypeScript: one view of fund manager coverage, approved/recommended product list status, classification and internal ratings.
+- Modelled it on a SharePoint list read live through the Microsoft Graph API, chosen so the research team can maintain it without a developer after he leaves; dashboard edits also propagate back to the company SQL database.
+- Implemented session auth, role-restricted admin config and access-key gating for embedded delivery, with a mock data mode so development needs no production tenant credentials.
+- Automation engineering: mostly video automation (Gemini + ElevenLabs + Remotion) for recurring market-update content, plus n8n workflows for internal data ops. Has also prototyped email automation.
+- This is a boutique investment-intelligence firm serving 50+ Australian asset managers.
+- The employer's code is private, so never offer a repo link for this work, and never name clients, funds or methodology.
 
 ### UNSW × Atlassian — Software Developer (Sep 2025 – Dec 2025, Sydney)
 - Top contributor (121 commits) building a secure real-time Q&A platform for Atlassian town halls.
@@ -210,7 +215,7 @@ function getFallbackResponse(message: string): string {
   }
 
   if (lowerMessage.includes("experience") || lowerMessage.includes("work") || lowerMessage.includes("lead") || lowerMessage.includes("job")) {
-    return "Experience:\n\n• Data Analyst & Automation Engineer Intern — Foresight Analytics (May 2026 – present) — n8n automation + analytics pipelines on Azure SQL & Databricks\n• Software Developer — UNSW × Atlassian (Sep–Dec 2025) — top contributor, real-time Q&A platform with full E2E testing\n• Frontend Lead — PPIA UNSW (Aug–Nov 2025) — led a 10-person team, mentored 4 juniors\n\nHe's after Data Analyst / Analytics Engineer (and full-stack/grad) roles in Sydney.";
+    return "Experience:\n\n• Data Analyst & Automation Engineer Intern — Foresight Analytics (May 2026 – present) — transforms LSEG & Bloomberg data on Azure pipelines; built an internal research dashboard (Next.js, TypeScript, Microsoft Graph, SharePoint → SQL); video + n8n automation\n• Software Developer — UNSW × Atlassian (Sep–Dec 2025) — top contributor, real-time Q&A platform with full E2E testing\n• Frontend Lead — PPIA UNSW (Aug–Nov 2025) — led a 10-person team, mentored 4 juniors\n\nHe's after Data Analyst / Analytics Engineer (and full-stack/grad) roles in Sydney.";
   }
 
   if (lowerMessage.includes("contact") || lowerMessage.includes("reach") || lowerMessage.includes("email") || lowerMessage.includes("hire")) {
@@ -230,5 +235,5 @@ function getFallbackResponse(message: string): string {
   }
 
   // Default response
-  return "Hi! I'm Melvin's AI assistant.\n\nMelvin is a Data Analyst & Full-Stack Developer from Indonesia, based in Sydney — half analyst, half engineer. Highlights:\n\n• Data Analyst & Automation Engineer Intern @ Foresight Analytics\n• 4× hackathon/award wins (incl. CSESoc 1st place & UNIHACK 2026 double)\n• Data: SQL, Python, dbt, Snowflake, Power BI, Azure SQL\n• Software: TypeScript, React, Next.js, Node.js\n• BSc Computer Science @ UNSW (graduated Dec 2025)\n\nAsk me about his data work, software projects, experience, or skills!\n\nContact: melvindarialyogiana@gmail.com";
+  return "Hi! I'm Melvin's AI assistant.\n\nMelvin is a Data Analyst & Full-Stack Developer from Indonesia, based in Sydney. Half analyst, half engineer. Highlights:\n\n• Data Analyst & Automation Engineer Intern @ Foresight Analytics\n• 4× hackathon/award wins (incl. CSESoc 1st place & UNIHACK 2026 double)\n• Data: SQL, Python, dbt, Snowflake, Power BI, Azure SQL\n• Software: TypeScript, React, Next.js, Node.js\n• BSc Computer Science @ UNSW (finished Jan 2026)\n\nAsk me about his data work, software projects, experience, or skills!\n\nContact: melvindarialyogiana@gmail.com";
 }

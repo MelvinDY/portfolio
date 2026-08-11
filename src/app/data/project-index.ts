@@ -71,16 +71,30 @@ export const dataProjects: IndexedProject[] = [
   },
 ]
 
+/* Featured order is the argument the page makes: production rigour, then
+   system design, then shipping for real users, then applied AI. The hackathon
+   builds carry real awards but their code lives in teammates' repos, so they
+   sit in the index row rather than holding a full card. */
 export const softwareProjects: IndexedProject[] = [
   {
-    id: 'peersuade',
-    title: 'Peersuade',
-    blurb: 'Live multiplayer debate game where players argue random prompts and an audience swings the vote in real time.',
-    stack: ['React', 'TypeScript', 'WebSocket', 'Node.js', 'Tailwind'],
-    href: 'https://politics-game.vercel.app/',
+    id: 'ratemyaccom',
+    title: 'Rate My Accom NSW',
+    blurb: 'Review platform for NSW student housing, with university-email verification, multi-dimensional ratings, request hardening and rate limiting.',
+    stack: ['Next.js 14', 'TypeScript', 'Zod', 'React Hook Form', 'Jest'],
+    href: 'https://ratemyaccom-beryl.vercel.app/',
     linkLabel: 'Live demo',
     featured: true,
-    note: 'UNIHACK 2026 · Most Fun + Best Design',
+    note: 'production',
+  },
+  {
+    id: 'haven',
+    title: 'Haven',
+    blurb: 'Consent-first Android app for couples where the sharing rules are enforced by the schema: symmetric grants, and no location history to leak.',
+    stack: ['Kotlin', 'Jetpack Compose', 'Ktor', 'PostgreSQL', 'WebSockets'],
+    href: 'https://github.com/MelvinDY/Haven',
+    linkLabel: 'Source',
+    featured: true,
+    note: 'private repo',
   },
   {
     id: 'ignite',
@@ -103,14 +117,13 @@ export const softwareProjects: IndexedProject[] = [
     note: 'COMP3900 capstone · team of 5',
   },
   {
-    id: 'ratemyaccom',
-    title: 'Rate My Accom NSW',
-    blurb: 'Review platform for NSW student housing, with university-email verification, multi-dimensional ratings, request hardening and rate limiting.',
-    stack: ['Next.js 14', 'TypeScript', 'Zod', 'React Hook Form', 'Jest'],
-    href: 'https://ratemyaccom-beryl.vercel.app/',
+    id: 'peersuade',
+    title: 'Peersuade',
+    blurb: 'Live multiplayer debate game where players argue random prompts and an audience swings the vote in real time.',
+    stack: ['React', 'TypeScript', 'WebSocket', 'Node.js', 'Tailwind'],
+    href: 'https://politics-game.vercel.app/',
     linkLabel: 'Live demo',
-    featured: true,
-    note: 'production',
+    note: 'UNIHACK 2026 · Most Fun + Best Design',
   },
   {
     id: 'onlycode',

@@ -29,7 +29,7 @@ export const hero = {
   hookLead: 'Hi, I am Melvin Darial Yogiana.',
   hookTail: 'I make data make sense.',
   intro:
-    'An Indonesian Computer Science student at UNSW, building in Sydney. Equal parts analyst and engineer, and fully addicted to the moment a messy spreadsheet finally tells you something true.',
+    'An Indonesian Computer Science graduate from UNSW, building in Sydney. Equal parts analyst and engineer, and fully addicted to the moment a messy spreadsheet finally tells you something true.',
   photo: { src: '/melvin.jpg', alt: 'Melvin Darial Yogiana' },
 }
 
@@ -39,16 +39,22 @@ export const socials = [
   { label: 'Email', href: 'mailto:melvindarialyogiana@gmail.com' },
 ]
 
+/* The story used to name neither employer, so the two roles that most prove the
+   analyst-and-engineer claim were invisible on the page whose job is to make it.
+   Foresight and Atlassian now carry a paragraph each, and the hackathons get
+   their own rather than sharing one with the community work. Voice, humour and
+   the coffee closer are the author's, kept per Section 11.C. */
 export const story = [
-  'I came to Sydney to study Computer Science at UNSW, and somewhere between a database lecture and my third hackathon I realised I had fallen for two things at once: finding the story hiding in data, and building the thing that puts that story in front of people.',
-  'Most developers pick a lane. I genuinely could not. So I lean into both. I will spend a weekend untangling ABS labour statistics or matching supermarket prices, then turn around and ship a full-stack app with a team under deadline. The two halves feed each other: the analyst makes my software honest, and the engineer makes my analysis usable.',
-  'Along the way I have been lucky enough to win a few rooms: a hackathon first place, two UNIHACK 2026 categories, and one gloriously cursed Golden Rubbish Bin. I also help run tech for PPIA UNSW, the Indonesian student community here, because building things that bring people together is the whole reason I started.',
-  'When I am not coding you will find me hunting Sydney’s coffee scene, planning the next trip, or quietly turning caffeine into commits.',
+  'I came to Sydney to study Computer Science at UNSW, and somewhere between a database lecture and my third hackathon I realised I had fallen for two things at once: finding the story hiding in data, and building the thing that puts that story in front of people. Most developers pick a lane. I genuinely could not, so I lean into both, and the two halves feed each other: the analyst makes my software honest, and the engineer makes my analysis usable.',
+  'At Foresight Analytics that split turned into a job title. Day to day I turn LSEG and Bloomberg market data into models the firm can actually report on, with the pipelines running on Azure. The rest of the time I build the tooling around it. The piece I care most about is an internal research dashboard that reads a SharePoint list live through the Microsoft Graph API. I chose SharePoint on purpose, so the research team can keep maintaining it without a developer long after I have gone, and whatever they edit there flows back into the SQL database.',
+  'Before that I spent a semester building with UNSW and Atlassian on a secure real-time Q&A platform for their town halls. I finished as top contributor at 121 commits, though the part I am quietly proudest of is less flashy: a three-layer test setup across the API, the integrations and the UI, plus the moderator tooling, so nothing could fall over while a few hundred people were watching.',
+  'Hackathons are where I learned to actually ship. First place at the CSESoc flagship, two categories at UNIHACK 2026, and one gloriously cursed Golden Rubbish Bin for the most absurd idea with the best execution. They teach you the thing a degree does not: how to cut scope at 3am and still walk into the demo with something that works.',
+  'I also help run tech for PPIA UNSW, the Indonesian student community here, because building things that bring people together is the whole reason I started. When I am not coding you will find me hunting Sydney’s coffee scene, planning the next trip, or quietly turning caffeine into commits.',
 ]
 
 export const facts = [
   { value: 'UNSW', label: 'Computer Science' },
-  { value: '2026', label: 'Graduating' },
+  { value: '2026', label: 'Graduated' },
   { value: 'Sydney', label: 'Based in AU' },
   { value: '4×', label: 'Award wins' },
 ]
@@ -60,12 +66,21 @@ export const entries: Entry[] = [
     role: 'Data Analyst and Automation Engineer Intern',
     org: 'Foresight Analytics',
     period: 'May 2026 to present, Sydney AU',
+    /* Written to parse cleanly in an applicant tracking system: each line opens
+       with a past-tense action verb, names the technology in the form a keyword
+       filter searches for, and states what was built rather than what was
+       assisted with. The internal product this embeds into is not named, and no
+       client, fund or methodology appears, because the work belongs to the
+       employer. The terms that do appear are standard funds-management
+       vocabulary. */
     points: [
-      'Building automation workflows with n8n to streamline internal data operations for a boutique investment intelligence firm serving 50+ Australian asset managers.',
-      'Supporting data analytics pipelines using Excel, Azure SQL and Databricks, working across investment diligence, ratings research and ESG datasets.',
-      'Conducting market and product research to inform analytical frameworks and data strategy within a DataOps-driven environment.',
+      'Transformed LSEG and Bloomberg market data into the firm’s internal reporting models, supporting analytics pipelines on Azure across investment diligence, ratings research and ESG datasets.',
+      'Built and shipped an internal research dashboard in Next.js and TypeScript, giving the research team one view of fund manager coverage, approved and recommended product list status, classification and internal ratings.',
+      'Modelled it on a SharePoint list read live through the Microsoft Graph API so the research team can maintain it without a developer after handover, with dashboard edits propagating back to the company SQL database.',
+      'Implemented session-based authentication, role-restricted admin configuration and access-key gating for embedded delivery, plus a mock data mode enabling development without production tenant credentials.',
+      'Built video automation pipelines generating recurring market-update content with Gemini, ElevenLabs and Remotion, plus n8n workflows streamlining internal data operations for a boutique investment intelligence firm serving 50+ Australian asset managers.',
     ],
-    tags: ['n8n', 'Azure SQL', 'Databricks', 'Excel', 'Research', 'DataOps'],
+    tags: ['Azure', 'SQL', 'LSEG', 'Bloomberg', 'Next.js', 'TypeScript', 'Microsoft Graph', 'SharePoint', 'n8n', 'Databricks'],
   },
   {
     kind: 'work',
@@ -112,7 +127,7 @@ export const entries: Entry[] = [
     year: '2023',
     role: 'Bachelor of Science, Computer Science',
     org: 'University of New South Wales',
-    period: '2023 to 2025, GPA 3.00 / 4.00',
+    period: '2023 to 2026, GPA 3.00 / 4.00',
     points: [],
     awards: [
       {
@@ -128,7 +143,7 @@ export const entries: Entry[] = [
         detail: 'Stall Wars, a chaotic toilet-themed two-player arcade game built in 48 hours.',
       },
     ],
-    status: 'Graduated Dec 2025',
+    status: 'Finished Jan 2026',
   },
   {
     kind: 'education',
