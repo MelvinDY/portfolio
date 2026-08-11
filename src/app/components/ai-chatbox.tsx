@@ -292,7 +292,7 @@ export default function AiChatbox() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={remaining > 0 ? "Ask about Melvin…" : "Daily limit reached — email him instead"}
+              placeholder={remaining > 0 ? "Ask about Melvin…" : "Daily limit reached. Email him instead"}
               disabled={isLoading || remaining === 0}
               autoComplete="off"
             />

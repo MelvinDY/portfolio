@@ -35,11 +35,11 @@ export const metadata: Metadata = {
   title: {
     // The homepage sets the exact legal name; every other page appends it, so
     // the full name appears in every SERP title on the site.
-    default: `${FULL_NAME} — ${JOB_TITLE}`,
-    template: `%s — ${FULL_NAME}`,
+    default: `${FULL_NAME}, ${JOB_TITLE}`,
+    template: `%s, ${FULL_NAME}`,
   },
   description: TAGLINE,
-  applicationName: `${FULL_NAME} — Portfolio`,
+  applicationName: `${FULL_NAME}, Portfolio`,
   authors: [{ name: FULL_NAME, url: SITE_URL }],
   creator: FULL_NAME,
   publisher: FULL_NAME,
@@ -56,14 +56,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_AU",
     url: SITE_URL,
-    siteName: `${FULL_NAME} — Portfolio`,
-    title: `${FULL_NAME} — ${JOB_TITLE}`,
+    siteName: `${FULL_NAME}, Portfolio`,
+    title: `${FULL_NAME}, ${JOB_TITLE}`,
     description: TAGLINE,
     images: [{ url: "/melvin.jpg", width: 1200, height: 630, alt: FULL_NAME }],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${FULL_NAME} — ${JOB_TITLE}`,
+    title: `${FULL_NAME}, ${JOB_TITLE}`,
     description: TAGLINE,
     images: ["/melvin.jpg"],
   },

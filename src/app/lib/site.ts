@@ -15,7 +15,7 @@ export const SHORT_NAME = "Melvin Yogiana"
 
 export const JOB_TITLE = "Data Analyst & Full-Stack Developer"
 
-export const TAGLINE = `${FULL_NAME} — ${JOB_TITLE} based in Sydney. UNSW Computer Science. UNIHACK 2026 award winner.`
+export const TAGLINE = `${FULL_NAME}, ${JOB_TITLE} based in Sydney. UNSW Computer Science. UNIHACK 2026 award winner.`
 
 /**
  * Profiles that already rank for the name. Google uses these (as schema.org

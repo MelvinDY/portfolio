@@ -8,7 +8,7 @@ const pixel = Press_Start_2P({ weight: '400', subsets: ['latin'], variable: '--f
 export const metadata: Metadata = {
   // `absolute` opts out of the root title template — the easter egg should not
   // announce whose site it is in the tab title.
-  title: { absolute: '??? — you found something' },
+  title: { absolute: '???, you found something' },
   robots: { index: false, follow: false },
 }
 

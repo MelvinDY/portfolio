@@ -132,15 +132,15 @@ export default function TeHero() {
 
       {/* folio */}
       <div className="h3-hud mono" aria-hidden="true">
-        <span className="h3-hud-tl">Melvin Yogiana — Portfolio</span>
-        <span className="h3-hud-bl">Vol. 01 · 33.8688°S — 151.2093°E</span>
+        <span className="h3-hud-tl">Melvin Yogiana, Portfolio</span>
+        <span className="h3-hud-bl">Vol. 01 · 33.8688°S, 151.2093°E</span>
         <span className="h3-hud-br">scroll to read ↓</span>
       </div>
 
       <div className="h3-stage">
         {/* act i — the name */}
         <div className="h3-scene h3-a">
-          <p className="h3-pre mono">[ data analyst · full-stack dev — sydney, au ]</p>
+          <p className="h3-pre mono">[ data analyst · full-stack dev, sydney au ]</p>
           <h1 className="h3-name">
             {/*
               The visible name is split per-character for the GSAP reveal and
