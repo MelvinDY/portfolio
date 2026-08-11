@@ -10,11 +10,24 @@ import { fillToken } from '../lib/theme-tokens'
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
-const MANIFESTO: { t: string; acid?: boolean }[] = [
-  { t: 'Raw' }, { t: 'data' }, { t: 'in' }, { t: '—' },
-  { t: 'decisions', acid: true }, { t: 'out.' },
-  { t: 'Ideas' }, { t: 'in' }, { t: '—' },
-  { t: 'shipped' }, { t: 'products', acid: true }, { t: 'out.' },
+/* The manifesto is one claim made twice: something raw goes in, something
+   finished comes out. Grouping it into clauses rather than one flat word list
+   lets each half sit on its own line block, so the parallel reads as parallel
+   instead of wrapping wherever the viewport happens to break it.
+
+   The dashes that used to stand between in and out are gone. They were their
+   own entries in this array, which meant the scrub spent a full stagger beat
+   inking a punctuation mark. ", then" carries the same turn and belongs to the
+   word before it. */
+const MANIFESTO: { t: string; acid?: boolean }[][] = [
+  [
+    { t: 'Raw' }, { t: 'data' }, { t: 'in,' }, { t: 'then' },
+    { t: 'decisions', acid: true }, { t: 'out.' },
+  ],
+  [
+    { t: 'Ideas' }, { t: 'in,' }, { t: 'then' },
+    { t: 'shipped' }, { t: 'products', acid: true }, { t: 'out.' },
+  ],
 ]
 
 const chars = (word: string) =>
@@ -140,15 +153,21 @@ export default function TeHero() {
         {/* act ii — the manifesto */}
         <div className="h3-scene h3-b">
           <p className="h3-man">
-            {MANIFESTO.map((w, i) => (
-              <span
-                key={i}
-                className={`h3-w${w.acid ? ' h3-w-acid' : ''}`}
-                /* A marker, not a colour: the tween resolves it against the
-                   live theme, so a hex cannot be baked in at render time. */
-                data-fill={w.acid ? 'acid' : undefined}
-              >
-                {w.t}{' '}
+            {MANIFESTO.map((clause, ci) => (
+              /* One block per clause. The .h3-w spans stay in document order
+                 inside it, so the scrub's stagger is unchanged. */
+              <span className="h3-mline" key={ci}>
+                {clause.map((w, i) => (
+                  <span
+                    key={i}
+                    className={`h3-w${w.acid ? ' h3-w-acid' : ''}`}
+                    /* A marker, not a colour: the tween resolves it against the
+                       live theme, so a hex cannot be baked in at render time. */
+                    data-fill={w.acid ? 'acid' : undefined}
+                  >
+                    {w.t}{' '}
+                  </span>
+                ))}
               </span>
             ))}
           </p>

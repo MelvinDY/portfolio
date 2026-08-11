@@ -874,17 +874,38 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 @keyframes te-pulse-dot { 0%,100% { opacity: 1 } 50% { opacity: 0.3 } }
 
 /* act ii — the manifesto */
+/* ─── act ii: the manifesto ───
+   Set in the prose serif rather than the display sans, so the claim reads in
+   the site's publication voice and lands as a different register from the name
+   in act i. Emphasis is italic of the same face, never a second family.
+
+   .h3-b and .h3-w are scrub-timeline hooks. The clause blocks are new markup
+   between them, which the stagger does not care about because it selects .h3-w
+   by descendant order. */
 .te-home .h3-man {
   font-family: var(--font-serif);
   font-size: clamp(32px, 5vw, 66px);
   font-weight: 400;
   letter-spacing: -0.01em;
-  line-height: 1.25;
+  /* 1.18 tightens the four lines into a block that reads as one statement.
+     Still clear of the 1.1 floor that italic descenders need, and `products`
+     is both italic and descending. */
+  line-height: 1.18;
   max-width: 22ch;
-  margin: 0;
+  margin: 0 auto;
 }
+
+/* Each half of the claim gets its own line so the parallel is visible. At
+   22ch both clauses break to two lines, giving the block an even four. */
+.te-home .h3-mline { display: block; }
+.te-home .h3-mline + .h3-mline { margin-top: 0.34em; }
+
 .te-home .h3-w { color: var(--ink-ghost); }
-.te-home .h3-w-acid { font-family: var(--font-serif); font-style: italic; font-weight: 400; padding-right: 0.05em; }
+.te-home .h3-w-acid {
+  font-style: italic;
+  /* Italic leaning into the roman word that follows needs the gap back. */
+  padding-right: 0.05em;
+}
 
 /* ─── act iii: the index ───
    The payoff of the pinned hero. The name has scaled past, the manifesto has
@@ -1934,3 +1955,4 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
   .te-home .h3-dt { font-size: clamp(18px, 2.1vw, 26px); }
   .te-home .h3-dirk { margin-bottom: 14px; }
 }
+
