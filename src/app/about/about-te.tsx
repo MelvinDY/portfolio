@@ -1,7 +1,10 @@
+import { readdirSync } from 'node:fs'
+import { join } from 'node:path'
 import Image from 'next/image'
 import Link from 'next/link'
 import LightHeader from '../components/light-header'
 import Reveal from '../components/reveal'
+import PurinConfetti from '../components/purin-confetti'
 import { hero, socials, story, facts, entries, toolbox } from '../data/about'
 
 /**
@@ -52,9 +55,32 @@ const Points = ({ items }: { items: string[] }) =>
     </ul>
   )
 
+/**
+ * Every cat in public/purin, read once at build.
+ *
+ * This is why adding a Purin is dropping a file in a folder and nothing else:
+ * no manifest to keep in sync, no import list, filenames irrelevant. The page
+ * is statically prerendered, so this costs nothing at runtime.
+ *
+ * An empty or missing folder is a normal state, not an error. The easter egg
+ * simply is not wired up and the photo renders as a photo, which is what lets
+ * this ship before the images do.
+ */
+function purinSprites(): string[] {
+  try {
+    return readdirSync(join(process.cwd(), 'public', 'purin'))
+      .filter(f => /\.(png|webp|gif)$/i.test(f))
+      .sort()
+      .map(f => `/purin/${f}`)
+  } catch {
+    return []
+  }
+}
+
 export default function AboutTE() {
   const work = entries.filter(e => e.kind === 'work')
   const study = entries.filter(e => e.kind === 'education')
+  const sprites = purinSprites()
 
   return (
     <div className="min-h-[100dvh] bg-[#F3F3F1] text-[#14120F] antialiased" style={display}>
@@ -67,9 +93,18 @@ export default function AboutTE() {
         </h1>
 
         <div className="mt-10 flex flex-col gap-8 sm:flex-row sm:items-start">
-          <div className="relative aspect-square w-[168px] shrink-0 overflow-hidden border border-[#14120F]/12 bg-[#EAEAE6]">
-            <Image src={hero.photo.src} alt={hero.photo.alt} fill sizes="168px" className="object-cover" priority />
-          </div>
+          {/* The photo is the easter egg's trigger. The alt stays on the image
+              rather than moving to an aria-label on the button, because a
+              button takes its accessible name from its content: that reads
+              correctly whether or not the egg is wired up. Moving it would
+              have left the photo with no alt at all on a build with no cats in
+              public/purin. The Image stays server-rendered; only the click
+              handling crosses into the client. */}
+          <PurinConfetti sprites={sprites}>
+            <div className="relative aspect-square w-[168px] shrink-0 overflow-hidden border border-[#14120F]/12 bg-[#EAEAE6]">
+              <Image src={hero.photo.src} alt={hero.photo.alt} fill sizes="168px" className="object-cover" priority />
+            </div>
+          </PurinConfetti>
           <p className="text-[17px] leading-relaxed text-[#5A544C]">{hero.intro}</p>
         </div>
 
