@@ -14,6 +14,7 @@ export const youtube: CaseStudyProps = {
     ['Stack', 'Python, pandas, scikit-learn'],
     ['Source', 'YouTube Data API'],
     ['Sample', '40k videos, 10 regions'],
+    ['Built', 'API collection, feature engineering, model'],
   ],
   contents: [
     ['overview', 'Overview'],
@@ -23,7 +24,7 @@ export const youtube: CaseStudyProps = {
     ['next', 'What is next'],
   ],
   links: [
-    { label: 'Source and notebook', href: 'https://github.com/MelvinDY', primary: true },
+    { label: 'Source and notebook', href: 'https://github.com/MelvinDY/youtube-trending-pipeline', primary: true },
     { label: 'YouTube Data API', href: 'https://developers.google.com/youtube/v3' },
   ],
   nextStudy: { href: '/projects/data/grocery', title: 'Woolworths vs Coles Price Analytics' },

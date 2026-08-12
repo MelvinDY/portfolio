@@ -17,6 +17,11 @@ export const labourMarket: CaseStudyProps = {
     ['Role', 'Solo build'],
     ['Stack', 'Python, Azure SQL, Power BI'],
     ['Source', 'ABS Data API, live'],
+    /* Who wrote the plumbing, stated separately from where the rows came from.
+       Those are two different claims and an interviewer will separate them, so
+       the page does too. The stack line says what it runs on; this says none of
+       it arrived as a clean CSV somebody else prepared. */
+    ['Built', 'ABS ingestion, staging→mart models, Power BI as code'],
     ['Window', '1978 to 2026'],
   ],
   contents: [

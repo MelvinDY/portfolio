@@ -29,7 +29,7 @@ export const hero = {
   hookLead: 'Hi, I am Melvin Darial Yogiana.',
   hookTail: 'I make data make sense.',
   intro:
-    'An Indonesian Computer Science graduate from UNSW, building in Sydney. Equal parts analyst and engineer, and fully addicted to the moment a messy spreadsheet finally tells you something true.',
+    'An Indonesian Computer Science graduate from UNSW, building in Sydney. The degree made me an engineer and the work made me an analyst, and the analyst is the one I am betting on. Fully addicted to the moment a messy spreadsheet finally tells you something true.',
   photo: { src: '/melvin.jpg', alt: 'Melvin Darial Yogiana' },
 }
 
@@ -46,6 +46,7 @@ export const socials = [
    the coffee closer are the author's, kept per Section 11.C. */
 export const story = [
   'I came to Sydney to study Computer Science at UNSW, and somewhere between a database lecture and my third hackathon I realised I had fallen for two things at once: finding the story hiding in data, and building the thing that puts that story in front of people. Most developers pick a lane. I genuinely could not, so I lean into both, and the two halves feed each other: the analyst makes my software honest, and the engineer makes my analysis usable.',
+  'If you want the short version of where that is going, it is the analyst seat. The engineering is not a hedge and it is not a fallback. It is the reason I can take a question from the raw extract all the way to the thing somebody makes a decision in, without handing it to another team halfway and hoping the definitions survive the trip.',
   'At Foresight Analytics that split turned into a job title. Day to day I turn LSEG and Bloomberg market data into models the firm can actually report on, with the pipelines running on Azure. The rest of the time I build the tooling around it. The piece I care most about is an internal research dashboard that reads a SharePoint list live through the Microsoft Graph API. I chose SharePoint on purpose, so the research team can keep maintaining it without a developer long after I have gone, and whatever they edit there flows back into the SQL database.',
   'Before that I spent a semester building with UNSW and Atlassian on a secure real-time Q&A platform for their town halls. I finished as top contributor at 121 commits, though the part I am quietly proudest of is less flashy: a three-layer test setup across the API, the integrations and the UI, plus the moderator tooling, so nothing could fall over while a few hundred people were watching.',
   'Hackathons are where I learned to actually ship. First place at the CSESoc flagship, two categories at UNIHACK 2026, and one gloriously cursed Golden Rubbish Bin for the most absurd idea with the best execution. They teach you the thing a degree does not: how to cut scope at 3am and still walk into the demo with something that works.',

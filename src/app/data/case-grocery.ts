@@ -12,8 +12,13 @@ export const grocery: CaseStudyProps = {
   meta: [
     ['Role', 'Solo build and analysis'],
     ['Stack', 'Python, DuckDB, rapidfuzz'],
-    ['Source', 'Retailer web APIs'],
+    ['Source', 'Retailer web APIs, live'],
     ['Sample', '50-item basket, 104 matched pairs'],
+    /* The limitation belongs beside the sample size, not four sections down.
+       A single-day snapshot is the honest description of this study and it is
+       also the reason its most interesting finding holds. */
+    ['Scope', 'One same-day snapshot'],
+    ['Built', 'Scraper, entity resolution, DuckDB warehouse'],
   ],
   contents: [
     ['overview', 'Overview'],
@@ -22,7 +27,7 @@ export const grocery: CaseStudyProps = {
     ['next', 'What is next'],
   ],
   links: [
-    { label: 'Source and notebook', href: 'https://github.com/MelvinDY', primary: true },
+    { label: 'Source and notebook', href: 'https://github.com/MelvinDY/woolworths-vs-coles-analytics', primary: true },
   ],
   nextStudy: { href: '/projects/data/saas', title: 'SaaS Sales & Revenue Analytics' },
   blocks: [

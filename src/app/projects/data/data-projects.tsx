@@ -88,7 +88,20 @@ export default function DataProjects() {
                     regardless of how long its blurb runs. */}
                 <p className="mt-4 max-w-[52ch] flex-1 text-[14.5px] leading-relaxed text-[#5A544C]">{e.blurb}</p>
 
-                <p className="mt-6 text-[11px] leading-relaxed text-[#8A8378]" style={mono}>
+                {/* Provenance sits above the method line, on the index, because
+                    the question it answers ("is this real data?") is the first
+                    one a reader asks and the last one the page used to answer.
+                    Live sources take the small-text orange; the synthetic one
+                    takes the muted grey, so it reads as a label rather than a
+                    badge and does not compete with the figure above it. */}
+                <p
+                  className="mt-6 text-[11px] tracking-[0.04em]"
+                  style={{ ...mono, color: e.provenance.real ? '#C13E00' : '#8A8378' }}
+                >
+                  {e.provenance.real ? '◆' : '◇'} {e.provenance.label}
+                </p>
+
+                <p className="mt-2 text-[11px] leading-relaxed text-[#8A8378]" style={mono}>
                   {e.method.source} &nbsp;/&nbsp; {e.method.transform} &nbsp;/&nbsp; {e.method.output}
                 </p>
 
