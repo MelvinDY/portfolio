@@ -1839,38 +1839,81 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
    AI ASSISTANT — ⌘K command palette
    ============================================================ */
 
-/* trigger chip (bottom-right) */
-.cmdk-trigger {
-  position: fixed; bottom: 39px; right: 24px; z-index: 60;
-  display: inline-flex; align-items: center; gap: 9px;
-  height: 40px; padding: 0 14px;
-  border-radius: 10px;
-  background: #14100e; color: #cabfb4;
-  border: 1px solid rgba(255,236,218,0.16);
-  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.6);
-  font-size: 13px; cursor: pointer;
-  transition: transform .2s, border-color .2s, color .2s, box-shadow .2s, opacity .2s;
+/* ─── palette tokens ───
+   The launcher is mounted in the root layout and appears on every route, so
+   these live on :root rather than inside .te-home. A component that renders
+   everywhere cannot read a palette scoped to one page's wrapper: that is the
+   same trap the context cursor above fell into.
+
+   :root carries the light values, because light is what the document renders
+   before and after next-themes writes its class today. html.dark restates the
+   same names, so when dark mode ships this component arrives with it and
+   nothing below needs a second pass. */
+:root {
+  --cmdk-paper:     #F8F8F6;
+  --cmdk-band:      #EAEAE6;
+  --cmdk-ink:       #14120F;
+  --cmdk-dim:       #5A544C;
+  /* Everything wearing this tier is mono at 10.5-12.5px, so it is the
+     deepened faint the home page settled on (4.7:1) rather than #8A8378,
+     which reads 3.4:1 and fails AA at those sizes. */
+  --cmdk-faint:     #736C60;
+  --cmdk-line:      rgba(20,18,15,0.15);
+  --cmdk-hair:      rgba(20,18,15,0.10);
+  --cmdk-acid:      #C13E00;
+  --cmdk-acid-soft: rgba(193,62,0,0.42);
+  --cmdk-acid-wash: rgba(193,62,0,0.07);
+  --cmdk-scrim:     rgba(20,18,15,0.45);
+  --cmdk-shadow:    rgba(20,18,15,0.22);
 }
-.cmdk-trigger:hover {
-  transform: translateY(-2px); color: #F2EAE0;
-  border-color: rgba(255,94,31,0.5);
-  box-shadow: 0 14px 34px -12px rgba(0,0,0,0.7), 0 0 22px -8px rgba(255,94,31,0.4);
-}
-.cmdk-trigger.is-hidden { opacity: 0; pointer-events: none; }
-.cmdk-kbd {
-  font-family: var(--font-mono, monospace); font-size: 11px; font-weight: 600;
-  color: #ff9a5a; background: rgba(255,94,31,0.12);
-  border: 1px solid rgba(255,94,31,0.28); border-radius: 5px;
-  padding: 2px 6px; line-height: 1;
+html.dark {
+  --cmdk-paper:     #151110;
+  --cmdk-band:      #100d0a;
+  --cmdk-ink:       #F2EAE0;
+  --cmdk-dim:       #a89d92;
+  --cmdk-faint:     #8d8175;
+  --cmdk-line:      rgba(255,236,218,0.16);
+  --cmdk-hair:      rgba(255,236,218,0.10);
+  --cmdk-acid:      #ff7a3c;
+  --cmdk-acid-soft: rgba(255,122,60,0.45);
+  --cmdk-acid-wash: rgba(255,94,31,0.12);
+  --cmdk-scrim:     rgba(6,4,3,0.6);
+  --cmdk-shadow:    rgba(0,0,0,0.6);
 }
 
-/* overlay */
+/* trigger plate (bottom-right). Square, hairline, one mono voice, matching
+   the header's Resume button and the project sheet rather than the rounded
+   dark chip this used to be. 28px inset rhymes with the UTM card opposite. */
+.cmdk-trigger {
+  position: fixed; bottom: 28px; right: 28px; z-index: 60;
+  display: inline-flex; align-items: center; gap: 10px;
+  height: 38px; padding: 0 14px;
+  background: var(--cmdk-paper); color: var(--cmdk-dim);
+  border: 1px solid var(--cmdk-line);
+  box-shadow: 0 10px 26px -16px var(--cmdk-shadow);
+  font-family: var(--font-mono, monospace); font-size: 12.5px;
+  cursor: pointer;
+  transition: transform .2s, border-color .2s, color .2s, opacity .2s;
+}
+.cmdk-trigger:hover { transform: translateY(-1px); color: var(--cmdk-acid); border-color: var(--cmdk-acid); }
+.cmdk-trigger:active { transform: translateY(0); }
+.cmdk-trigger:focus-visible { outline: 2px solid var(--cmdk-acid); outline-offset: 2px; }
+.cmdk-trigger.is-hidden { opacity: 0; pointer-events: none; }
+.cmdk-kbd {
+  font-size: 11px; font-weight: 600; line-height: 1;
+  color: var(--cmdk-acid); background: var(--cmdk-acid-wash);
+  border: 1px solid var(--cmdk-acid-soft);
+  padding: 3px 5px;
+}
+
+/* overlay. Same scrim and blur the project sheet uses, so the two modals on
+   the site darken the page by the same amount. */
 .cmdk-overlay {
   position: fixed; inset: 0; z-index: 70;
   display: flex; align-items: flex-start; justify-content: center;
   padding: clamp(16px, 12vh, 150px) 16px 16px;
-  background: rgba(8,6,4,0.55);
-  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  background: var(--cmdk-scrim);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
   transition: opacity .2s ease;
 }
 .cmdk-overlay[data-open="false"] { opacity: 0; pointer-events: none; visibility: hidden; }
@@ -1880,10 +1923,9 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 .cmdk {
   width: 100%; max-width: 560px; max-height: min(70vh, 560px);
   display: flex; flex-direction: column;
-  background: #16110e;
-  border: 1px solid rgba(255,236,218,0.14);
-  border-radius: 16px;
-  box-shadow: 0 40px 100px -24px rgba(0,0,0,0.8);
+  background: var(--cmdk-paper);
+  border: 1px solid var(--cmdk-line);
+  box-shadow: 0 30px 80px -30px var(--cmdk-shadow);
   overflow: hidden;
   /* transform is driven by the FLIP morph (WAAPI) in ai-chatbox.tsx;
      origin must be top-left to match the measured rects */
@@ -1892,82 +1934,152 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
   will-change: transform;
 }
 
-/* input row */
-.cmdk-row { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid rgba(255,236,218,0.10); }
-.cmdk-row-ico { color: #ff7a3c; display: inline-flex; flex-shrink: 0; }
-.cmdk-input { flex: 1; min-width: 0; background: transparent; border: none; outline: none; color: #F2EAE0; font-size: 16px; }
-.cmdk-input::placeholder { color: #6e6358; }
-.cmdk-input:disabled { opacity: .6; }
+/* input row. The prompt mark is a typed caret rather than a magnifier: this
+   is a question box, not a search field, and the glyph belongs to the same
+   terminal voice as the › in front of each asked question below. */
+.cmdk-row { display: flex; align-items: center; gap: 12px; padding: 15px 18px; border-bottom: 1px solid var(--cmdk-hair); }
+.cmdk-prompt {
+  font-family: var(--font-mono, monospace); font-size: 15px; font-weight: 600;
+  color: var(--cmdk-acid); flex-shrink: 0; line-height: 1;
+}
+.cmdk-input { flex: 1; min-width: 0; background: transparent; border: none; outline: none; color: var(--cmdk-ink); font-size: 16px; }
+.cmdk-input::placeholder { color: var(--cmdk-faint); }
+.cmdk-input:disabled { opacity: .7; }
 .cmdk-esc {
-  font-family: var(--font-mono, monospace); font-size: 10.5px; letter-spacing: .08em;
-  color: #6e6358; border: 1px solid rgba(255,236,218,0.14); border-radius: 5px;
+  font-family: var(--font-mono, monospace); font-size: 10px; letter-spacing: .12em;
+  color: var(--cmdk-faint); border: 1px solid var(--cmdk-line);
   padding: 3px 6px; flex-shrink: 0;
 }
 
 /* body */
-.cmdk-body { flex: 1; overflow-y: auto; padding: 10px; }
+.cmdk-body { flex: 1; overflow-y: auto; padding: 8px; }
 .cmdk-hint {
-  padding: 8px 12px 6px; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
-  color: #6e6358; font-family: var(--font-mono, monospace);
+  padding: 10px 12px 8px; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--cmdk-faint); font-family: var(--font-mono, monospace);
 }
 
-/* suggestion rows */
+/* suggestion rows. The active row is a wash plus an acid edge drawn with an
+   inset shadow, so moving the selection costs no layout.
+
+   There is deliberately no :hover rule. The pointer already sets the active
+   row through onMouseEnter, so a second, separately-styled hover state can
+   only ever disagree with the keyboard's: opening the palette leaves a
+   stationary pointer sitting on whichever row the morph happened to slide
+   under it, and two rows light up at once. One selection, one highlight. */
 .cmdk-sug {
-  display: flex; align-items: center; gap: 11px; width: 100%; text-align: left;
-  padding: 11px 12px; border-radius: 10px; color: #cabfb4; font-size: 14px;
-  background: transparent; border: 1px solid transparent; cursor: pointer;
-  transition: background .12s, color .12s, border-color .12s;
+  display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+  padding: 11px 12px; color: var(--cmdk-dim); font-size: 14px;
+  background: transparent; border: 0; cursor: pointer;
+  transition: background .12s, color .12s, box-shadow .12s;
 }
-.cmdk-sug:hover, .cmdk-sug[data-active="true"] {
-  background: rgba(255,94,31,0.10); color: #F2EAE0; border-color: rgba(255,94,31,0.22);
+.cmdk-sug[data-active="true"] {
+  background: var(--cmdk-acid-wash); color: var(--cmdk-ink);
+  box-shadow: inset 2px 0 0 var(--cmdk-acid);
 }
-.cmdk-sug-ico { color: #ff7a3c; opacity: .85; display: inline-flex; flex-shrink: 0; }
-.cmdk-sug-arrow { margin-left: auto; color: #6e6358; font-family: var(--font-mono, monospace); font-size: 12px; }
-.cmdk-sug[data-active="true"] .cmdk-sug-arrow { color: #ff9a5a; }
+.cmdk-sug:focus-visible { outline: 2px solid var(--cmdk-acid); outline-offset: -2px; }
+/* The same hairline tick the project sheets use to open a list item. */
+.cmdk-sug-tick { width: 10px; height: 1px; background: var(--cmdk-line); flex-shrink: 0; transition: background .12s; }
+.cmdk-sug[data-active="true"] .cmdk-sug-tick { background: var(--cmdk-acid); }
+.cmdk-sug-arrow { margin-left: auto; color: var(--cmdk-faint); font-family: var(--font-mono, monospace); font-size: 12px; }
+.cmdk-sug[data-active="true"] .cmdk-sug-arrow { color: var(--cmdk-acid); }
 
 /* conversation */
-.cmdk-conv { display: flex; flex-direction: column; gap: 18px; padding: 8px 12px 6px; }
-.cmdk-q { display: flex; gap: 8px; align-items: baseline; color: #F2EAE0; font-size: 14.5px; font-weight: 500; }
-.cmdk-q-mark { color: #ff7a3c; font-family: var(--font-mono, monospace); flex-shrink: 0; }
-.cmdk-a {
-  color: #cabfb4; font-size: 14px; line-height: 1.62;
-  white-space: pre-wrap; overflow-wrap: anywhere;
-  padding-left: 16px; border-left: 2px solid rgba(255,94,31,0.28);
-}
+.cmdk-conv { display: flex; flex-direction: column; gap: 20px; padding: 8px 12px 6px; }
+.cmdk-q { display: flex; gap: 8px; align-items: baseline; color: var(--cmdk-ink); font-size: 14.5px; font-weight: 600; }
+.cmdk-q-mark { color: var(--cmdk-acid); font-family: var(--font-mono, monospace); flex-shrink: 0; }
 
-/* typing */
-.cmdk-typing { display: inline-flex; gap: 4px; align-items: center; padding-left: 16px; }
-.cmdk-dot { width: 6px; height: 6px; border-radius: 50%; background: #9a8f84; animation: cmdk-bounce 1.2s infinite ease-in-out; }
+/* ─── the answer ───
+   The model is asked for tight bullet points, so it replies in markdown. This
+   used to be printed verbatim into a pre-wrap div, which is why a **bolded**
+   phrase arrived on screen wearing four asterisks. It is parsed now
+   (chat-answer.tsx), and everything it can emit is styled here. */
+/* The spine is acid rather than ink. A hairline is one device pixel, and at
+   15% ink that is invisible on a paper ground, which is the whole reason the
+   rule is here: it is what separates the reply from the question above it. */
+.cmdk-a {
+  color: var(--cmdk-dim); font-size: 14px; line-height: 1.62;
+  overflow-wrap: anywhere;
+  padding-left: 15px; border-left: 1px solid var(--cmdk-acid-soft);
+}
+.cmdk-a > :first-child { margin-top: 0; }
+.cmdk-a > :last-child { margin-bottom: 0; }
+.cmdk-a p { margin: 0 0 9px; }
+.cmdk-a strong { font-weight: 600; color: var(--cmdk-ink); }
+.cmdk-a em { font-style: italic; }
+.cmdk-a a {
+  color: var(--cmdk-acid); text-decoration: underline; text-underline-offset: 3px;
+  text-decoration-color: var(--cmdk-acid-soft); transition: text-decoration-color .2s;
+}
+.cmdk-a a:hover { text-decoration-color: var(--cmdk-acid); }
+.cmdk-a code {
+  font-family: var(--font-mono, monospace); font-size: 0.88em;
+  background: var(--cmdk-band); color: var(--cmdk-ink); padding: 1px 5px;
+}
+.cmdk-a pre { margin: 0 0 9px; padding: 10px 12px; overflow-x: auto; background: var(--cmdk-band); border: 1px solid var(--cmdk-hair); }
+.cmdk-a pre code { background: none; padding: 0; }
+/* The bullet tick is 2px, not the hairline used elsewhere. List items land on
+   fractional pixels here (14px on a 1.62 leading is a 22.68px rhythm), and
+   anything one pixel tall put at a half-pixel is split across two device rows
+   at half alpha each: the ticks came out alternating orange and grey down the
+   list. Two pixels always keeps a solid core, whatever the offset. A typed
+   hyphen has the same problem for the same reason, so the marker stays drawn.
+   Numbers have the height to antialias properly, so they are set. */
+.cmdk-a ul, .cmdk-a ol { margin: 0 0 9px; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.cmdk-a li { position: relative; padding-left: 17px; }
+.cmdk-a ul > li::before {
+  content: ""; position: absolute; left: 0; top: 10px;
+  width: 9px; height: 2px; background: var(--cmdk-acid);
+}
+.cmdk-a ol { counter-reset: cmdk-li; }
+.cmdk-a ol > li { counter-increment: cmdk-li; }
+.cmdk-a ol > li::before {
+  content: counter(cmdk-li) "."; position: absolute; left: 0; top: 1px;
+  font-family: var(--font-mono, monospace); font-size: 11px; color: var(--cmdk-acid);
+}
+/* A three-line answer has no use for a display heading, so one that arrives
+   reads as an emphasised line instead of blowing the palette open. */
+.cmdk-a h1, .cmdk-a h2, .cmdk-a h3, .cmdk-a h4 {
+  font-size: 14px; font-weight: 600; color: var(--cmdk-ink); margin: 12px 0 6px;
+}
+.cmdk-a blockquote { margin: 0 0 9px; padding-left: 12px; border-left: 2px solid var(--cmdk-acid); }
+.cmdk-a hr { border: 0; border-top: 1px solid var(--cmdk-hair); margin: 12px 0; }
+
+/* thinking. Squares, not dots, so the one animated thing in the palette still
+   belongs to a page with no round corners on it. */
+.cmdk-typing { display: inline-flex; gap: 5px; align-items: center; padding-left: 16px; }
+.cmdk-dot { width: 5px; height: 5px; background: var(--cmdk-acid); animation: cmdk-bounce 1.2s infinite ease-in-out; }
 .cmdk-dot:nth-child(2) { animation-delay: .15s; }
 .cmdk-dot:nth-child(3) { animation-delay: .3s; }
-@keyframes cmdk-bounce { 0%, 60%, 100% { transform: translateY(0); opacity: .5; } 30% { transform: translateY(-4px); opacity: 1; } }
+@keyframes cmdk-bounce { 0%, 60%, 100% { transform: translateY(0); opacity: .35; } 30% { transform: translateY(-4px); opacity: 1; } }
 
 /* footer */
 .cmdk-foot {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 10px 16px; border-top: 1px solid rgba(255,236,218,0.10);
-  font-size: 11px; color: #6e6358;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 10px 16px; border-top: 1px solid var(--cmdk-hair);
+  background: var(--cmdk-band);
+  font-family: var(--font-mono, monospace); font-size: 11px; color: var(--cmdk-faint);
 }
 .cmdk-foot-keys { display: flex; gap: 14px; align-items: center; }
 .cmdk-foot-keys span { display: inline-flex; align-items: center; gap: 5px; }
 .cmdk-foot kbd {
-  font-family: var(--font-mono, monospace); font-size: 10px; color: #9a8f84;
-  border: 1px solid rgba(255,236,218,0.14); border-radius: 4px; padding: 1px 5px;
+  font-family: inherit; font-size: 10px; color: var(--cmdk-dim);
+  border: 1px solid var(--cmdk-line); padding: 1px 5px;
 }
 
 /* scrollbar */
 .cmdk-body::-webkit-scrollbar { width: 8px; }
-.cmdk-body::-webkit-scrollbar-thumb { background: rgba(255,236,218,0.14); border-radius: 4px; }
+.cmdk-body::-webkit-scrollbar-thumb { background: var(--cmdk-line); }
 .cmdk-body::-webkit-scrollbar-track { background: transparent; }
 
 @media (max-width: 480px) {
-  .cmdk-trigger { right: 14px; bottom: 14px; }
+  .cmdk-trigger { right: 16px; bottom: 16px; }
   .cmdk-overlay { padding: 70px 12px 12px; }
   .cmdk-foot-keys span:not(:last-child) { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .cmdk, .cmdk-overlay, .cmdk-trigger { transition: opacity .2s ease; }
-  .cmdk-dot { animation: none; }
+  .cmdk-trigger:hover { transform: none; }
+  .cmdk-dot { animation: none; opacity: .6; }
 }
 
 
@@ -2122,8 +2234,12 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
     background: #fff !important;
     color: #000 !important;
   }
-  /* The floating chat launcher and any fixed page furniture are screen-only. */
-  .ai-chatbox-launcher,
+  /* The floating chat launcher and any fixed page furniture are screen-only.
+     `.ai-chatbox-launcher` is the class the launcher had before it became a
+     command palette, so this rule had stopped matching anything and the chip
+     was printing into the resume PDFs. Both palette classes are named now. */
+  .cmdk-trigger,
+  .cmdk-overlay,
   [data-print-hide] {
     display: none !important;
   }
