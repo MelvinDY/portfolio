@@ -1094,6 +1094,29 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 
 .te-home .h3-drow:focus-visible { outline: none; }
 
+/* The person row carries a face, so it takes a fourth track ahead of the
+   title. Greyscale by default: this page runs one accent and a colour
+   photograph at the top of the index would spend it. Warming the photo on
+   hover is this row's share of the feedback the others get from the accent
+   rule, and it rides filter and transform only. */
+.te-home .h3-drow-me { grid-template-columns: auto 1fr auto auto; }
+.te-home .h3-face {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  /* The face sits high in the source frame; a centred crop lands on the chin. */
+  object-position: center 22%;
+  filter: grayscale(1) contrast(1.05);
+  align-self: center;
+  transition: filter 0.45s var(--ease), transform 0.45s var(--ease);
+}
+.te-home .h3-drow-me:hover .h3-face,
+.te-home .h3-drow-me:focus-visible .h3-face {
+  filter: grayscale(0) contrast(1);
+  transform: scale(1.06);
+}
+
 /* Below 720px the meta drops under the destination so the title keeps its
    scale instead of being squeezed by a three-track row. */
 @media (max-width: 720px) {
@@ -1101,13 +1124,22 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
   .te-home .h3-drow { grid-template-columns: 1fr auto; row-gap: 5px; }
   .te-home .h3-dm { grid-column: 1; grid-row: 2; }
   .te-home .h3-darr { grid-row: 1 / span 2; align-self: center; }
+
+  /* The person row keeps its photo track here, so the two-line stack sits in
+     column 2 and the face spans both lines. Without the override the rule
+     above would send the meta to column 1 and park it under the photo. */
+  .te-home .h3-drow-me { grid-template-columns: auto 1fr auto; }
+  .te-home .h3-face { grid-row: 1 / span 2; width: 38px; height: 38px; }
+  .te-home .h3-drow-me .h3-dt,
+  .te-home .h3-drow-me .h3-dm { grid-column: 2; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .te-home .h3-drow::after,
   .te-home .h3-dt,
   .te-home .h3-dm,
-  .te-home .h3-darr { transition: none; }
+  .te-home .h3-darr,
+  .te-home .h3-face { transition: none; }
 }
 
 /* contents card — the index answers back when you hover a row. Needs real room
