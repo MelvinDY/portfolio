@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import DungeonDot from './dungeon-dot'
@@ -244,6 +245,33 @@ export default function TeHero() {
           {/* No ordinals. These are four kinds of destination, not four steps,
               and numbering them asserted a sequence that was never there. */}
           <nav className="h3-dir" aria-label="Quick links">
+            {/* This row leads because it answers a different question. The four
+                below it are things that were made; this one is who made them,
+                and a reader deciding where to go asks that first.
+
+                It is also the reason /about saw 20 views against the home
+                page's 211: the index is where this page hands out
+                destinations, and About was not one of them.
+
+                The photo is the only image in the list, which is the whole
+                differentiator. No badge, no colour, no NEW label. It ships
+                greyscale so it cannot fight the one-orange palette, and warms
+                on hover as this row's version of the accent rule the others
+                get. alt is empty on purpose: the link text already says the
+                name, and a screen reader does not need it twice. */}
+            <Link className="h3-drow h3-drow-me" href="/about" data-cursor="open ↗">
+              {/* Eager, not lazy, and not priority. The row sits inside the
+                  pinned hero so it is within the viewport from first paint,
+                  but it ships at opacity 0 and only fades in during act iii,
+                  which is exactly the case where a lazy image can arrive after
+                  the reader is already looking at the row. At 44px the
+                  optimised file is a couple of kilobytes. priority would add a
+                  preload and compete with the name, which is the real LCP. */}
+              <Image className="h3-face" src="/melvin.jpg" alt="" width={44} height={44} loading="eager" />
+              <span className="h3-dt">Melvin Yogiana</span>
+              <span className="h3-dm mono">who made this</span>
+              <span className="h3-darr" aria-hidden="true">↗</span>
+            </Link>
             <Link className="h3-drow" href="/projects/data" data-cursor="open ↗">
               <span className="h3-dt">Data Projects</span>
               <span className="h3-dm mono">4 case studies</span>

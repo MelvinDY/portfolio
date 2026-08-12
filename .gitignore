@@ -47,3 +47,4 @@ next-env.d.ts
 # agent skill scaffolding installed by `skills add` (vendor docs, not project source)
 .agents/
 .claude/
+claude_file/
