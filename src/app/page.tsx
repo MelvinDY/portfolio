@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useTeEffects } from './lib/use-te-effects'
 import { useHomeGsap } from './lib/use-home-gsap'
+import { useSmoothScroll } from './lib/use-smooth-scroll'
 import LightHeader from './components/light-header'
 import TeHero from './components/te-hero'
 import HomeTelemetry from './components/home-telemetry'
@@ -52,6 +53,10 @@ const SecHead = ({ name }: { name: string }) => (
 export default function HomePage() {
   useTeEffects()
   useHomeGsap()
+  /* Last, and deliberately: this runs in a passive effect, so every
+     ScrollTrigger on the page already exists by the time Lenis starts driving
+     the scroll position they read. */
+  useSmoothScroll()
 
   return (
     <div className="te-home">
@@ -69,42 +74,65 @@ export default function HomePage() {
           <div className="wrap">
             <SecHead name="about" />
             <div className="ab2-grid">
-              <h2 className="ab2-head" data-lines aria-label="Half analyst. Half engineer. Fully curious.">
+              {/* The third line used to be "Fully curious.", which said nothing
+                  about direction. Both halves are still true and both stay; the
+                  line that follows them now says which one is the destination.
+                  Every visible span here is aria-hidden for the clip reveal, so
+                  the aria-label is the only copy a screen reader gets and has to
+                  move with them. */}
+              <h2 className="ab2-head" data-lines aria-label="Half analyst. Half engineer. Pointed at data.">
                 <span className="lr" aria-hidden="true"><span className="lr-in">Half analyst.</span></span>
                 <span className="lr" aria-hidden="true"><span className="lr-in">Half engineer.</span></span>
-                <span className="lr" aria-hidden="true"><span className="lr-in ab2-it">Fully curious.</span></span>
+                <span className="lr" aria-hidden="true"><span className="lr-in ab2-it">Pointed at data.</span></span>
               </h2>
               <Ink words={ABOUT_INK} />
             </div>
+            {/* The commercial analytics work used to live four paragraphs deep
+                on /about, which meant the only paid data experience on the site
+                was invisible on the page most readers stop at. It leads /data
+                now. Scope stays inside what /about already publishes: vendor
+                names and the cloud, no client, fund, methodology or internal
+                product. */}
             <div className="mods" data-rise-group>
               <article className="mod">
                 <span className="mod-k">[ /data ]</span>
-                <p>SQL, Python (pandas / numpy), dbt and dashboards. I care about the boring parts: clean joins, sane definitions, and a number you can actually defend in a meeting.</p>
+                <p>Every weekday I turn LSEG and Bloomberg market data into models a firm reports on, with the pipelines running on Azure. SQL, Python, dbt. I care about the boring parts: clean joins, sane definitions, and a number you can actually defend in a meeting.</p>
               </article>
               <article className="mod">
                 <span className="mod-k">[ /software ]</span>
-                <p>TypeScript, React, Next.js, Node and Postgres. Five hackathons, a capstone, and a habit of shipping the demo before the deadline panic sets in.</p>
+                <p>TypeScript, React, Next.js, Node and Postgres. This is the half that lets me build the pipeline and then build the thing people read it in, instead of handing over an extract and hoping. Five hackathons taught me to ship.</p>
               </article>
               <article className="mod">
                 <span className="mod-k">[ /the_goal ]</span>
-                <p>A Data Analyst / Analytics Engineer seat in Sydney where I can own a question end-to-end, from the raw extract to the slide that changes a decision.</p>
+                <p>A Data Analyst / Analytics Engineer seat in Sydney, from the raw extract to the slide that changes a decision. The engineering is how I got here. The data is where I am going.</p>
               </article>
             </div>
+            {/* The rendered text is the real figure, not a zero placeholder.
+                use-te-effects derives the count-up target from data-count and
+                overwrites textContent on enter, so it never reads what ships
+                here. That means the animation is unchanged, and every state
+                before it fires — no JS, pre-hydration, print, a screenshot, a
+                scraper — now prints the number instead of four zeros.
+
+                Rows analysed is the figure this page can actually defend:
+                40,000 trending videos, 12,500 invoices, 1,147 subscriptions
+                and 104 matched pairs, all of them published on the case study
+                pages. The number it replaced could not be pointed at. */}
             <div className="rdout" data-rise>
               <div className="rd">
-                <span className="rd-v"><span data-count="8" data-suf="+">0</span></span>
+                <span className="rd-v"><span data-count="8" data-suf="+">8+</span></span>
                 <span className="rd-l mono">Projects shipped</span>
               </div>
               <div className="rd">
-                <span className="rd-v"><span data-count="4" data-suf="×">0</span></span>
+                <span className="rd-v"><span data-count="4" data-suf="×">4×</span></span>
                 <span className="rd-l mono">Hackathon awards</span>
               </div>
               <div className="rd">
-                <span className="rd-v"><span data-count="1.2" data-suf="M+">0</span></span>
+                <span className="rd-v"><span data-count="50" data-suf="k+">50k+</span></span>
                 <span className="rd-l mono">Rows analysed</span>
               </div>
               <div className="rd">
-                <span className="rd-v"><span data-count="26" data-pre="’">0</span></span>
+                <span className="rd-v"><span data-count="26" data-pre="’">’26</span></span>
                 <span className="rd-l mono">Grad year</span>
               </div>
             </div>
