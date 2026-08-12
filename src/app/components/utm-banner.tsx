@@ -3,6 +3,18 @@
 import { useSearchParams, usePathname } from 'next/navigation'
 import { useEffect, useRef, useState, Suspense } from 'react'
 
+/**
+ * One line of welcome for a visitor arriving with a utm_source we recognise.
+ * Shows once per session, dismissible, and never on a page it would only send
+ * the reader back to.
+ *
+ * Styling lives in globals.css under the floating-chrome block, next to the
+ * ⌘K palette, rather than in a string injected into <head> on first render.
+ * Both are mounted in the root layout and sit in opposite bottom corners of
+ * the same viewport, so they share one set of tokens: a surface cannot share
+ * a palette it cannot see.
+ */
+
 const STORAGE_KEY = 'utm_banner_dismissed_v1'
 
 const VARIANTS: Record<string, { label: string; message: string; cta?: { text: string; href: string } }> = {
@@ -22,109 +34,17 @@ const VARIANTS: Record<string, { label: string; message: string; cta?: { text: s
   },
 }
 
-const CSS = `
-  #utm-banner {
-    position: fixed;
-    bottom: 28px;
-    left: 28px;
-    z-index: 200;
-    width: 360px;
-    max-width: calc(100vw - 56px);
-    background: #09090b;
-    border: 1px solid rgba(255,255,255,0.11);
-    border-top: 2px solid #ff5e1f;
-    transform: translateY(calc(100% + 56px));
-    transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: transform;
-  }
-  #utm-banner.utm-visible {
-    transform: translateY(0);
-  }
-  #utm-banner.utm-hiding {
-    transform: translateY(calc(100% + 56px));
-    transition: transform 0.34s cubic-bezier(0.55, 0, 0.8, 0.2);
-  }
-  .utm-inner {
-    padding: 16px 18px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 11px;
-  }
-  .utm-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .utm-label {
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: #ff5e1f;
-  }
-  .utm-close {
-    background: none;
-    border: none;
-    padding: 14px;
-    margin: -14px -14px -14px 0;
-    cursor: pointer;
-    color: #5e5e68;
-    font-size: 14px;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.2s;
-    font-family: inherit;
-    min-width: 44px;
-    min-height: 44px;
-  }
-  .utm-close:hover { color: #9c9ca6; }
-  .utm-msg {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
-    font-size: 13px;
-    color: #9c9ca6;
-    line-height: 1.65;
-    margin: 0;
-  }
-  .utm-cta {
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 11.5px;
-    color: #ff5e1f;
-    letter-spacing: 0.04em;
-    text-decoration: none;
-    transition: opacity 0.2s;
-    display: inline-block;
-  }
-  .utm-cta:hover { opacity: 0.7; }
-  @media (max-width: 480px) {
-    #utm-banner { left: 16px; right: 16px; bottom: 16px; width: auto; max-width: none; }
-  }
-`
-
 function BannerInner() {
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const [source, setSource] = useState<string | null>(null)
   const [hiding, setHiding] = useState(false)
   const bannerRef = useRef<HTMLDivElement>(null)
-  const styleInjected = useRef(false)
 
   useEffect(() => {
     const utm = searchParams.get('utm_source')?.toLowerCase() ?? null
     if (!utm || !VARIANTS[utm]) return
     if (sessionStorage.getItem(STORAGE_KEY) === '1') return
-
-    if (!styleInjected.current) {
-      if (!document.getElementById('utm-banner-styles')) {
-        const s = document.createElement('style')
-        s.id = 'utm-banner-styles'
-        s.textContent = CSS
-        document.head.appendChild(s)
-      }
-      styleInjected.current = true
-    }
 
     setSource(utm)
 
