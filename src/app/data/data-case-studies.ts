@@ -16,11 +16,28 @@ export interface Method {
   output: string
 }
 
+/**
+ * Where a study's numbers came from, stated on the index rather than left for
+ * the reader to work out.
+ *
+ * Every case study already discloses this honestly, but the disclosures sit
+ * mid-page, which means a reader scanning the index has to guess. A reader who
+ * has to ask whether the data is real has already marked it down. Three of the
+ * four are live sources; labelling the one synthetic set next to them is what
+ * makes the other three credible.
+ */
+export interface Provenance {
+  label: string
+  /** False only for generated data. Drives the label's colour, not its wording. */
+  real: boolean
+}
+
 export interface DataEntry {
   id: string
   title: string
   /** What kind of work this is, in a few words. */
   sub: string
+  provenance: Provenance
   /** The headline figure, already formatted. */
   figure: string
   /** The claim the figure supports. Reads as a sentence after the figure. */
@@ -37,6 +54,7 @@ export const entries: DataEntry[] = [
     id: 'labour-market',
     title: 'Australian Labour Market Dashboard',
     sub: 'End to end pipeline on live ABS data',
+    provenance: { label: 'Live ABS API', real: true },
     figure: '80%',
     claim: 'of working men hold a full-time job. For women it is 57%.',
     blurb:
@@ -75,6 +93,7 @@ export const entries: DataEntry[] = [
     id: 'youtube',
     title: 'YouTube Trending Analytics',
     sub: 'Forensics on 40,000 trending videos',
+    provenance: { label: 'YouTube Data API, 40k rows', real: true },
     figure: '38 hrs',
     claim: 'is how long the average video survives on the Trending page before it vanishes.',
     blurb:
@@ -92,6 +111,7 @@ export const entries: DataEntry[] = [
     id: 'grocery',
     title: 'Woolworths vs Coles Price Analytics',
     sub: 'Same-day basket comparison',
+    provenance: { label: 'Live retailer APIs, one-day snapshot', real: true },
     figure: '$1.82',
     claim: 'separates a 50-item basket at the two retailers. Half of 104 matched products cost exactly the same.',
     blurb:
@@ -109,6 +129,7 @@ export const entries: DataEntry[] = [
     id: 'saas',
     title: 'SaaS Sales & Revenue Analytics',
     sub: 'Cohort retention from 12.5K invoices',
+    provenance: { label: 'Synthetic, seeded generator', real: false },
     figure: '37%',
     claim: 'of the discount-promo cohort was still a customer at month six. Neighbouring cohorts kept about 71%.',
     blurb:

@@ -18,6 +18,11 @@ export const saas: CaseStudyProps = {
     ['Role', 'Solo build and analysis'],
     ['Stack', 'dbt, DuckDB, SQL'],
     ['Source', '12.5K invoices, 1,147 subscriptions'],
+    /* The margin note below still does the explaining. This is the flag, in
+       the sidebar, above the fold, so nobody reads three findings before
+       learning what generated them. */
+    ['Data', 'Synthetic, seeded generator'],
+    ['Built', 'Generator, dbt models, cross-database macros'],
     ['Tests', '44 dbt data tests'],
   ],
   contents: [
@@ -27,7 +32,7 @@ export const saas: CaseStudyProps = {
     ['next', 'What is next'],
   ],
   links: [
-    { label: 'Source and dbt project', href: 'https://github.com/MelvinDY', primary: true },
+    { label: 'Source and dbt project', href: 'https://github.com/MelvinDY/saas-sales-analytics', primary: true },
   ],
   nextStudy: { href: '/projects/data/labour-market', title: 'Australian Labour Market Dashboard' },
   blocks: [
