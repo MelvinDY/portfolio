@@ -55,6 +55,9 @@ const Points = ({ items }: { items: string[] }) =>
     </ul>
   )
 
+/** Alpha-capable formats only. See purinSprites. */
+const SPRITE_RE = /\.(png|webp|avif|gif)$/i
+
 /**
  * Every cat in public/purin, read once at build.
  *
@@ -65,16 +68,41 @@ const Points = ({ items }: { items: string[] }) =>
  * An empty or missing folder is a normal state, not an error. The easter egg
  * simply is not wired up and the photo renders as a photo, which is what lets
  * this ship before the images do.
+ *
+ * JPEG is deliberately not on the list. These are cutouts thrown as confetti
+ * over a near-white page, so a sprite without an alpha channel is not a
+ * slightly worse sprite, it is an opaque rectangle tumbling across the
+ * screen. A JPEG cannot carry that alpha, and flattening one onto white at
+ * export is exactly how it goes wrong. Anything dropped here needs its
+ * background actually removed, in a format that can hold the hole.
+ *
+ * That rule bit once already: five .jpg cats went into the folder and the
+ * filter skipped every one, so the egg was silently inert with no error to
+ * find. Hence the warning below. Rejecting the file is right; rejecting it
+ * quietly is not.
  */
 function purinSprites(): string[] {
+  let files: string[]
   try {
-    return readdirSync(join(process.cwd(), 'public', 'purin'))
-      .filter(f => /\.(png|webp|gif)$/i.test(f))
-      .sort()
-      .map(f => `/purin/${f}`)
+    files = readdirSync(join(process.cwd(), 'public', 'purin'))
   } catch {
     return []
   }
+
+  const sprites = files.filter(f => SPRITE_RE.test(f))
+
+  if (process.env.NODE_ENV !== 'production') {
+    const skipped = files.filter(f => !SPRITE_RE.test(f) && /\.[a-z0-9]+$/i.test(f) && f !== '.gitkeep')
+    if (skipped.length > 0) {
+      console.warn(
+        `[purin] ignoring ${skipped.length} file(s) in public/purin that cannot carry ` +
+          `transparency: ${skipped.join(', ')}. Export as PNG or WebP with the ` +
+          `background removed, or they will not appear.`,
+      )
+    }
+  }
+
+  return sprites.sort().map(f => `/purin/${f}`)
 }
 
 export default function AboutTE() {
