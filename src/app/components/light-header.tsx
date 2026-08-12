@@ -86,14 +86,32 @@ export default function LightHeader({ active, overlay = false }: { active?: stri
           </Link>
         </nav>
 
+        {/* Both bars are placed in the same grid cell, so they share one centre
+            and the X is centred by construction.
+
+            The previous version stacked them in a flex column with gap-[5px]
+            and then converged them with a hardcoded ±3px, which only lands on
+            a cross if that 3px stays exactly half the gap plus the bar height.
+            Three separate utilities had to resolve for the shape to be right,
+            and when one of them did not the bars kept their rotation but not
+            their size, and left the button entirely. Here the closed state is
+            the offset and the open state is simply no offset, so the worst a
+            missing utility can do is a slightly wrong-looking bar in the right
+            place. */}
         <button
-          className="flex h-9 w-9 flex-col items-center justify-center gap-[5px] border border-[#14120F]/15 md:hidden"
+          className="grid h-9 w-9 place-items-center border border-[#14120F]/15 md:hidden"
           aria-label={open ? 'Close menu' : 'Open menu'}
           aria-expanded={open}
           onClick={() => setOpen(o => !o)}
         >
-          <span className={`block h-px w-4 bg-[#14120F] transition-transform ${open ? 'translate-y-[3px] rotate-45' : ''}`} />
-          <span className={`block h-px w-4 bg-[#14120F] transition-transform ${open ? '-translate-y-[3px] -rotate-45' : ''}`} />
+          <span
+            aria-hidden="true"
+            className={`col-start-1 row-start-1 h-px w-4 bg-[#14120F] transition-transform duration-300 ${open ? 'rotate-45' : '-translate-y-[3px]'}`}
+          />
+          <span
+            aria-hidden="true"
+            className={`col-start-1 row-start-1 h-px w-4 bg-[#14120F] transition-transform duration-300 ${open ? '-rotate-45' : 'translate-y-[3px]'}`}
+          />
         </button>
       </div>
 
