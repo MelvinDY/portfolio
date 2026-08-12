@@ -140,7 +140,7 @@ export function buildQueries(range: RangeSpec): StatQuery[] {
     {
       id: 'prev',
       title: 'Previous period totals',
-      note: 'The same fold over the window immediately before this one — this is what every "vs prev period" delta is measured against.',
+      note: 'The same fold over the window immediately before this one. This is what every "vs prev period" delta is measured against.',
       text: sql`
         WITH pv AS (
           SELECT visitor_id, count(*) AS c
@@ -165,14 +165,14 @@ export function buildQueries(range: RangeSpec): StatQuery[] {
     },
     {
       id: 'prevSeries',
-      title: 'Traffic — previous period',
+      title: 'Traffic, previous period',
       note: 'Identical SQL shifted one window back. It draws the dashed comparison line, index for index.',
       ...prevSeries,
     },
     {
       id: 'heatmap',
       title: 'Rhythm',
-      note: 'Views folded onto a weekday × hour grid. Sparse by nature — the shape is the point, not the totals.',
+      note: 'Views folded onto a weekday × hour grid. Sparse by nature: the shape is the point, not the totals.',
       text: sql`
         SELECT extract(dow  FROM ts AT TIME ZONE '${TZ}')::int AS dow,
                extract(hour FROM ts AT TIME ZONE '${TZ}')::int AS hour,
@@ -187,7 +187,7 @@ export function buildQueries(range: RangeSpec): StatQuery[] {
     {
       id: 'pages',
       title: 'Top pages',
-      note: 'Raw pageviews, not visitors — reloads and returns count. Paths are normalised at write time (query strings dropped, trailing slash stripped).',
+      note: 'Raw pageviews, not visitors, so reloads and returns count. Paths are normalised at write time (query strings dropped, trailing slash stripped).',
       text: sql`
         SELECT path AS x, count(*)::int AS y
         FROM events
@@ -218,7 +218,7 @@ export function buildQueries(range: RangeSpec): StatQuery[] {
     {
       id: 'countries',
       title: 'Countries',
-      note: 'Country comes from the edge request header, never from an IP lookup table — the IP itself is hashed and dropped.',
+      note: 'Country comes from the edge request header, never from an IP lookup table. The IP itself is hashed and dropped.',
       text: sql`
         SELECT country AS x, count(DISTINCT visitor_id)::int AS y
         FROM events
@@ -262,7 +262,7 @@ export function buildQueries(range: RangeSpec): StatQuery[] {
     {
       id: 'live',
       title: 'Reading right now',
-      note: 'Distinct visitors seen in the last five minutes. Ignores the selected range — "live" means live.',
+      note: 'Distinct visitors seen in the last five minutes. Ignores the selected range: "live" means live.',
       text: sql`
         SELECT count(DISTINCT visitor_id)::int AS n
         FROM events
@@ -291,27 +291,43 @@ export function buildQueries(range: RangeSpec): StatQuery[] {
  *
  * `visitor_id` is compared against a hash recomputed for the current request —
  * it is never sent to the browser, only the boolean it produces.
+ *
+ * `who` is the one piece of linkage the feed does expose: a number that says
+ * which of these rows are the same person walking the site, so the wire can
+ * draw a session as one stroke. It is a rank over the returned rows only, so
+ * it carries no meaning outside this payload and cannot be compared against
+ * another poll's numbers — and the hash it is derived from still never leaves
+ * the server.
  */
 export const FEED_QUERY = sql`
+  -- Narrowed first, then ranked: taking the window before the rank keeps who
+  -- numbered 1..n within the payload, so it cannot leak how many people were
+  -- on the site in the last 24 hours.
+  WITH recent AS (
+    SELECT ts, path, country, device, browser, referrer_host, visitor_id
+    FROM events
+    WHERE ts > now() - interval '24 hours'
+      AND event IS NULL
+    ORDER BY ts DESC
+    LIMIT $2::int
+  )
   -- The live count rides along as an uncorrelated scalar subquery: Postgres
   -- evaluates it once for the whole statement, so the wire and the header badge
   -- cost one round trip between them rather than two on every poll.
-  SELECT to_char(ts AT TIME ZONE '${TZ}', 'HH24:MI:SS') AS at,
-         extract(epoch FROM now() - ts)::int            AS age,
+  SELECT to_char(ts AT TIME ZONE '${TZ}', 'HH24:MI:SS')  AS at,
+         extract(epoch FROM now() - ts)::int             AS age,
          path,
          country,
          device,
          browser,
          referrer_host,
-         visitor_id = $1::text                          AS you,
+         visitor_id = $1::text                           AS you,
+         (dense_rank() OVER (ORDER BY visitor_id))::int  AS who,
          (SELECT count(DISTINCT visitor_id)::int
           FROM events
-          WHERE ts > now() - interval '5 minutes')      AS live
-  FROM events
-  WHERE ts > now() - interval '24 hours'
-    AND event IS NULL
+          WHERE ts > now() - interval '5 minutes')       AS live
+  FROM recent
   ORDER BY ts DESC
-  LIMIT $2::int
 `
 
 /**

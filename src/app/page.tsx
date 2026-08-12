@@ -3,20 +3,19 @@
 import Link from 'next/link'
 import { useTeEffects } from './lib/use-te-effects'
 import { useHomeGsap } from './lib/use-home-gsap'
-import TeHeader from './components/te-header'
+import { useSmoothScroll } from './lib/use-smooth-scroll'
+import LightHeader from './components/light-header'
 import TeHero from './components/te-hero'
-import TeCursor from './components/te-cursor'
 import HomeTelemetry from './components/home-telemetry'
 import ScrollProgress from './components/scroll-progress'
-import TeContactForm from './components/te-contact-form'
 
 type InkWord = { t: string; acid?: boolean }
 
 const ABOUT_INK: InkWord[] = [
-  { t: 'I’m' }, { t: 'a' }, { t: 'Computer' }, { t: 'Science' }, { t: 'student' },
-  { t: 'at' }, { t: 'UNSW' }, { t: 'who' }, { t: 'got' }, { t: 'hooked' }, { t: 'on' },
+  { t: 'I’m' }, { t: 'a' }, { t: 'Computer' }, { t: 'Science' }, { t: 'graduate' },
+  { t: 'from' }, { t: 'UNSW' }, { t: 'who' }, { t: 'got' }, { t: 'hooked' }, { t: 'on' },
   { t: 'the' }, { t: 'moment' }, { t: 'a' }, { t: 'chart' }, { t: 'makes' }, { t: 'a' },
-  { t: 'room' }, { t: 'go' }, { t: '“oh”', acid: true }, { t: '—' }, { t: 'so' },
+  { t: 'room' }, { t: 'go' }, { t: '“oh”,', acid: true }, { t: 'so' },
   { t: 'I' }, { t: 'wrangle' }, { t: 'data' }, { t: 'into' },
   { t: 'honest', acid: true }, { t: 'insight,', acid: true }, { t: 'and' },
   { t: 'build' }, { t: 'the' }, { t: 'software' }, { t: 'that' }, { t: 'puts' },
@@ -29,7 +28,9 @@ const Ink = ({ words }: { words: InkWord[] }) => (
       <span
         key={i}
         className={`iw${w.acid ? ' iw-acid' : ''}`}
-        data-fill={w.acid ? '#ff5e1f' : '#F2EAE0'}
+        /* A marker, not a colour: useHomeGsap resolves it against the live
+           theme when the scrub runs, so a hex cannot be baked in here. */
+        data-fill={w.acid ? 'acid' : undefined}
       >
         {w.t}{' '}
       </span>
@@ -37,24 +38,31 @@ const Ink = ({ words }: { words: InkWord[] }) => (
   </p>
 )
 
-const SecHead = ({ no, name, meta }: { no: string; name: string; meta: string }) => (
+/* Section marks carried a number, a name and a slash comment. The numbers
+   asserted a sequence that does not exist, since nobody reads a portfolio in
+   order and section four is not a consequence of section three, and five
+   labelled eyebrows on a five-section page is four more than the page can
+   carry. Name and rule only. */
+const SecHead = ({ name }: { name: string }) => (
   <div className="sh mono" data-rise>
-    <span className="sh-no">[ {no} ]</span>
-    <i className="sh-rule" />
     <span className="sh-name">{name}</span>
-    <i className="sh-rule sh-rule-s" />
-    <span className="sh-meta">{meta}</span>
+    <i className="sh-rule" />
   </div>
 )
 
 export default function HomePage() {
   useTeEffects()
   useHomeGsap()
+  /* Last, and deliberately: this runs in a passive effect, so every
+     ScrollTrigger on the page already exists by the time Lenis starts driving
+     the scroll position they read. */
+  useSmoothScroll()
 
   return (
     <div className="te-home">
-      <TeCursor />
-      <TeHeader />
+      {/* The header stays on the current shared one. The rest of this page is
+          back on the pre-redesign version, where the GSAP choreography ran. */}
+      <LightHeader overlay />
       <ScrollProgress />
 
       <main>
@@ -64,44 +72,67 @@ export default function HomePage() {
         {/* 01 — ABOUT */}
         <section id="about" className="sec">
           <div className="wrap">
-            <SecHead no="01" name="about" meta="//decoded" />
+            <SecHead name="about" />
             <div className="ab2-grid">
-              <h2 className="ab2-head" data-lines aria-label="Half analyst. Half engineer. Fully curious.">
+              {/* The third line used to be "Fully curious.", which said nothing
+                  about direction. Both halves are still true and both stay; the
+                  line that follows them now says which one is the destination.
+                  Every visible span here is aria-hidden for the clip reveal, so
+                  the aria-label is the only copy a screen reader gets and has to
+                  move with them. */}
+              <h2 className="ab2-head" data-lines aria-label="Half analyst. Half engineer. Pointed at data.">
                 <span className="lr" aria-hidden="true"><span className="lr-in">Half analyst.</span></span>
                 <span className="lr" aria-hidden="true"><span className="lr-in">Half engineer.</span></span>
-                <span className="lr" aria-hidden="true"><span className="lr-in ab2-it">Fully curious.</span></span>
+                <span className="lr" aria-hidden="true"><span className="lr-in ab2-it">Pointed at data.</span></span>
               </h2>
               <Ink words={ABOUT_INK} />
             </div>
+            {/* The commercial analytics work used to live four paragraphs deep
+                on /about, which meant the only paid data experience on the site
+                was invisible on the page most readers stop at. It leads /data
+                now. Scope stays inside what /about already publishes: vendor
+                names and the cloud, no client, fund, methodology or internal
+                product. */}
             <div className="mods" data-rise-group>
               <article className="mod">
                 <span className="mod-k">[ /data ]</span>
-                <p>SQL, Python (pandas / numpy), dbt and dashboards. I care about the boring parts — clean joins, sane definitions, and a number you can actually defend in a meeting.</p>
+                <p>Every weekday I turn LSEG and Bloomberg market data into models a firm reports on, with the pipelines running on Azure. SQL, Python, dbt. I care about the boring parts: clean joins, sane definitions, and a number you can actually defend in a meeting.</p>
               </article>
               <article className="mod">
                 <span className="mod-k">[ /software ]</span>
-                <p>TypeScript, React, Next.js, Node and Postgres. Five hackathons, a capstone, and a habit of shipping the demo before the deadline panic sets in.</p>
+                <p>TypeScript, React, Next.js, Node and Postgres. This is the half that lets me build the pipeline and then build the thing people read it in, instead of handing over an extract and hoping. Five hackathons taught me to ship.</p>
               </article>
               <article className="mod">
                 <span className="mod-k">[ /the_goal ]</span>
-                <p>A Data Analyst / Analytics Engineer seat in Sydney where I can own a question end-to-end — from the raw extract to the slide that changes a decision.</p>
+                <p>A Data Analyst / Analytics Engineer seat in Sydney, from the raw extract to the slide that changes a decision. The engineering is how I got here. The data is where I am going.</p>
               </article>
             </div>
+            {/* The rendered text is the real figure, not a zero placeholder.
+                use-te-effects derives the count-up target from data-count and
+                overwrites textContent on enter, so it never reads what ships
+                here. That means the animation is unchanged, and every state
+                before it fires — no JS, pre-hydration, print, a screenshot, a
+                scraper — now prints the number instead of four zeros.
+
+                Rows analysed is the figure this page can actually defend:
+                40,000 trending videos, 12,500 invoices, 1,147 subscriptions
+                and 104 matched pairs, all of them published on the case study
+                pages. The number it replaced could not be pointed at. */}
             <div className="rdout" data-rise>
               <div className="rd">
-                <span className="rd-v"><span data-count="8" data-suf="+">0</span></span>
+                <span className="rd-v"><span data-count="8" data-suf="+">8+</span></span>
                 <span className="rd-l mono">Projects shipped</span>
               </div>
               <div className="rd">
-                <span className="rd-v"><span data-count="4" data-suf="×">0</span></span>
+                <span className="rd-v"><span data-count="4" data-suf="×">4×</span></span>
                 <span className="rd-l mono">Hackathon awards</span>
               </div>
               <div className="rd">
-                <span className="rd-v"><span data-count="1.2" data-suf="M+">0</span></span>
+                <span className="rd-v"><span data-count="50" data-suf="k+">50k+</span></span>
                 <span className="rd-l mono">Rows analysed</span>
               </div>
               <div className="rd">
-                <span className="rd-v"><span data-count="26" data-pre="’">0</span></span>
+                <span className="rd-v"><span data-count="26" data-pre="’">’26</span></span>
                 <span className="rd-l mono">Grad year</span>
               </div>
             </div>
@@ -113,14 +144,13 @@ export default function HomePage() {
           <div className="hz-fade" aria-hidden="true" />
           <div className="hz-pin">
             <div className="wrap">
-              <SecHead no="02" name="work" meta="//read sideways" />
+              <SecHead name="work" />
             </div>
             <div className="hz-track" data-cursor="read →">
               <article className="hz-panel hz-intro">
                 <p className="hz-kick">[ the spread ]</p>
                 <h3 className="hz-state">Two desks,<br /><em>one brain.</em></h3>
-                <p className="hz-note">One desk asks the questions, the other ships the answers. Keep scrolling — the shelf reads sideways.</p>
-                <span className="hz-cue mono">scroll on →</span>
+                <p className="hz-note">One desk asks the questions, the other ships the answers. The shelf reads sideways.</p>
               </article>
               <Link className="hz-panel wk-card" href="/projects/data" data-cursor="open ↗">
                 <div className="wk-top mono">
@@ -128,7 +158,7 @@ export default function HomePage() {
                   <span>4 case studies</span>
                 </div>
                 <h3>Data<br />Projects</h3>
-                <p>Dashboards, pricing wars, trending-video forensics and a revenue pipeline — each written as a data story, not a README.</p>
+                <p>Dashboards, pricing wars, trending-video forensics and a revenue pipeline, each written as a data story, not a README.</p>
                 <span className="cardlink mono">enter the data desk <span className="arrow">↗</span></span>
               </Link>
               <Link className="hz-panel wk-card" href="/projects/software" data-cursor="open ↗">
@@ -153,18 +183,18 @@ export default function HomePage() {
         {/* 03 — RECOGNITION */}
         <section id="awards" className="sec">
           <div className="wrap">
-            <SecHead no="03" name="recognition" meta="//rooms where it landed" />
+            <SecHead name="recognition" />
           </div>
           <div className="marquee" aria-hidden="true">
             <div className="marquee-track">
-              <span>FIRST PLACE — CSESOC HACKATHON 2025</span><span className="m-dot">✶</span>
-              <span>UNIHACK 2026 — MOST FUN IDEA</span><span className="m-dot">✶</span>
-              <span>UNIHACK 2026 — BEST DESIGN</span><span className="m-dot">✶</span>
+              <span>FIRST PLACE, CSESOC HACKATHON 2025</span><span className="m-dot">✶</span>
+              <span>UNIHACK 2026, MOST FUN IDEA</span><span className="m-dot">✶</span>
+              <span>UNIHACK 2026, BEST DESIGN</span><span className="m-dot">✶</span>
               <span>UNSW INTERNATIONAL STUDENT AWARD</span><span className="m-dot">✶</span>
               <span>GOLDEN RUBBISH BIN AWARD</span><span className="m-dot">✶</span>
-              <span>FIRST PLACE — CSESOC HACKATHON 2025</span><span className="m-dot">✶</span>
-              <span>UNIHACK 2026 — MOST FUN IDEA</span><span className="m-dot">✶</span>
-              <span>UNIHACK 2026 — BEST DESIGN</span><span className="m-dot">✶</span>
+              <span>FIRST PLACE, CSESOC HACKATHON 2025</span><span className="m-dot">✶</span>
+              <span>UNIHACK 2026, MOST FUN IDEA</span><span className="m-dot">✶</span>
+              <span>UNIHACK 2026, BEST DESIGN</span><span className="m-dot">✶</span>
               <span>UNSW INTERNATIONAL STUDENT AWARD</span><span className="m-dot">✶</span>
               <span>GOLDEN RUBBISH BIN AWARD</span><span className="m-dot">✶</span>
             </div>
@@ -178,7 +208,7 @@ export default function HomePage() {
               </li>
               <li className="aw-row">
                 <span className="aw-yr2 mono">[ 2026 ]</span>
-                <div className="aw-t"><h4>Most Fun Idea &amp; Best Design</h4><p>UNIHACK 2026 · Peersuade — two category wins</p></div>
+                <div className="aw-t"><h4>Most Fun Idea &amp; Best Design</h4><p>UNIHACK 2026 · Peersuade, two category wins</p></div>
                 <span className="aw-tag2 mono">✶ double</span>
               </li>
               <li className="aw-row">
@@ -188,7 +218,7 @@ export default function HomePage() {
               </li>
               <li className="aw-row">
                 <span className="aw-yr2 mono">[ 2025 ]</span>
-                <div className="aw-t"><h4>Golden Rubbish Bin Award — Most Absurd Idea with Best Execution</h4><p>Terrible Ideas Hackathon · Stall Wars · the prize nobody plans for</p></div>
+                <div className="aw-t"><h4>Golden Rubbish Bin Award, Most Absurd Idea with Best Execution</h4><p>Terrible Ideas Hackathon · Stall Wars · the prize nobody plans for</p></div>
                 <span className="aw-tag2 mono">🗑 legend</span>
               </li>
             </ul>
@@ -198,7 +228,7 @@ export default function HomePage() {
         {/* 04 — TELEMETRY */}
         <section id="telemetry" className="sec">
           <div className="wrap">
-            <SecHead no="04" name="telemetry" meta="//the site measures itself" />
+            <SecHead name="telemetry" />
             <HomeTelemetry />
           </div>
         </section>
@@ -206,7 +236,7 @@ export default function HomePage() {
         {/* 05 — CONTACT */}
         <section id="contact" className="sec">
           <div className="wrap">
-            <SecHead no="05" name="contact" meta="//channel open" />
+            <SecHead name="contact" />
             <h2 className="ct-head" data-lines aria-label="Let's make the data talk.">
               <span className="lr" aria-hidden="true"><span className="lr-in">Let&apos;s make</span></span>
               <span className="lr" aria-hidden="true"><span className="lr-in">the data <em className="ct-talk">talk.</em></span></span>
@@ -214,7 +244,7 @@ export default function HomePage() {
             <p className="lead ct-lead" data-rise>
               Open to <span className="acid-text">Data Analyst</span>,{' '}
               <span className="acid-text">Analytics Engineer</span> &amp; graduate roles in
-              Sydney — and always up for a good problem. Pick a channel.
+              Sydney, and always up for a good problem. Pick a channel.
             </p>
             <div className="ct-grid" data-rise-group>
               <a className="ct-card" href="mailto:melvindarialyogiana@gmail.com" data-copy="melvindarialyogiana@gmail.com" data-cursor="copy">
@@ -233,7 +263,6 @@ export default function HomePage() {
                 <span className="ct-note mono">let&apos;s connect ↗</span>
               </a>
             </div>
-            <TeContactForm />
           </div>
         </section>
       </main>

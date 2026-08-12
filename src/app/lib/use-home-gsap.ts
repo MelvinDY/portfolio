@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { fillToken } from './theme-tokens'
 
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
@@ -64,7 +65,7 @@ export function useHomeGsap() {
 
       gsap.utils.toArray<HTMLElement>('[data-ink]').forEach((p) => {
         gsap.to(p.querySelectorAll<HTMLElement>('.iw'), {
-          color: (i, t) => (t as HTMLElement).dataset.fill || '#F2EAE0',
+          color: (i, t) => fillToken((t as HTMLElement).dataset.fill),
           stagger: 0.2, ease: 'none',
           scrollTrigger: { trigger: p, start: 'top 75%', end: 'top 25%', scrub: true },
         })

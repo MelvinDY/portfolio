@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     if (!limit.allowed) {
       return NextResponse.json(
-        { error: "You've sent a few messages already — please try again later, or email melvindarialyogiana@gmail.com directly." },
+        { error: "You've sent a few messages already. Please try again later, or email melvindarialyogiana@gmail.com directly." },
         { status: 429 }
       )
     }

@@ -4,10 +4,10 @@ import SoftwareProjects from "./software-projects"
 export const metadata: Metadata = {
   title: "Software Projects",
   description:
-    "Full-stack software built by Melvin Darial Yogiana — React, Next.js and TypeScript apps, hackathon projects, and team builds shipped under deadline.",
+    "Full-stack software built by Melvin Darial Yogiana, including React, Next.js and TypeScript apps, hackathon projects, and team builds shipped under deadline.",
   alternates: { canonical: "/projects/software" },
   openGraph: {
-    title: "Software Projects — Melvin Darial Yogiana",
+    title: "Software Projects, Melvin Darial Yogiana",
     description: "React, Next.js and TypeScript apps, hackathon projects, and team builds.",
     url: "/projects/software",
   },

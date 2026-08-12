@@ -1,69 +1,60 @@
 "use client"
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import DungeonDot from './dungeon-dot'
-import { usePulse } from '../lib/use-pulse'
+import { fillToken } from '../lib/theme-tokens'
+import { usePulse, type Pulse } from '../lib/use-pulse'
 
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
-const INK = '#F2EAE0'
-const ACID = '#ff5e1f'
+/* The manifesto is one claim made twice: something raw goes in, something
+   finished comes out. Grouping it into clauses rather than one flat word list
+   lets each half sit on its own line block, so the parallel reads as parallel
+   instead of wrapping wherever the viewport happens to break it.
 
-const MANIFESTO: { t: string; acid?: boolean }[] = [
-  { t: 'Raw' }, { t: 'data' }, { t: 'in' }, { t: '—' },
-  { t: 'decisions', acid: true }, { t: 'out.' },
-  { t: 'Ideas' }, { t: 'in' }, { t: '—' },
-  { t: 'shipped' }, { t: 'products', acid: true }, { t: 'out.' },
+   The dashes that used to stand between in and out are gone. They were their
+   own entries in this array, which meant the scrub spent a full stagger beat
+   inking a punctuation mark. ", then" carries the same turn and belongs to the
+   word before it. */
+const MANIFESTO: { t: string; acid?: boolean }[][] = [
+  [
+    { t: 'Raw' }, { t: 'data' }, { t: 'in,' }, { t: 'then' },
+    { t: 'decisions', acid: true }, { t: 'out.' },
+  ],
+  [
+    { t: 'Ideas' }, { t: 'in,' }, { t: 'then' },
+    { t: 'shipped' }, { t: 'products', acid: true }, { t: 'out.' },
+  ],
 ]
-
-/**
- * Per-line weight range for the pointer wave. The resting value is what the
- * name looks like with no pointer in the room — the wave is symmetric around
- * it, so the composition is never lighter or heavier overall, only alive.
- */
-const WEIGHT = {
-  sans: { rest: 600, near: 700, far: 520 },
-  serif: { rest: 400, near: 620, far: 330 },
-}
-/** How far the wave reaches, in px. */
-const WAVE_RADIUS = 260
 
 const chars = (word: string) =>
   word.split('').map((c, i) => (
     <span className="h3-ch" key={i}>{c}</span>
   ))
 
-/* The index rows, and what each one previews on hover. */
-const DIR = [
-  {
-    no: '№ 01', title: 'Data Projects', meta: '4 case studies',
-    href: '/projects/data', cursor: 'open ↗', kind: 'link' as const,
-    contents: ['Grocery pricing wars', 'Australian labour market', 'SaaS revenue pipeline', 'YouTube trending forensics'],
-  },
-  {
-    no: '№ 02', title: 'Software Projects', meta: '4 builds',
-    href: '/projects/software', cursor: 'open ↗', kind: 'link' as const,
-    contents: ['OnlyCode — hackathon winner', 'RateMyAccom', 'PPIA UNSW Ignite', 'Stall Wars'],
-  },
-  {
-    no: '№ 03', title: 'The Data Room', meta: 'live analytics',
-    href: '/stats', cursor: 'open ↗', kind: 'link' as const,
-    contents: [], // filled from the live pulse
-  },
-  {
-    no: '№ 04', title: 'Contact', meta: 'say hello',
-    href: '#contact', cursor: 'go ↓', kind: 'anchor' as const,
-    contents: ['melvindarialyogiana@gmail.com', 'github.com/MelvinDY', 'in/melvin-yogiana'],
-  },
-]
+const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`
+
+/**
+ * What the folio prints, and when.
+ *
+ * Three states rather than one string. Before the pulse lands there is nothing
+ * true to say, so it holds the volume mark. With nobody else on the site,
+ * "0 reading now" broadcasts an empty room, so the count is dropped and the
+ * day's views carry the line on their own. Only a real reader lights the dot.
+ */
+const folio = (p: Pulse | null) => {
+  if (!p) return 'Vol. 01'
+  const today = `${plural(p.viewsToday, 'view', 'views')} today`
+  return p.live > 0 ? `${plural(p.live, 'reading', 'reading')} now, ${today}` : today
+}
 
 export default function TeHero() {
   const scope = useRef<HTMLElement>(null)
-  const [preview, setPreview] = useState<number | null>(null)
   const pulse = usePulse()
 
   useIsomorphicLayoutEffect(() => {
@@ -74,6 +65,16 @@ export default function TeHero() {
     // mid-pin scroll position on reload
     window.history.scrollRestoration = 'manual'
     window.scrollTo(0, 0)
+
+    /* Hand the entrance over from CSS to GSAP.
+       The markup ships as data-intro="pending", which is the entrance's own
+       start state written in CSS, so the server-rendered paint already has the
+       name below its mask. Without it the name painted in place, hydration ran
+       and .from() snapped it down, and it animated back: a jumpy enter, and the
+       one thing on the page a reader is most likely to be looking at.
+       Flipping the attribute stops those rules matching. GSAP's inline start
+       values are visually identical, so the handover is invisible. */
+    el.dataset.intro = 'running'
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       el.classList.add('h3-static')
@@ -97,156 +98,105 @@ export default function TeHero() {
         scrollTrigger: {
           trigger: el,
           start: 'top top',
-          end: '+=260%',
+          /* The timeline runs about 9.7 units across three acts. At 260% that
+             was 2.6 viewports for all of it, so act i was over in roughly 700px
+             and the manifesto went past faster than it can be read. 400% gives
+             each act about a viewport and a half of travel. */
+          end: '+=400%',
           pin: true,
           scrub: 1,
           anticipatePin: 1,
+          // the scanline's travel is measured off hero height, so it has to be
+          // remeasured when the viewport changes
+          invalidateOnRefresh: true,
         },
         defaults: { ease: 'none' },
       })
 
       scrub
-        // act i — camera pushes through the name
-        .to('.h3-a', { scale: 1.55, opacity: 0, filter: 'blur(9px)', ease: 'power1.in', duration: 3 }, 0)
-        // the plate belongs to act i — it recedes as the manifesto takes over,
-        // leaving acts ii and iii on clean --bg. It lives outside .h3-stage, so
-        // it holds still while the name scales past it.
-        .to('.h3-plate, .h3-plate-acid, .h3-scrim', { opacity: 0, ease: 'power1.in', duration: 2 }, 2.2)
+        /* act i — camera pushes through the name.
+           The blur that used to ride along here is gone. A changing blur radius
+           cannot be composited, so every frame re-rasterised the layer holding
+           the display-size name, over a plate that is already doing
+           mix-blend-mode and two mask gradients. Scale and opacity alone are
+           pure compositor work and still read as a camera push. */
+        .to('.h3-a', { scale: 1.55, opacity: 0, ease: 'power1.in', duration: 3 }, 0)
         // act ii — manifesto fades in, words ink up one by one, then lifts away
         .fromTo('.h3-b', { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, ease: 'power1.out', duration: 1.2 }, 2.2)
-        .to('.h3-w', { color: (i, t) => (t as HTMLElement).dataset.fill || INK, duration: 0.35, stagger: 0.26 }, 3.0)
+        .to('.h3-w', { color: (i, t) => fillToken((t as HTMLElement).dataset.fill), duration: 0.35, stagger: 0.26 }, 3.0)
         .to('.h3-b', { opacity: 0, y: -70, ease: 'power1.in', duration: 1.2 }, 6.6)
         // act iii — the directory
         .set('.h3-c', { pointerEvents: 'auto' }, 7.3)
         .fromTo('.h3-c', { opacity: 0 }, { opacity: 1, ease: 'power1.out', duration: 0.9 }, 7.3)
         .fromTo('.h3-dirk', { y: 16, opacity: 0 }, { y: 0, opacity: 1, ease: 'power2.out', duration: 0.6 }, 7.4)
         .fromTo('.h3-drow', { y: 36, opacity: 0 }, { y: 0, opacity: 1, ease: 'power2.out', duration: 0.8, stagger: 0.3 }, 7.5)
-        // continuous instruments across the whole pin
-        .fromTo('.h3-scan', { top: '10%' }, { top: '90%', duration: 10 }, 0)
+        /* continuous instruments across the whole pin.
+           This travels on `y`, not `top`. `top` is a layout property, so the
+           old version ran layout and paint on every frame of the longest tween
+           on the page, for the entire duration of the pin. The distance is
+           measured off the hero rather than written as a percentage because a
+           percentage in a transform resolves against the element's own height,
+           and this element is 1px tall. */
+        .fromTo(
+          '.h3-scan',
+          { y: () => el.clientHeight * 0.1 },
+          { y: () => el.clientHeight * 0.9, duration: 10 },
+          0,
+        )
         // hold the directory settled before unpinning
         .to({}, { duration: 1.2 })
 
-      /* ── pointer instruments: name drift, weight wave, grid spotlight ──
-         All three ride one listener and one rAF. The wave reads each glyph's
-         box straight from the DOM rather than caching it, because GSAP is
-         already moving the name — a cached centre would be wrong by exactly
-         the drift we just applied. */
+      // pointer drift on the name
       if (window.matchMedia('(pointer:fine)').matches) {
         const xTo = gsap.quickTo('.h3-name', 'x', { duration: 0.9, ease: 'power3' })
         const yTo = gsap.quickTo('.h3-name', 'y', { duration: 0.9, ease: 'power3' })
-        const glyphs = Array.from(el.querySelectorAll<HTMLElement>('.h3-ch'))
-        const serif = new WeakMap<HTMLElement, boolean>()
-        glyphs.forEach(g => serif.set(g, !!g.closest('.h3-n2')))
-
-        let px = 0, py = 0, queued = false, waving = false
-
-        const restWeights = () => {
-          glyphs.forEach(g => {
-            const w = WEIGHT[serif.get(g) ? 'serif' : 'sans'].rest
-            g.style.fontVariationSettings = `"wght" ${w}`
-          })
-        }
-
-        const frame = () => {
-          queued = false
-          // Once the camera starts pushing through the name the glyph boxes are
-          // mid-scale and the wave stops meaning anything — settle and stand down.
-          const inActI = window.scrollY < window.innerHeight * 0.35
-          if (!inActI) {
-            if (waving) { restWeights(); waving = false }
-            return
-          }
-          waving = true
-          for (const g of glyphs) {
-            const r = g.getBoundingClientRect()
-            const dx = px - (r.left + r.width / 2)
-            const dy = py - (r.top + r.height / 2)
-            const d = Math.min(Math.hypot(dx, dy) / WAVE_RADIUS, 1)
-            const falloff = 1 - d * d // eased, so the crest is broad and the tail flat
-            const { near, far } = WEIGHT[serif.get(g) ? 'serif' : 'sans']
-            g.style.fontVariationSettings = `"wght" ${Math.round(far + (near - far) * falloff)}`
-          }
-        }
-
         const onMove = (e: PointerEvent) => {
-          px = e.clientX
-          py = e.clientY
-          xTo(((px / window.innerWidth) - 0.5) * 26)
-          yTo(((py / window.innerHeight) - 0.5) * 16)
-          el.style.setProperty('--gx', `${px}px`)
-          el.style.setProperty('--gy', `${py}px`)
-          el.classList.add('spot-on')
-          if (!queued) { queued = true; requestAnimationFrame(frame) }
+          xTo(((e.clientX / window.innerWidth) - 0.5) * 26)
+          yTo(((e.clientY / window.innerHeight) - 0.5) * 16)
         }
-        const onLeave = () => {
-          el.classList.remove('spot-on')
-          restWeights()
-          waving = false
-        }
-
-        restWeights()
         window.addEventListener('pointermove', onMove)
-        document.addEventListener('pointerleave', onLeave)
-        return () => {
-          window.removeEventListener('pointermove', onMove)
-          document.removeEventListener('pointerleave', onLeave)
-          glyphs.forEach(g => { g.style.fontVariationSettings = '' })
-        }
+        return () => window.removeEventListener('pointermove', onMove)
       }
     }, scope)
 
     return () => ctx.revert()
   }, [])
 
-  /* The live plate. Falls back to the fixed coordinates until the pulse lands,
-     so the HUD never renders empty and never shifts. */
-  const hudLive = pulse
-    ? `Vol. 01 · ${pulse.live} reading now · ${pulse.viewsToday} ${pulse.viewsToday === 1 ? 'view' : 'views'} today`
-    : 'Vol. 01 · 33.8688°S — 151.2093°E'
-
-  const place = pulse?.city ?? (pulse?.country ? regionName(pulse.country) : null)
-  const greeting = pulse
-    ? `reader № ${pulse.rank} today${place ? ` — hello, ${place} 👋` : ''}`
-    : ''
-
-  const previewItems = (i: number) => {
-    if (i !== 2) return DIR[i].contents
-    if (!pulse) return ['live from this site’s own pipeline']
-    return [
-      `${pulse.live} reading right now`,
-      `${pulse.viewsToday} views today`,
-      `${pulse.visitorsToday} visitors today`,
-    ]
-  }
-
   return (
-    <section className="hero3" id="top" ref={scope}>
-      {/* instruments — the plate sits first so DOM order puts it under everything */}
-      <div className="h3-plate" aria-hidden="true" />
-      <div className="h3-plate-acid" aria-hidden="true" />
-      <div className="h3-scrim" aria-hidden="true" />
+    <section className="hero3" id="top" ref={scope} data-intro="pending">
+      {/* instruments */}
       <div className="h3-grid" aria-hidden="true" />
-      <div className="h3-spot" aria-hidden="true" />
       <div className="h3-scan" aria-hidden="true" />
       <i className="h3-tick tl" aria-hidden="true" />
       <i className="h3-tick tr" aria-hidden="true" />
       <i className="h3-tick bl" aria-hidden="true" />
       <i className="h3-tick br" aria-hidden="true" />
 
-      {/* folio */}
+      {/* Folio. The bottom mark used to print the Sydney coordinates, which is
+          decoration wearing the costume of data, and the bottom right told the
+          reader to scroll, which they were about to do anyway. The strip now
+          reports what the site actually knows about the room it is in.
+
+          The dot element is always rendered and only changes class when the
+          pulse lands, so the entrance timeline never loses a target mid-flight.
+          Still aria-hidden: this is folio furniture, and a number that changes
+          under a reader is worse than silence. */}
       <div className="h3-hud mono" aria-hidden="true">
-        <span className="h3-hud-tl">Melvin Yogiana — Portfolio</span>
+        <span className="h3-hud-tl">Melvin Yogiana, Portfolio</span>
         <span className="h3-hud-bl">
-          {pulse && <i className="h3-hud-dot" />}
-          {hudLive}
+          <i className={`h3-hud-dot${pulse && pulse.live > 0 ? ' on' : ''}`} />
+          {folio(pulse)}
         </span>
-        <span className="h3-hud-br">scroll to read ↓</span>
       </div>
 
       <div className="h3-stage">
         {/* act i — the name */}
         <div className="h3-scene h3-a">
-          <p className="h3-pre mono">[ data analyst · full-stack dev — sydney, au ]</p>
+          {/* Both halves stay on the page. What changed is that the top of it
+              now names a direction instead of two co-equal job titles, so a
+              reader hiring an analyst does not have to reach /about to find out
+              whether the data work is the destination or the current phase. */}
+          <p className="h3-pre mono">[ data analyst · analytics engineer, sydney au ]</p>
           <h1 className="h3-name">
             {/*
               The visible name is split per-character for the GSAP reveal and
@@ -262,22 +212,28 @@ export default function TeHero() {
             </span>
           </h1>
           <p className="h3-sub mono">
-            Data Analyst <span className="acid-text">·</span> Full-Stack Developer <span className="acid-text">·</span> UNSW Computer Science
+            Data Analyst <span className="acid-text">·</span> Analytics Engineer <span className="acid-text">·</span> builds his own pipelines
           </p>
-          {/* Height is reserved whether or not the pulse ever lands. */}
-          <p className={`h3-you mono${pulse ? ' on' : ''}`} aria-live="polite">{greeting}</p>
         </div>
 
         {/* act ii — the manifesto */}
         <div className="h3-scene h3-b">
           <p className="h3-man">
-            {MANIFESTO.map((w, i) => (
-              <span
-                key={i}
-                className={`h3-w${w.acid ? ' h3-w-acid' : ''}`}
-                data-fill={w.acid ? ACID : INK}
-              >
-                {w.t}{' '}
+            {MANIFESTO.map((clause, ci) => (
+              /* One block per clause. The .h3-w spans stay in document order
+                 inside it, so the scrub's stagger is unchanged. */
+              <span className="h3-mline" key={ci}>
+                {clause.map((w, i) => (
+                  <span
+                    key={i}
+                    className={`h3-w${w.acid ? ' h3-w-acid' : ''}`}
+                    /* A marker, not a colour: the tween resolves it against the
+                       live theme, so a hex cannot be baked in at render time. */
+                    data-fill={w.acid ? 'acid' : undefined}
+                  >
+                    {w.t}{' '}
+                  </span>
+                ))}
               </span>
             ))}
           </p>
@@ -286,50 +242,59 @@ export default function TeHero() {
         {/* act iii — the index */}
         <div className="h3-scene h3-c">
           <p className="h3-dirk mono">[ the index ]</p>
-          <nav className="h3-dir" aria-label="Quick links" onMouseLeave={() => setPreview(null)}>
-            {DIR.map((row, i) => {
-              const props = {
-                className: 'h3-drow',
-                'data-cursor': row.cursor,
-                onMouseEnter: () => setPreview(i),
-                onFocus: () => setPreview(i),
-                onBlur: () => setPreview(null),
-                children: (
-                  <>
-                    <span className="h3-dno mono">{row.no}</span>
-                    <span className="h3-dt">{row.title}</span>
-                    <span className="h3-dm mono">{row.meta}</span>
-                    <span className="h3-darr">↗</span>
-                  </>
-                ),
-              }
-              return row.kind === 'link'
-                ? <Link key={row.no} href={row.href} {...props} />
-                : <a key={row.no} href={row.href} {...props} />
-            })}
-          </nav>
+          {/* No ordinals. These are four kinds of destination, not four steps,
+              and numbering them asserted a sequence that was never there. */}
+          <nav className="h3-dir" aria-label="Quick links">
+            {/* This row leads because it answers a different question. The four
+                below it are things that were made; this one is who made them,
+                and a reader deciding where to go asks that first.
 
-          {/* contents card — the index gets a table of contents on hover */}
-          <aside className={`h3-prev mono${preview != null ? ' on' : ''}`} aria-hidden="true">
-            {preview != null && (
-              <>
-                <span className="h3-prev-k">[ {DIR[preview].no.toLowerCase()} / contents ]</span>
-                <ul>
-                  {previewItems(preview).map(item => <li key={item}>{item}</li>)}
-                </ul>
-              </>
-            )}
-          </aside>
+                It is also the reason /about saw 20 views against the home
+                page's 211: the index is where this page hands out
+                destinations, and About was not one of them.
+
+                The photo is the only image in the list, which is the whole
+                differentiator. No badge, no colour, no NEW label. It ships
+                greyscale so it cannot fight the one-orange palette, and warms
+                on hover as this row's version of the accent rule the others
+                get. alt is empty on purpose: the link text already says the
+                name, and a screen reader does not need it twice. */}
+            <Link className="h3-drow h3-drow-me" href="/about" data-cursor="open ↗">
+              {/* Eager, not lazy, and not priority. The row sits inside the
+                  pinned hero so it is within the viewport from first paint,
+                  but it ships at opacity 0 and only fades in during act iii,
+                  which is exactly the case where a lazy image can arrive after
+                  the reader is already looking at the row. At 44px the
+                  optimised file is a couple of kilobytes. priority would add a
+                  preload and compete with the name, which is the real LCP. */}
+              <Image className="h3-face" src="/melvin.jpg" alt="" width={44} height={44} loading="eager" />
+              <span className="h3-dt">Melvin Yogiana</span>
+              <span className="h3-dm mono">who made this</span>
+              <span className="h3-darr" aria-hidden="true">↗</span>
+            </Link>
+            <Link className="h3-drow" href="/projects/data" data-cursor="open ↗">
+              <span className="h3-dt">Data Projects</span>
+              <span className="h3-dm mono">4 case studies</span>
+              <span className="h3-darr" aria-hidden="true">↗</span>
+            </Link>
+            <Link className="h3-drow" href="/projects/software" data-cursor="open ↗">
+              <span className="h3-dt">Software Projects</span>
+              <span className="h3-dm mono">4 builds</span>
+              <span className="h3-darr" aria-hidden="true">↗</span>
+            </Link>
+            <Link className="h3-drow" href="/stats" data-cursor="open ↗">
+              <span className="h3-dt">The Data Room</span>
+              <span className="h3-dm mono">live analytics</span>
+              <span className="h3-darr" aria-hidden="true">↗</span>
+            </Link>
+            <a className="h3-drow" href="#contact" data-cursor="go ↓">
+              <span className="h3-dt">Contact</span>
+              <span className="h3-dm mono">say hello</span>
+              <span className="h3-darr h3-darr-down" aria-hidden="true">↓</span>
+            </a>
+          </nav>
         </div>
       </div>
     </section>
   )
-}
-
-function regionName(code: string) {
-  try {
-    return new Intl.DisplayNames(['en'], { type: 'region' }).of(code) ?? code
-  } catch {
-    return code
-  }
 }

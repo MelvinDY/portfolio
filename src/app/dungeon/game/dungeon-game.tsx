@@ -50,11 +50,11 @@ const BARKS: Record<string, string> = { slash: 'bram-bark', ember: 'nyx-bark', l
 // doris has opinions and a good memory — all of this is true
 const FACTS = [
   "the dev won FIRST PLACE at the csesoc 2025 flagship hackathon. built a real-time coding platform called onlycode. i don't know what that means but he seemed pleased.",
-  "unihack 2026 — his team's game 'peersuade' took home BOTH 'most fun idea' and 'best design'. double trophies. we don't have room for trophies here.",
+  "unihack 2026: his team's game 'peersuade' took home BOTH 'most fun idea' and 'best design'. double trophies. we don't have room for trophies here.",
   "he once won a golden rubbish bin at the terrible ideas hackathon. ON PURPOSE. the game was called stall wars. he's weirdly proud of it.",
   "unsw computer science, sydney town. came all the way from indonesia to stare at charts.",
   "half analyst, half engineer, he says. sql and dashboards with one hand, react and node with the other.",
-  "the stats page upstairs? built the whole analytics pipeline himself — tracker, api, database. trusts no third parties. respect.",
+  "the stats page upstairs? built the whole analytics pipeline himself: tracker, api, database. trusts no third parties. respect.",
   "he reckons a good chart should make a room go 'oh'. i've seen it happen once. unsettling.",
   "this entire dungeon hides behind a nine-pixel dot on his name. he genuinely thought nobody would find it. yet here you are, drinking my ale.",
 ]
@@ -454,7 +454,7 @@ export default function DungeonGame() {
     mountedRef.current = true
     const mount = mountRef.current
     if (!mount) return
-    document.title = '??? — you found something'
+    document.title = '???, you found something'
     const prevOverflow = document.documentElement.style.overflow
     document.documentElement.style.overflow = 'hidden'
 
@@ -1156,7 +1156,7 @@ export default function DungeonGame() {
         g.combatRoom = null
         g.pending = null
         for (const h of heroes()) h.hp = Math.min(h.maxHp, h.hp + 6)
-        log('room cleared — the party catches its breath (+6 hp).')
+        log('room cleared, the party catches its breath (+6 hp).')
       }
       g.busy = false
       refreshHi()
@@ -1179,7 +1179,7 @@ export default function DungeonGame() {
       u.acted = false
     }
     const n = engaged().length
-    log(`steel out — ${n} foe${n === 1 ? '' : 's'} engage${n === 1 ? 's' : ''}!`)
+    log(`steel out: ${n} foe${n === 1 ? '' : 's'} engage${n === 1 ? 's' : ''}!`)
     if (engaged().some((f) => f.sprite === 'boss')) playVoice('boss-roar', true)
     // frame the fight
     const t = threeRef.current
@@ -1299,7 +1299,7 @@ export default function DungeonGame() {
       u.cooldowns = u.cooldowns.map((c) => Math.max(0, c - 1))
     }
     g.busy = false
-    log(`round ${g.round} — your move.`)
+    log(`round ${g.round}, your move.`)
     refreshHi()
     bump()
   }
@@ -1338,7 +1338,7 @@ export default function DungeonGame() {
     void tween(1200, (k) => {
       revealKRef.current = k
     })
-    log('the inn door groans open — torches gutter awake in the dark below.')
+    log('the inn door groans open, torches gutter awake in the dark below.')
     playSfx('sfx-door', 0.7)
     bump()
   }
@@ -1402,11 +1402,11 @@ export default function DungeonGame() {
 
   function openPuck() {
     playVoice('puck-user', true)
-    say(PUCK, "GAH— a user?! Nobody ever finds this place. I'm Puck. I haunt the hidden dev dungeon. The beast in the far vault holds the place together — or apart, hard to say.", [
+    say(PUCK, "GAH, a user?! Nobody ever finds this place. I'm Puck. I haunt the hidden dev dungeon. The beast in the far vault holds the place together, or apart, hard to say.", [
       {
         label: '“what is this place?”',
         act: () =>
-          say(PUCK, "An easter egg. The résumé is upstairs — down here it's just me, some slimes, and a beast made of legacy code. Clear the vault and the dungeon is yours.", [farewell()]),
+          say(PUCK, "An easter egg. The résumé is upstairs. Down here it's just me, some slimes, and a beast made of legacy code. Clear the vault and the dungeon is yours.", [farewell()]),
       },
       {
         label: '“any advice before I fight?”',
@@ -1415,7 +1415,7 @@ export default function DungeonGame() {
           if (!g.gaveGift) {
             g.gaveGift = true
             g.inventory.push({ id: 'gift', name: 'cold brew of vigor', desc: 'heals your most wounded hero for 10', pos: null, effect: 'heal' })
-            text += " Here — cold brew. I made it during standup. It's barely cursed."
+            text += " Here, cold brew. I made it during standup. It's barely cursed."
           }
           say(PUCK, text, [farewell()])
         },
@@ -1424,7 +1424,7 @@ export default function DungeonGame() {
         label: '“are you… a ghost?”',
         act: () => {
           playVoice('puck-ship')
-          say(PUCK, "An unmerged feature branch, technically. Four thousand commits behind main and full of regrets. Don't be like me, traveler — ship.", [farewell()])
+          say(PUCK, "An unmerged feature branch, technically. Four thousand commits behind main and full of regrets. Don't be like me, traveler. Ship.", [farewell()])
         },
       },
       farewell(),
@@ -1440,12 +1440,12 @@ export default function DungeonGame() {
 
   function openDoris() {
     playVoice('doris-welcome', true)
-    say(DORIS, "welcome to the rubber duck inn — last warm room before the dungeon. the dev built this whole place, y'know. what'll it be?", [
+    say(DORIS, "welcome to the rubber duck inn, last warm room before the dungeon. the dev built this whole place, y'know. what'll it be?", [
       { label: '“tell me about the dev.”', act: nextFact },
       {
         label: '“who should I take below?”',
         act: () =>
-          say(DORIS, 'the witch burns from afar, the ranger reaches further, the cleric keeps you standing. no wrong pick, love — only different funerals avoided.', [
+          say(DORIS, 'the witch burns from afar, the ranger reaches further, the cleric keeps you standing. no wrong pick, love, only different funerals avoided.', [
             farewell(),
           ]),
       },
@@ -1772,7 +1772,7 @@ export default function DungeonGame() {
                 key={ab.id}
                 className={`dgn-ab${g.pending === i ? ' armed' : ''}${usable ? '' : ' off'}`}
                 onClick={() => abilityClick(i)}
-                title={`${ab.name} — ${ab.desc || 'attack'} · range ${ab.range}${ab.dmg ? ` · ${ab.dmg} dmg` : ''}${ab.heal ? ` · heals ${ab.heal}` : ''}${ab.shield ? ` · ${ab.shield} shield` : ''}`}
+                title={`${ab.name}: ${ab.desc || 'attack'} · range ${ab.range}${ab.dmg ? ` · ${ab.dmg} dmg` : ''}${ab.heal ? ` · heals ${ab.heal}` : ''}${ab.shield ? ` · ${ab.shield} shield` : ''}`}
               >
                 <span className="dgn-ab-name">{ab.name}</span>
                 <span className="dgn-ab-meta">
@@ -1821,7 +1821,7 @@ export default function DungeonGame() {
           )}
           {popupUnit.recruit && heroes().length >= 2 && <span className="dgn-pop-note">the party is full.</span>}
           {popupUnit.faction === 'foe' && g.mode === 'explore' && !engageable && (
-            <span className="dgn-pop-note">too far away to engage — move closer.</span>
+            <span className="dgn-pop-note">too far away to engage. move closer.</span>
           )}
           <div className="dgn-pop-row">
             {popupUnit.faction === 'foe' && g.mode === 'explore' && engageable && (
@@ -1865,7 +1865,7 @@ export default function DungeonGame() {
             <b>dungeon cleared</b>
             <p>
               you hovered a suspicious dot, befriended a ghost, and slew a beast made of legacy code.
-              this has been the hidden dev dungeon — thanks for playing. <span className="acid">— m</span>
+              this has been the hidden dev dungeon. thanks for playing. <span className="acid">- m</span>
             </p>
             <div className="dgn-dlg-choices">
               <button className="dgn-btn acid" onClick={exitToPortfolio}>return to the portfolio</button>
@@ -1899,7 +1899,7 @@ export default function DungeonGame() {
       {/* intro hint */}
       {!g.introSeen && (
         <div className="dgn-hint">
-          <b>mouse only.</b> click — move &amp; talk · drag — pan · wheel — zoom · right-click — inspect. recruit a companion at a table before you descend — and doris behind the bar keeps facts about the dev on tap.
+          <b>mouse only.</b> click to move &amp; talk · drag to pan · wheel to zoom · right-click to inspect. recruit a companion at a table before you descend, and doris behind the bar keeps facts about the dev on tap.
         </div>
       )}
 

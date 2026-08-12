@@ -46,7 +46,7 @@ export default function TeContactForm() {
       setForm(EMPTY)
       setStatus('sent')
     } catch {
-      setError('Network error — please email me directly.')
+      setError('Network error. Please email me directly.')
       setStatus('error')
     }
   }
@@ -124,7 +124,7 @@ export default function TeContactForm() {
         </button>
 
         <p className="ct-status mono" role="status" aria-live="polite">
-          {status === 'sent' && <span className="ct-ok">✓ sent — thanks, I&apos;ll be in touch.</span>}
+          {status === 'sent' && <span className="ct-ok">✓ sent, thanks, I&apos;ll be in touch.</span>}
           {status === 'error' && <span className="ct-err">{error}</span>}
         </p>
       </div>
