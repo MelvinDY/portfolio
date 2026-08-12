@@ -97,17 +97,29 @@ export default function TeHero() {
         scrollTrigger: {
           trigger: el,
           start: 'top top',
-          end: '+=260%',
+          /* The timeline runs about 9.7 units across three acts. At 260% that
+             was 2.6 viewports for all of it, so act i was over in roughly 700px
+             and the manifesto went past faster than it can be read. 400% gives
+             each act about a viewport and a half of travel. */
+          end: '+=400%',
           pin: true,
           scrub: 1,
           anticipatePin: 1,
+          // the scanline's travel is measured off hero height, so it has to be
+          // remeasured when the viewport changes
+          invalidateOnRefresh: true,
         },
         defaults: { ease: 'none' },
       })
 
       scrub
-        // act i — camera pushes through the name
-        .to('.h3-a', { scale: 1.55, opacity: 0, filter: 'blur(9px)', ease: 'power1.in', duration: 3 }, 0)
+        /* act i — camera pushes through the name.
+           The blur that used to ride along here is gone. A changing blur radius
+           cannot be composited, so every frame re-rasterised the layer holding
+           the display-size name, over a plate that is already doing
+           mix-blend-mode and two mask gradients. Scale and opacity alone are
+           pure compositor work and still read as a camera push. */
+        .to('.h3-a', { scale: 1.55, opacity: 0, ease: 'power1.in', duration: 3 }, 0)
         // act ii — manifesto fades in, words ink up one by one, then lifts away
         .fromTo('.h3-b', { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, ease: 'power1.out', duration: 1.2 }, 2.2)
         .to('.h3-w', { color: (i, t) => fillToken((t as HTMLElement).dataset.fill), duration: 0.35, stagger: 0.26 }, 3.0)
@@ -117,8 +129,19 @@ export default function TeHero() {
         .fromTo('.h3-c', { opacity: 0 }, { opacity: 1, ease: 'power1.out', duration: 0.9 }, 7.3)
         .fromTo('.h3-dirk', { y: 16, opacity: 0 }, { y: 0, opacity: 1, ease: 'power2.out', duration: 0.6 }, 7.4)
         .fromTo('.h3-drow', { y: 36, opacity: 0 }, { y: 0, opacity: 1, ease: 'power2.out', duration: 0.8, stagger: 0.3 }, 7.5)
-        // continuous instruments across the whole pin
-        .fromTo('.h3-scan', { top: '10%' }, { top: '90%', duration: 10 }, 0)
+        /* continuous instruments across the whole pin.
+           This travels on `y`, not `top`. `top` is a layout property, so the
+           old version ran layout and paint on every frame of the longest tween
+           on the page, for the entire duration of the pin. The distance is
+           measured off the hero rather than written as a percentage because a
+           percentage in a transform resolves against the element's own height,
+           and this element is 1px tall. */
+        .fromTo(
+          '.h3-scan',
+          { y: () => el.clientHeight * 0.1 },
+          { y: () => el.clientHeight * 0.9, duration: 10 },
+          0,
+        )
         // hold the directory settled before unpinning
         .to({}, { duration: 1.2 })
 
@@ -168,7 +191,11 @@ export default function TeHero() {
       <div className="h3-stage">
         {/* act i — the name */}
         <div className="h3-scene h3-a">
-          <p className="h3-pre mono">[ data analyst · full-stack dev, sydney au ]</p>
+          {/* Both halves stay on the page. What changed is that the top of it
+              now names a direction instead of two co-equal job titles, so a
+              reader hiring an analyst does not have to reach /about to find out
+              whether the data work is the destination or the current phase. */}
+          <p className="h3-pre mono">[ data analyst · analytics engineer, sydney au ]</p>
           <h1 className="h3-name">
             {/*
               The visible name is split per-character for the GSAP reveal and
@@ -184,7 +211,7 @@ export default function TeHero() {
             </span>
           </h1>
           <p className="h3-sub mono">
-            Data Analyst <span className="acid-text">·</span> Full-Stack Developer <span className="acid-text">·</span> UNSW Computer Science
+            Data Analyst <span className="acid-text">·</span> Analytics Engineer <span className="acid-text">·</span> builds his own pipelines
           </p>
         </div>
 

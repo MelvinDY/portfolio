@@ -22,6 +22,36 @@ body {
   scroll-behavior: smooth;
 }
 
+/* ─── Lenis ───
+   Required by the smooth-scroll layer on the home page (use-smooth-scroll.ts).
+   These classes are set by Lenis itself, so on every other page nothing here
+   matches and scrolling stays entirely native.
+
+   scroll-behavior has to go back to auto while Lenis is driving. The rules
+   above set it on `*`, which means the browser would also be running its own
+   smooth-scroll animation on top of Lenis's, and two easings fighting over one
+   scroll position is precisely the jitter this is meant to remove. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+/* Keyed on `.lenis`, which the library sets for as long as it is mounted, not
+   on `.lenis-smooth`: that class does not exist in 1.3, so an override written
+   against it silently never matches and the browser goes on running its own
+   smooth-scroll animation underneath Lenis's. */
+html.lenis,
+html.lenis body,
+html.lenis * {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+/* Opt-out hook: anything marked keeps its own native scrolling. */
+html.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
 /* Mobile-friendly viewport height utility */
 /* Header is h-14 (3.5rem = 56px) + border-b (1px) = 57px */
 .h-screen-safe {
@@ -661,7 +691,17 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 .te-home .foot-col a { display: flex; align-items: center; gap: 8px; padding: 7px 0; color: var(--ink-dim); font-size: 15px; transition: color .25s, padding .25s; }
 .te-home .foot-col a:hover { color: var(--acid); padding-left: 6px; }
 .te-home .foot-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--line); font-family: var(--font-mono); font-size: 12px; color: var(--ink-faint); flex-wrap: wrap; gap: 12px; }
-@media (max-width: 760px) { .te-home .foot-grid { grid-template-columns: 1fr; gap: 36px; } }
+/* On a phone the single column stacked the wordmark, five Navigate links and
+   three Elsewhere links into one long run, so the footer took most of a screen
+   to say very little. The two link lists are short and narrow, and they read
+   fine side by side. The wordmark keeps the full width above them, because it
+   is the one thing here that wants to be large. */
+@media (max-width: 760px) {
+  .te-home .foot-grid { grid-template-columns: 1fr 1fr; gap: 34px 20px; }
+  .te-home .foot-grid > :first-child { grid-column: 1 / -1; }
+  /* Tighter rows: at two columns the list is the content, not the spacing. */
+  .te-home .foot-col a { padding: 5px 0; font-size: 14.5px; }
+}
 
 .te-home .mt-s { margin-top: 12px; }
 .te-home .mt-m { margin-top: 24px; }
@@ -775,13 +815,17 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 }
 .te-home .hero3.spot-on .h3-spot { opacity: 1; }
 
-/* scanline that travels with scroll progress */
+/* Scanline that travels with scroll progress.
+   top is 0, not 10%: the travel is a transform now, and the timeline supplies
+   both ends of it (10% to 90% of hero height). Leaving a percentage here too
+   would offset the whole run. */
 .te-home .h3-scan {
-  position: absolute; left: 0; right: 0; top: 10%;
+  position: absolute; left: 0; right: 0; top: 0;
   height: 1px;
   pointer-events: none;
   background: linear-gradient(90deg, transparent, var(--h3-scan-line), transparent);
   box-shadow: 0 0 24px var(--h3-scan-glow);
+  will-change: transform;
 }
 
 /* corner registration ticks */
@@ -817,6 +861,10 @@ body.te-home-page::-webkit-scrollbar-thumb:hover { background: #3a3028; }
 .te-home .h3-stage { position: absolute; inset: 0; }
 .te-home .h3-scene {
   position: absolute; inset: 0;
+  /* All three acts are scrubbed on transform and opacity for the whole pin.
+     Promoting them once is cheaper than letting the compositor decide per
+     frame, and it keeps the plate's blend and masks off the repaint path. */
+  will-change: transform, opacity;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   text-align: center;
