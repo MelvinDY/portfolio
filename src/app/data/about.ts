@@ -76,6 +76,7 @@ export const entries: Entry[] = [
        vocabulary. */
     points: [
       'Transformed LSEG and Bloomberg market data into the firm’s internal reporting models, supporting analytics pipelines on Azure across investment diligence, ratings research and ESG datasets.',
+      'Worked daily in Excel and R, the tools the firm’s legacy data models run on, transforming datasets and building the charts that feed internal reporting.',
       'Built and shipped an internal research dashboard in Next.js and TypeScript, giving the research team one view of fund manager coverage, approved and recommended product list status, classification and internal ratings.',
       'Modelled it on a SharePoint list read live through the Microsoft Graph API so the research team can maintain it without a developer after handover, with dashboard edits propagating back to the company SQL database.',
       'Implemented session-based authentication, role-restricted admin configuration and access-key gating for embedded delivery, plus a mock data mode enabling development without production tenant credentials.',
@@ -108,13 +109,19 @@ export const entries: Entry[] = [
     role: 'Frontend Lead',
     org: 'PPIA UNSW',
     period: 'Aug 2025 to Nov 2025, Sydney AU',
+    /* Rewritten against the repo rather than from memory, so the named stack
+       matches what a reader would find in it: React 19 on Vite with React
+       Router, not the Next.js the tags used to claim. The team, mentoring and
+       stakeholder lines are the author's own and stay as written. */
     points: [
-      'Led a 10-person cross-functional team with structured agile governance: daily standups, sprint reviews and documented workflows.',
+      'Led frontend development for Ignite, the official PPIA UNSW membership platform, building a React 19 and TypeScript application on Vite with Tailwind CSS, React Router and Radix UI.',
+      'Architected a component-based frontend around shared UI primitives and Zod-validated forms, enabling 3 sub-teams to build member profiles, the events feed and the community directory in parallel without integration conflicts.',
+      'Integrated the client with an Express and TypeScript REST API over Supabase PostgreSQL, covering JWT session authentication, email OTP verification, profile management, connection requests and directory search.',
+      'Wrote frontend unit and integration tests with Vitest, React Testing Library and Mock Service Worker, mocking the documented API so interface work could proceed independently of backend delivery.',
+      'Led a 10-person cross-functional team with structured agile governance: daily standups, sprint reviews and documented workflows, mentoring 4 junior developers on code review, Git workflows and development standards.',
       'Drove stakeholder alignment through bi-weekly demos with the PPIA board, translating feedback into 15+ feature enhancements.',
-      'Mentored 4 junior developers on code review, Git workflows and development standards.',
-      'Architected a component-based frontend enabling parallel development by 3 sub-teams without integration conflicts.',
     ],
-    tags: ['React', 'Next.js', 'Agile', 'Team leadership', 'Code review'],
+    tags: ['React', 'TypeScript', 'Vite', 'Tailwind CSS', 'React Router', 'Zod', 'Supabase', 'PostgreSQL', 'Vitest', 'Agile', 'Team leadership'],
   },
   {
     kind: 'education',
@@ -164,15 +171,30 @@ export const entries: Entry[] = [
   },
 ]
 
+/**
+ * The two lists a keyword scan actually reads, since the resume builds its
+ * Skills section from them.
+ *
+ * Widened against the public repos rather than from memory, so every entry has
+ * something behind it: dbt, DuckDB and BigQuery from the SaaS and YouTube
+ * pipelines, Looker Studio (the real product name, where this said "Looker"),
+ * Jupyter from the notebook work, and on the build side Vite, Zod, Vitest,
+ * Docker, GitHub Actions and the Java queue service.
+ *
+ * Excel and R are here because they are the daily job, not despite it. The
+ * legacy models at work run on both, and Excel is the single most-requested
+ * tool in analyst ads. A list that hides them to look more modern is a list
+ * that fails the keyword scan it exists to pass.
+ */
 export const toolbox = [
   {
     title: 'Data and analytics',
     note: 'analyse',
-    chips: ['SQL', 'Python', 'pandas', 'NumPy', 'dbt', 'Snowflake', 'PostgreSQL', 'Tableau', 'Looker', 'scikit-learn'],
+    chips: ['SQL', 'Excel', 'Python', 'R', 'pandas', 'NumPy', 'dbt', 'DuckDB', 'BigQuery', 'Azure SQL', 'PostgreSQL', 'Snowflake', 'Power BI', 'Looker Studio', 'Tableau', 'scikit-learn', 'Jupyter'],
   },
   {
     title: 'Software and web',
     note: 'build',
-    chips: ['TypeScript', 'React', 'Next.js', 'Node.js', 'Express', 'Supabase', 'PostgreSQL', 'Tailwind', 'WebSocket', 'Git'],
+    chips: ['TypeScript', 'React', 'Next.js', 'Node.js', 'Express', 'Vite', 'Supabase', 'PostgreSQL', 'Tailwind', 'Zod', 'WebSocket', 'Vitest', 'Jest', 'Docker', 'GitHub Actions', 'Java', 'Git'],
   },
 ]
