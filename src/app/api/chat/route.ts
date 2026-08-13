@@ -62,8 +62,8 @@ const SYSTEM_PROMPT = `You are the AI assistant on Melvin Darial Yogiana's portf
 4. Rate My Accom NSW: production student-housing review platform with university-email verification, multi-dimensional ratings, and a security pass (XSS/CSRF, rate limiting); fully tested. Stack: Next.js 14, TypeScript, Zod, React Hook Form, Jest.
 
 ## TOOLBOX
-- Data & Analytics: SQL, Python, pandas, NumPy, dbt, Snowflake, PostgreSQL, Azure SQL, Databricks, Power BI, DAX, Tableau, Looker, scikit-learn, n8n, Excel.
-- Software & Web: TypeScript, React, Next.js, Node.js, Express, Supabase, PostgreSQL, Tailwind, WebSocket, Git, CI/CD, Jest.
+- Data & Analytics: SQL, Excel, Python, R, pandas, NumPy, dbt, DuckDB, BigQuery, Azure SQL, PostgreSQL, Snowflake, Databricks, Power BI, DAX, Looker Studio, Tableau, scikit-learn, Jupyter, n8n. (Excel and R are daily tools at Foresight, where the legacy data models run on them.)
+- Software & Web: TypeScript, React, Next.js, Node.js, Express, Vite, Supabase, PostgreSQL, Tailwind, Zod, WebSocket, Vitest, Jest, Docker, GitHub Actions, Java, Git, CI/CD.
 - Currently: self-directed study on DataCamp; preparing Microsoft Azure and Databricks certifications.
 
 ## A BIT MORE PERSONAL
@@ -199,7 +199,7 @@ function getFallbackResponse(message: string): string {
   const lowerMessage = message.toLowerCase();
 
   if (lowerMessage.includes("skill") || lowerMessage.includes("technology") || lowerMessage.includes("tech stack")) {
-    return "Melvin works across two lanes:\n\n• Data & Analytics: SQL, Python (pandas, NumPy), dbt, Snowflake, PostgreSQL, Azure SQL, Databricks, Power BI, DAX, Tableau, Looker, scikit-learn\n• Software & Web: TypeScript, React, Next.js, Node.js, Express, Supabase, PostgreSQL, Tailwind, WebSocket, Jest, CI/CD\n\nHe's a Data Analyst & Full-Stack Developer: half analyst, half engineer.";
+    return "Melvin works across two lanes:\n\n• Data & Analytics: SQL, Excel, Python (pandas, NumPy), R, dbt, DuckDB, BigQuery, Azure SQL, PostgreSQL, Snowflake, Databricks, Power BI, DAX, Looker Studio, Tableau, scikit-learn, Jupyter\n• Software & Web: TypeScript, React, Next.js, Node.js, Express, Vite, Supabase, PostgreSQL, Tailwind, Zod, WebSocket, Vitest, Jest, Docker, GitHub Actions, Java\n\nHe's a Data Analyst & Full-Stack Developer: half analyst, half engineer.";
   }
 
   if (lowerMessage.includes("education") || lowerMessage.includes("study") || lowerMessage.includes("university") || lowerMessage.includes("unsw")) {
@@ -215,7 +215,7 @@ function getFallbackResponse(message: string): string {
   }
 
   if (lowerMessage.includes("experience") || lowerMessage.includes("work") || lowerMessage.includes("lead") || lowerMessage.includes("job")) {
-    return "Experience:\n\n• Data Analyst & Automation Engineer Intern, Foresight Analytics (May 2026 to present): transforms LSEG & Bloomberg data on Azure pipelines; built an internal research dashboard (Next.js, TypeScript, Microsoft Graph, SharePoint → SQL); video + n8n automation\n• Software Developer: Podium, UNSW × Atlassian (Sep to Dec 2025): Forge SQL schema and 58 migrations, a Whisper → GPT-4o-mini voice-to-text pipeline, and tests across ingestion, transformation and storage\n• Frontend Lead: PPIA UNSW (Aug to Nov 2025): led a 10-person team, mentored 4 juniors\n\nHe's after Data Analyst / Analytics Engineer (and full-stack/grad) roles in Sydney.";
+    return "Experience:\n\n• Data Analyst & Automation Engineer Intern, Foresight Analytics (May 2026 to present): transforms LSEG & Bloomberg data on Azure pipelines; daily Excel and R work on the firm's legacy data models; built an internal research dashboard (Next.js, TypeScript, Microsoft Graph, SharePoint → SQL); video + n8n automation\n• Software Developer: Podium, UNSW × Atlassian (Sep to Dec 2025): Forge SQL schema and 58 migrations, a Whisper → GPT-4o-mini voice-to-text pipeline, and tests across ingestion, transformation and storage\n• Frontend Lead: PPIA UNSW (Aug to Nov 2025): led a 10-person team, mentored 4 juniors\n\nHe's after Data Analyst / Analytics Engineer (and full-stack/grad) roles in Sydney.";
   }
 
   if (lowerMessage.includes("contact") || lowerMessage.includes("reach") || lowerMessage.includes("email") || lowerMessage.includes("hire")) {
