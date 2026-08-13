@@ -108,13 +108,13 @@ export const softwareProjects: IndexedProject[] = [
   },
   {
     id: 'confluence-qa',
-    title: 'AI Confluence Q&A Helper',
-    blurb: 'Retrieval-augmented assistant answering natural-language questions over a team’s Confluence workspace, with cited sources.',
-    stack: ['Python', 'FastAPI', 'React', 'RAG', 'OpenAI'],
+    title: 'Podium',
+    blurb: 'Q&A platform for Atlassian townhalls, published on the Atlassian Marketplace and still in use there: an eight-table Forge SQL schema, and voice questions transcribed by Whisper into structured rows.',
+    stack: ['TypeScript', 'Atlassian Forge', 'Forge SQL', 'MySQL', 'OpenAI Whisper', 'GPT-4o-mini'],
     href: 'https://github.com/unsw-cse-comp99-3900/capstone-project-25t3-3900-w18a-cherry',
     linkLabel: 'Source',
     featured: true,
-    note: 'COMP3900 capstone · team of 5',
+    note: 'COMP3900 capstone · team of 6',
   },
   {
     id: 'peersuade',

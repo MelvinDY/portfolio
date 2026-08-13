@@ -87,15 +87,20 @@ export const entries: Entry[] = [
     kind: 'work',
     year: '2025',
     role: 'Software Developer',
-    org: 'UNSW × Atlassian',
-    period: 'Sep 2025 to Dec 2025, Sydney AU',
+    org: 'Podium — AI-powered Q&A platform for Confluence (Atlassian Forge)',
+    period: 'Sep 2025 to Dec 2025, UNSW COMP3900 capstone, Sydney AU',
+    /* Rewritten to lead with the data work rather than the commit count: the
+       schema and the migrations, the Whisper-to-GPT pipeline, and the tests
+       that guard it. Same project, told for a reader hiring for pipelines. */
     points: [
-      'Led development of an enterprise Q&A system as top contributor with 121 commits, delivering a secure real-time audience interaction platform for Atlassian town halls.',
-      'Designed and implemented three-layer end-to-end testing infrastructure across API, integration and UI, with an automated CI pipeline.',
-      'Built backend services with SQL schema design, implementing structured data validation and access controls across resolvers and API endpoints.',
-      'Developed a moderator dashboard with role-based permissions, audit trail tracking and session facilitation controls.',
+      'Designed and implemented a relational database schema across 8 tables on Forge SQL (MySQL), writing 58 version-controlled schema migrations to support structured data for events, questions, voting and moderation.',
+      'Built an ETL-style data pipeline integrating OpenAI Whisper for speech-to-text and GPT-4o-mini, transforming unstructured voice recordings into clean, structured text data written back to the production database.',
+      'Engineered a chunked-upload data ingestion workflow to reliably move large audio payloads through a serverless backend, working within platform size constraints.',
+      'Wrote automated data validation and integration tests in Jest, Mocha and WebdriverIO to verify data integrity and correctness across the pipeline, from ingestion through transformation to storage.',
+      'Configured CI/CD automation with GitHub Actions to run tests and validate builds on every commit, aligned with Atlassian engineering standards.',
+      'Collaborated in an agile team of 6 to ship a data-driven application for hybrid Atlassian developer townhalls, published on the Atlassian Marketplace and handed over to Atlassian’s developer advocate for ongoing use.',
     ],
-    tags: ['TypeScript', 'React', 'GraphQL', 'SQL', 'CI/CD', 'Testing'],
+    tags: ['Forge SQL', 'MySQL', 'TypeScript', 'OpenAI Whisper', 'GPT-4o-mini', 'ETL', 'Jest', 'WebdriverIO', 'GitHub Actions', 'CI/CD'],
   },
   {
     kind: 'work',
