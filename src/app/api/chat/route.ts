@@ -58,12 +58,12 @@ const SYSTEM_PROMPT = `You are the AI assistant on Melvin Darial Yogiana's portf
 ## SOFTWARE PROJECTS (4 builds)
 1. Peersuade: real-time multiplayer debate/persuasion game; won two UNIHACK 2026 categories. Stack: React, TypeScript, WebSocket, Node.js, Tailwind. Live: politics-game.vercel.app.
 2. Ignite: official PPIA UNSW networking platform (member profiles, events, directory), built and shipped with a team of 10. Stack: TypeScript, React, Supabase, PostgreSQL, Node.js.
-3. AI Confluence Q&A Helper: retrieval-augmented (RAG) assistant answering questions over a team's Confluence with cited sources; UNSW COMP3900 capstone, team of 5. Stack: Python, FastAPI, React, RAG, OpenAI.
+3. Podium: AI-powered Q&A platform for hybrid Atlassian developer townhalls, built as a Confluence app on Atlassian Forge; published on the Atlassian Marketplace and handed over to Atlassian's developer advocate, who still runs it for their townhalls; 8-table Forge SQL schema across 58 migrations, plus an ETL pipeline turning voice questions into structured text with Whisper and GPT-4o-mini. UNSW COMP3900 capstone, team of 6. Stack: TypeScript, Atlassian Forge, Forge SQL (MySQL), OpenAI Whisper, GPT-4o-mini, Jest, WebdriverIO, GitHub Actions.
 4. Rate My Accom NSW: production student-housing review platform with university-email verification, multi-dimensional ratings, and a security pass (XSS/CSRF, rate limiting); fully tested. Stack: Next.js 14, TypeScript, Zod, React Hook Form, Jest.
 
 ## TOOLBOX
-- Data & Analytics: SQL, Python, pandas, NumPy, dbt, Snowflake, PostgreSQL, Azure SQL, Databricks, Power BI, DAX, Tableau, Looker, scikit-learn, n8n, Excel.
-- Software & Web: TypeScript, React, Next.js, Node.js, Express, Supabase, PostgreSQL, Tailwind, WebSocket, Git, CI/CD, Jest.
+- Data & Analytics: SQL, Excel, Python, R, pandas, NumPy, dbt, DuckDB, BigQuery, Azure SQL, PostgreSQL, Snowflake, Databricks, Power BI, DAX, Looker Studio, Tableau, scikit-learn, Jupyter, n8n. (Excel and R are daily tools at Foresight, where the legacy data models run on them.)
+- Software & Web: TypeScript, React, Next.js, Node.js, Express, Vite, Supabase, PostgreSQL, Tailwind, Zod, WebSocket, Vitest, Jest, Docker, GitHub Actions, Java, Git, CI/CD.
 - Currently: self-directed study on DataCamp; preparing Microsoft Azure and Databricks certifications.
 
 ## A BIT MORE PERSONAL
@@ -199,7 +199,7 @@ function getFallbackResponse(message: string): string {
   const lowerMessage = message.toLowerCase();
 
   if (lowerMessage.includes("skill") || lowerMessage.includes("technology") || lowerMessage.includes("tech stack")) {
-    return "Melvin works across two lanes:\n\n• Data & Analytics: SQL, Python (pandas, NumPy), dbt, Snowflake, PostgreSQL, Azure SQL, Databricks, Power BI, DAX, Tableau, Looker, scikit-learn\n• Software & Web: TypeScript, React, Next.js, Node.js, Express, Supabase, PostgreSQL, Tailwind, WebSocket, Jest, CI/CD\n\nHe's a Data Analyst & Full-Stack Developer: half analyst, half engineer.";
+    return "Melvin works across two lanes:\n\n• Data & Analytics: SQL, Excel, Python (pandas, NumPy), R, dbt, DuckDB, BigQuery, Azure SQL, PostgreSQL, Snowflake, Databricks, Power BI, DAX, Looker Studio, Tableau, scikit-learn, Jupyter\n• Software & Web: TypeScript, React, Next.js, Node.js, Express, Vite, Supabase, PostgreSQL, Tailwind, Zod, WebSocket, Vitest, Jest, Docker, GitHub Actions, Java\n\nHe's a Data Analyst & Full-Stack Developer: half analyst, half engineer.";
   }
 
   if (lowerMessage.includes("education") || lowerMessage.includes("study") || lowerMessage.includes("university") || lowerMessage.includes("unsw")) {
@@ -207,7 +207,7 @@ function getFallbackResponse(message: string): string {
   }
 
   if (lowerMessage.includes("project") || lowerMessage.includes("portfolio")) {
-    return "A few highlights:\n\nData\n• Australian Labour Market Dashboard: ABS data → Azure SQL → Power BI\n• YouTube Trending Analytics: ~40k videos, pandas + scikit-learn\n• Woolworths vs Coles Price Analytics: retailer APIs, DuckDB + rapidfuzz matching\n• SaaS Sales & Revenue Analytics: dbt pipeline, 44 tests, cohort retention\n\nSoftware\n• Peersuade: UNIHACK 2026 double winner (React, WebSocket)\n• Ignite: PPIA UNSW platform, team of 10\n• AI Confluence Q&A Helper: RAG capstone (Python, FastAPI)\n• Rate My Accom NSW: production Next.js review site\n\nGitHub: github.com/MelvinDY";
+    return "A few highlights:\n\nData\n• Australian Labour Market Dashboard: ABS data → Azure SQL → Power BI\n• YouTube Trending Analytics: ~40k videos, pandas + scikit-learn\n• Woolworths vs Coles Price Analytics: retailer APIs, DuckDB + rapidfuzz matching\n• SaaS Sales & Revenue Analytics: dbt pipeline, 44 tests, cohort retention\n\nSoftware\n• Peersuade: UNIHACK 2026 double winner (React, WebSocket)\n• Ignite: PPIA UNSW platform, team of 10\n• Podium: Atlassian townhall Q&A app, published on the Marketplace and still in use (Forge, Forge SQL, Whisper)\n• Rate My Accom NSW: production Next.js review site\n\nGitHub: github.com/MelvinDY";
   }
 
   if (lowerMessage.includes("onlycode") || lowerMessage.includes("hackathon") || lowerMessage.includes("award") || lowerMessage.includes("peersuade")) {
@@ -215,7 +215,7 @@ function getFallbackResponse(message: string): string {
   }
 
   if (lowerMessage.includes("experience") || lowerMessage.includes("work") || lowerMessage.includes("lead") || lowerMessage.includes("job")) {
-    return "Experience:\n\n• Data Analyst & Automation Engineer Intern, Foresight Analytics (May 2026 to present): transforms LSEG & Bloomberg data on Azure pipelines; built an internal research dashboard (Next.js, TypeScript, Microsoft Graph, SharePoint → SQL); video + n8n automation\n• Software Developer: UNSW × Atlassian (Sep to Dec 2025): top contributor, real-time Q&A platform with full E2E testing\n• Frontend Lead: PPIA UNSW (Aug to Nov 2025): led a 10-person team, mentored 4 juniors\n\nHe's after Data Analyst / Analytics Engineer (and full-stack/grad) roles in Sydney.";
+    return "Experience:\n\n• Data Analyst & Automation Engineer Intern, Foresight Analytics (May 2026 to present): transforms LSEG & Bloomberg data on Azure pipelines; daily Excel and R work on the firm's legacy data models; built an internal research dashboard (Next.js, TypeScript, Microsoft Graph, SharePoint → SQL); video + n8n automation\n• Software Developer: Podium, UNSW × Atlassian (Sep to Dec 2025): Forge SQL schema and 58 migrations, a Whisper → GPT-4o-mini voice-to-text pipeline, and tests across ingestion, transformation and storage\n• Frontend Lead: PPIA UNSW (Aug to Nov 2025): led a 10-person team, mentored 4 juniors\n\nHe's after Data Analyst / Analytics Engineer (and full-stack/grad) roles in Sydney.";
   }
 
   if (lowerMessage.includes("contact") || lowerMessage.includes("reach") || lowerMessage.includes("email") || lowerMessage.includes("hire")) {
@@ -231,7 +231,7 @@ function getFallbackResponse(message: string): string {
   }
 
   if (lowerMessage.includes("atlassian") || lowerMessage.includes("forge") || lowerMessage.includes("confluence") || lowerMessage.includes("jira")) {
-    return "Melvin's Atlassian Experience:\n\n• Stale Page Hunter (Codegeist 2025)\n  - AI-powered Confluence app using Rovo AI\n  - Space Health Dashboard with A-F grading\n  - Built with Atlassian Forge, UI Kit 2\n\n• Confluence Q&A Helper (UNSW x Atlassian)\n  - Enterprise Q&A system for live events\n  - Upvoting, moderation, presenter dashboards";
+    return "Melvin's Atlassian Experience:\n\n• Stale Page Hunter (Codegeist 2025)\n  - AI-powered Confluence app using Rovo AI\n  - Space Health Dashboard with A-F grading\n  - Built with Atlassian Forge, UI Kit 2\n\n• Podium (UNSW x Atlassian, COMP3900 capstone)\n  - Q&A platform for hybrid developer townhalls\n  - Published on the Atlassian Marketplace, handed to Atlassian's developer advocate and still in use\n  - Forge app with an 8-table Forge SQL (MySQL) schema\n  - Voice questions transcribed via Whisper + GPT-4o-mini";
   }
 
   // Default response

@@ -1,11 +1,21 @@
 "use client";
 
 import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
+import dynamic from "next/dynamic";
 
 interface Exchange {
   q: string;
   a: string;
 }
+
+/** Markdown renderer for replies. Split out and loaded on demand so the parser
+ *  stays out of the first-load bundle of every page the launcher sits on; see
+ *  chat-answer.tsx. `open()` warms the chunk, so by the time an answer comes
+ *  back from the API it is already here and this loading state never shows. */
+const ChatAnswer = dynamic(() => import("./chat-answer"), {
+  ssr: false,
+  loading: () => null,
+});
 
 const SUGGESTIONS = [
   "What's his data stack?",
@@ -57,9 +67,8 @@ export default function AiChatbox() {
         t.width / p.width,
         0.02
       )}, ${Math.max(t.height / p.height, 0.02)})`,
-      borderRadius: "12px",
     };
-    const expanded = { transform: "none", borderRadius: "16px" };
+    const expanded = { transform: "none" };
     const timing: KeyframeAnimationOptions = {
       duration: 340,
       easing: "cubic-bezier(0.22, 1, 0.36, 1)",
@@ -89,6 +98,8 @@ export default function AiChatbox() {
 
   const open = useCallback(() => {
     setActiveIndex(0);
+    // Warm the markdown chunk while the visitor is still typing a question.
+    void import("./chat-answer");
     setIsOpen(true); // morph fires from the layout effect below
   }, []);
 
@@ -279,12 +290,7 @@ export default function AiChatbox() {
         >
           {/* Input row */}
           <form className="cmdk-row" onSubmit={handleSubmit}>
-            <span className="cmdk-row-ico" aria-hidden="true">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="7" />
-                <path d="M21 21l-4.3-4.3" />
-              </svg>
-            </span>
+            <span className="cmdk-prompt" aria-hidden="true">›</span>
             <input
               ref={inputRef}
               className="cmdk-input"
@@ -313,18 +319,17 @@ export default function AiChatbox() {
                     onMouseEnter={() => setActiveIndex(i)}
                     onClick={() => sendMessage(s)}
                   >
-                    <span className="cmdk-sug-ico" aria-hidden="true">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6z" />
-                      </svg>
-                    </span>
+                    <span className="cmdk-sug-tick" aria-hidden="true" />
                     {s}
                     <span className="cmdk-sug-arrow" aria-hidden="true">↵</span>
                   </button>
                 ))}
               </>
             ) : (
-              <div className="cmdk-conv">
+              /* Replies arrive after the palette has already taken focus, so
+                 the region announces itself rather than leaving a screen
+                 reader with a silent box. */
+              <div className="cmdk-conv" aria-live="polite">
                 {exchanges.map((ex, i) => (
                   <div key={i}>
                     <div className="cmdk-q">
@@ -332,7 +337,9 @@ export default function AiChatbox() {
                       <span>{ex.q}</span>
                     </div>
                     {ex.a ? (
-                      <div className="cmdk-a" style={{ marginTop: 8 }}>{ex.a}</div>
+                      <div className="cmdk-a" style={{ marginTop: 8 }}>
+                        <ChatAnswer text={ex.a} />
+                      </div>
                     ) : (
                       isLoading && i === exchanges.length - 1 && (
                         <div className="cmdk-typing" style={{ marginTop: 8 }} aria-label="Thinking">
