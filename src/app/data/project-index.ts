@@ -26,6 +26,15 @@ export interface IndexedProject {
   /** A short, true marker — an award, a status. Rendered in the accent, so it
    *  should be worth spending the accent on. */
   note?: string
+  /** True when there is something a stranger can open or install right now:
+   *  a deployed URL, or a listing on a marketplace. Not "the code exists". */
+  live?: boolean
+  /** True when the build was mine end to end — architecture, backend, front
+   *  end, deploy. Anything with a team, however small, is false. */
+  solo?: boolean
+  /** Named awards actually won, counted individually. Peersuade took two
+   *  categories at one hackathon, so it counts two. */
+  awards?: number
 }
 
 export const dataProjects: IndexedProject[] = [
@@ -72,9 +81,11 @@ export const dataProjects: IndexedProject[] = [
 ]
 
 /* Featured order is the argument the page makes: production rigour, then
-   system design, then shipping for real users, then applied AI. The hackathon
-   builds carry real awards but their code lives in teammates' repos, so they
-   sit in the index row rather than holding a full card. */
+   system design, then the warehouse, then shipping for real users. The
+   hackathon builds carry real awards but their code lives in teammates'
+   repos, so they sit in the index row rather than holding a full card.
+   Ignite sits there too: it is real and live, but a ten-person student
+   platform is the weakest of the five candidates for a full card. */
 export const softwareProjects: IndexedProject[] = [
   {
     id: 'ratemyaccom',
@@ -85,6 +96,8 @@ export const softwareProjects: IndexedProject[] = [
     linkLabel: 'Live demo',
     featured: true,
     note: 'production',
+    live: true,
+    solo: true,
   },
   {
     id: 'haven',
@@ -95,16 +108,18 @@ export const softwareProjects: IndexedProject[] = [
     linkLabel: 'Source',
     featured: true,
     note: 'private repo',
+    solo: true,
   },
   {
-    id: 'ignite',
-    title: 'Ignite',
-    blurb: 'The official PPIA UNSW platform, carrying member profiles, event tooling and a directory for the Indonesian student community.',
-    stack: ['TypeScript', 'React', 'Supabase', 'PostgreSQL', 'Node.js'],
-    href: 'https://github.com/MelvinDY/ignite',
+    id: 'dora',
+    title: 'DORA',
+    blurb: 'Snowflake warehouse computing the four DORA delivery metrics, enriched in-warehouse with Cortex and fronted by an agent that answers plain-English questions over a curated semantic layer.',
+    stack: ['Python', 'Snowflake', 'dbt', 'DuckDB', 'Streamlit', 'Claude'],
+    href: 'https://github.com/MelvinDY/DORA',
     linkLabel: 'Source',
     featured: true,
-    note: 'team of 10',
+    note: 'data platform',
+    solo: true,
   },
   {
     id: 'confluence-qa',
@@ -115,6 +130,17 @@ export const softwareProjects: IndexedProject[] = [
     linkLabel: 'Source',
     featured: true,
     note: 'COMP3900 capstone · team of 6',
+    live: true,
+  },
+  {
+    id: 'ignite',
+    title: 'Ignite',
+    blurb: 'The official PPIA UNSW platform, carrying member profiles, event tooling and a directory for the Indonesian student community.',
+    stack: ['TypeScript', 'React', 'Supabase', 'PostgreSQL', 'Node.js'],
+    href: 'https://github.com/MelvinDY/ignite',
+    linkLabel: 'Source',
+    note: 'team of 10',
+    live: true,
   },
   {
     id: 'peersuade',
@@ -124,6 +150,8 @@ export const softwareProjects: IndexedProject[] = [
     href: 'https://politics-game.vercel.app/',
     linkLabel: 'Live demo',
     note: 'UNIHACK 2026 · Most Fun + Best Design',
+    live: true,
+    awards: 2,
   },
   {
     id: 'onlycode',
@@ -133,6 +161,7 @@ export const softwareProjects: IndexedProject[] = [
     href: 'https://github.com/tangkenzee/OnlyCode',
     linkLabel: 'Source',
     note: '1st · CSESoc Flagship 2025',
+    awards: 1,
   },
   {
     id: 'stall-wars',
@@ -142,6 +171,7 @@ export const softwareProjects: IndexedProject[] = [
     href: 'https://github.com/MelvinDY/Stall_Wars',
     linkLabel: 'Source',
     note: 'Golden Rubbish Bin · Terrible Ideas Hackathon',
+    awards: 1,
   },
   {
     id: 'portfolio',
@@ -151,6 +181,8 @@ export const softwareProjects: IndexedProject[] = [
     href: 'https://github.com/MelvinDY/portfolio',
     linkLabel: 'Source',
     note: 'you are looking at it',
+    live: true,
+    solo: true,
   },
 ]
 
