@@ -39,6 +39,10 @@ export interface ProjectDetail {
   /** Empty is fine and common — the sheet drops the gallery entirely rather
    *  than showing a placeholder frame. */
   shots: Shot[]
+  /** How the shots are framed. Everything defaults to a 16:9 plate; a phone
+   *  build gets a 9:19.5 one, letterboxed inside the same 16:9 hole so the
+   *  page keeps one plate size and the screenshot is not cropped to fit. */
+  shape?: 'wide' | 'phone'
 }
 
 export const projectDetails: Record<string, ProjectDetail> = {
@@ -116,7 +120,40 @@ export const projectDetails: Record<string, ProjectDetail> = {
     links: [
       { label: 'GitHub', href: 'https://github.com/unsw-cse-comp99-3900/capstone-project-25t3-3900-w18a-cherry', primary: true },
     ],
-    shots: [],
+    /* Every session, code and name in these shots is seeded demo data. The
+       product is real; the townhall in the screenshots is not. */
+    shots: [
+      {
+        src: '/projects/podium/attendee.jpg',
+        caption: 'What an attendee gets: one box to ask, an anonymity toggle, and a queue that sorts itself by votes.',
+        alt: 'Podium attendee view of a live townhall. An “Ask the room” box with an ask-anonymously toggle sits above nine questions sorted by votes, the top one at 63 votes and marked being asked now. A side panel shows the join code and the house rules.',
+      },
+      {
+        src: '/projects/podium/dashboard-live.jpg',
+        caption: 'The moderator’s room mid-session: six counters, the queue, and a voice answer partway through the pipeline.',
+        alt: 'Podium moderator dashboard during a live session, with counters for questions, answered, pinned, flagged, people in the room and votes cast, a question queue below, and a side panel transcribing a spoken answer.',
+      },
+      {
+        src: '/projects/podium/voice-answer.jpg',
+        caption: 'A spoken answer moving through the pipeline: captured, uploaded in chunks, Whisper, GPT-4o-mini, written back under the question.',
+        alt: 'Podium panel showing a recorded answer progressing through five steps — captured, uploaded in four chunks, transcribing with Whisper, cleaning up with GPT-4o-mini, written back to the question — beside a question queue where one answer already appears as tidied text.',
+      },
+      {
+        src: '/projects/podium/presentation.jpg',
+        caption: 'Presentation mode. The question being asked, what is queued behind it, and the join code on the same slide.',
+        alt: 'Podium presentation mode on a dark ground: the current question set large with its vote count, three queued questions listed beside it, and a QR code with the six-character join code along the bottom.',
+      },
+      {
+        src: '/projects/podium/events.jpg',
+        caption: 'Every session in the workspace — live, scheduled and ended — each with its code and question volume.',
+        alt: 'Podium events table listing five sessions with their space, time, six-character code, a question-volume sparkline, attendance and a status lozenge reading live, scheduled or ended.',
+      },
+      {
+        src: '/projects/podium/home-join.jpg',
+        caption: 'Joining. Six characters, read out by the host or projected on the last slide.',
+        alt: 'Podium home page inside Confluence with a six-box code entry for joining a session, a list of the user’s events, and a live session card showing 247 in the room and three moderators on duty.',
+      },
+    ],
   },
 
   haven: {
@@ -139,10 +176,60 @@ export const projectDetails: Record<string, ProjectDetail> = {
     links: [
       { label: 'GitHub', href: 'https://github.com/MelvinDY/Haven', primary: true },
     ],
-    /* The repo carries four screenshots under docs/screenshots. They are not
-       copied into /public yet, and the sheet drops the gallery rather than
-       showing a placeholder frame. */
-    shots: [],
+    /* Three of the twenty screenshots the repo keeps under docs/screenshots,
+       copied across as-is. The app's interface language is Indonesian, so the
+       captions say what the screen does rather than transliterating it. */
+    shape: 'phone',
+    shots: [
+      {
+        src: '/projects/haven/pairing.png',
+        caption: 'Pairing. One partner sends the code, the other enters it — there is no third path in.',
+        alt: 'Haven pairing screen on a dark purple ground, headed “Sekarang, kalian.”, offering two cards: invite your partner by sending a code, or enter a code you were sent.',
+      },
+      {
+        src: '/projects/haven/sharing.png',
+        caption: 'The sharing switchboard. Live location is running with six minutes left on it; everything else is off, and says so.',
+        alt: 'Haven sharing screen listing live location, safe-arrival, plans and a shared space. Live location reads “active, both of you, 6 minutes left” with a stop button; the rest read “off, and that is normal”.',
+      },
+      {
+        src: '/projects/haven/home.png',
+        caption: 'Home. Both moods side by side, and a location share you start by choosing how long it lasts.',
+        alt: 'Haven home screen with a glowing mascot face, a row showing each partner’s current mood, quick context chips, a send-a-hug button, and a location card offering 15 minute, 1 hour, 3 hour and 12 hour durations.',
+      },
+    ],
+  },
+
+  dora: {
+    id: 'dora',
+    title: 'DORA',
+    sub: 'Engineering-delivery warehouse with an analytics agent',
+    summary:
+      'A Snowflake warehouse that computes the four DORA metrics — deployment frequency, lead time for changes, change failure rate, time to restore — from ingested delivery events, enriches them in-warehouse with Cortex, and puts a Claude analytics agent in front of a curated semantic layer so the questions can be asked in plain English. It runs on a synthetic event generator rather than any real organisation’s delivery data, which is what makes the whole pipeline shareable.',
+    pull: 'The agent never sees the schema. It sees the semantic model someone chose to give it.',
+    highlights: [
+      'The agent reads only semantic_model.yaml, never INFORMATION_SCHEMA, and runs three tools: run_sql, search_incidents and get_metric_definition',
+      'Layered guardrails: sqlglot rejects anything that is not a single allowlisted SELECT, and the read-only warehouse role is the hard stop behind it',
+      'staging → conformed → marts in dbt, fed by a FastAPI webhook receiver and per-source REST backfill',
+      'Cortex classifies pull requests and summarises and embeds incidents; a local deterministic twin runs the same pipeline on DuckDB with no Snowflake account',
+      'The delivery events are generated, not scraped: a payload-accurate, story-seeded simulator stands in for a real org, so the numbers on screen are the generator’s, not a customer’s',
+    ],
+    year: '2026',
+    status: 'Built end to end',
+    role: 'Solo',
+    stack: ['Python', 'Snowflake', 'dbt', 'DuckDB', 'Streamlit', 'Claude', 'sqlglot', 'FastAPI'],
+    links: [{ label: 'GitHub', href: 'https://github.com/MelvinDY/DORA', primary: true }],
+    shots: [
+      {
+        src: '/projects/dora/dashboard.png',
+        caption: 'The four metrics, banded elite to low against the prior half-year, over a twelve-month trend.',
+        alt: 'DORA Control Room dashboard: four tiles reading deployment frequency 1.57 a day (elite), lead time for changes 48.5 hours median (high), change failure rate 3.2 percent (elite) and time to restore 3.3 hours median (high), each with a sparkline, above four twelve-month trend charts.',
+      },
+      {
+        src: '/projects/dora/agent.png',
+        caption: 'A plain-English question, answered with the validated read-only SQL it actually ran.',
+        alt: 'DORA agent panel answering why the payments team’s lead time got worse in April, attributing it to review latency, with the validated single-SELECT SQL it ran shown below and marked validated, single select, marts only, limit 1000.',
+      },
+    ],
   },
   ratemyaccom: {
     id: 'ratemyaccom',
@@ -158,6 +245,7 @@ export const projectDetails: Record<string, ProjectDetail> = {
       'Schema-validated forms and a Jest suite covering the critical flows',
     ],
     status: 'Production',
+    role: 'Full-stack, solo',
     stack: ['Next.js 14', 'TypeScript', 'Zod', 'React Hook Form', 'Jest', 'TailwindCSS'],
     links: [
       { label: 'Live demo', href: 'https://ratemyaccom-beryl.vercel.app/', primary: true },
