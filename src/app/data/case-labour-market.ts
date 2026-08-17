@@ -151,6 +151,13 @@ export const labourMarket: CaseStudyProps = {
     { t: 'note', text: 'I confirmed against the live API that the industry series is stale at source, not on my disk, so re-running the extract does not help. The monthly Labour Force survey carries no industry dimension at all, so there is nowhere else to get it. Rather than quietly mix a 2022 series into current numbers, every industry title carries its own vintage. Knowing a source’s recency before you build on it matters more than any chart.' },
     {
       t: 'fig',
+      src: '/projects/labour-market/pbi-industry.png',
+      page: 'Page 3, Industry View',
+      alt: 'Power BI Industry View page: all 19 ANZSIC divisions ranked by employed persons for 2022, a focus-industries trend line for Construction, Health Care, Information Media and Retail Trade, and an industry detail table with year-on-year change and a growth classification.',
+      caption: 'Health Care and Social Assistance at 2.02 million, well clear of Retail Trade. Note the chart titles: they read "2022 (’000, annual)" rather than just "Employed persons", so the vintage travels with the number instead of being buried in a footnote.',
+    },
+    {
+      t: 'fig',
       src: '/projects/labour-market/pbi-overview.png',
       page: 'Page 1, Overview',
       alt: 'Power BI Overview page: national unemployment rate trend back to 1978, employed persons trend, and KPI cards for unemployment rate, employment, participation and employment-to-population ratio.',

@@ -89,8 +89,8 @@ export const entries: DataEntry[] = [
       },
       {
         src: '/projects/labour-market/pbi-industry.png',
-        alt: 'Power BI page breaking employment down by industry.',
-        caption: 'Industry breakdown, annual to 2022, labelled with its vintage on purpose.',
+        alt: 'Power BI Industry View page: 19 ANZSIC divisions ranked by employment for 2022, a focus-industries trend line, and an industry detail table.',
+        caption: 'Industry breakdown. Annual to 2022, and every title says so rather than hiding it in a footnote.',
       },
     ],
   },
