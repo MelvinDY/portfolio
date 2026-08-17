@@ -46,6 +46,45 @@ export interface ProjectDetail {
 }
 
 export const projectDetails: Record<string, ProjectDetail> = {
+  'research-dashboard': {
+    id: 'research-dashboard',
+    title: 'Research Dashboard',
+    sub: 'Fund manager research, embedded',
+    summary:
+      'A dashboard for an investment research team: one row per fund manager carrying approved-list status, asset classification, an internal rating and whatever else the team has since added, with search, multi-column sorting, filters built from the data itself and a drill-down into each manager’s documents. It was built to live inside another product’s page rather than as a site of its own, which set most of the constraints below.',
+    pull:
+      'The interesting decision was refusing to build a database. The folder the team already keeps is the record.',
+    highlights: [
+      'No application database: each manager’s document-library folder is the record, its columns read live through one expanded Microsoft Graph query — nothing to sync, nothing to drift, and the team keeps editing where they already work',
+      'The embed gate carries its token in a header rather than a cookie, because the page renders in a cross-site iframe where any cookie it sets is third-party and blocked by default',
+      'Managers bind to a stable list-item id and columns to their internal name, so renaming a folder or a column label breaks nothing — with a health endpoint for the one case that stays silent',
+      'The build refuses to ship a deployment that cannot work: environment checks run before anything compiles, blocking on real harm and warning on mess',
+      'The one client-supplied path that reaches an upstream URL is rejected outright rather than sanitised, so a request that would climb out of its folder fails instead of quietly reading elsewhere',
+    ],
+    year: '2026',
+    team: 'Solo',
+    role: 'Full-stack, solo',
+    status: 'Live demo on synthetic data',
+    stack: [
+      'Next.js',
+      'TypeScript',
+      'Microsoft Graph',
+      'SharePoint',
+      'Vercel Edge Config',
+      'node:test',
+    ],
+    links: [
+      { label: 'Live demo', href: 'https://research-dashboard-demo.vercel.app/demo', primary: true },
+    ],
+    shots: [
+      {
+        src: '/projects/research-dashboard/dashboard.jpg',
+        caption:
+          'The dashboard on synthetic data. The table is the scrolling surface, not the page — headers and footer stay put while rows move.',
+        alt: 'Research Dashboard demo: a table of fund managers with columns for asset class, watchlist, approved-list flags, internal rating, research status, strategy and fund size, above a footer reading “Showing 1–26 of 26 managers · 2 exited hidden”.',
+      },
+    ],
+  },
   peersuade: {
     id: 'peersuade',
     title: 'Peersuade',

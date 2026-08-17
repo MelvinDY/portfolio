@@ -88,6 +88,18 @@ export const dataProjects: IndexedProject[] = [
    platform is the weakest of the five candidates for a full card. */
 export const softwareProjects: IndexedProject[] = [
   {
+    id: 'research-dashboard',
+    title: 'Research Dashboard',
+    blurb: 'Fund manager research dashboard for an investment research house, built to run embedded in another product’s iframe. No application database — each manager’s document-library folder is the record, read live through Microsoft Graph.',
+    stack: ['Next.js', 'TypeScript', 'Microsoft Graph', 'SharePoint', 'Vercel Edge Config'],
+    href: 'https://research-dashboard-demo.vercel.app/demo',
+    linkLabel: 'Live demo',
+    featured: true,
+    note: 'built for an investment research house',
+    live: true,
+    solo: true,
+  },
+  {
     id: 'ratemyaccom',
     title: 'Rate My Accom NSW',
     blurb: 'Review platform for NSW student housing, with university-email verification, multi-dimensional ratings, request hardening and rate limiting.',
