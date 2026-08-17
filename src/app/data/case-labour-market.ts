@@ -147,6 +147,13 @@ export const labourMarket: CaseStudyProps = {
       ],
       read: 'I expected wide regional gaps. Instead the spread across the whole country is under a single percentage point.',
     },
+    {
+      t: 'fig',
+      src: '/projects/labour-market/pbi-state.png',
+      page: 'Page 2, State Breakdown',
+      alt: 'Power BI State Breakdown page: unemployment rate and employed persons ranked across all eight states and territories for the latest month, and an unemployment rate trend line per jurisdiction back to 1978.',
+      caption: 'All eight jurisdictions, Northern Territory and the ACT included. The earlier version of this page showed six, because the ABS quietly returns only what exists for a seasonally adjusted request. Ranked bars rather than a map: a built-in Bing map rendered as a zoomed-out world view and read as broken.',
+    },
     { t: 'p', text: 'The second is vintage. Health Care and Social Assistance is the country’s largest employer by headcount, ahead of Retail Trade, but the industry breakdown comes from the annual ABS Labour Account, which lags badly and ends at 2022 while everything else is current to June 2026.' },
     { t: 'note', text: 'I confirmed against the live API that the industry series is stale at source, not on my disk, so re-running the extract does not help. The monthly Labour Force survey carries no industry dimension at all, so there is nowhere else to get it. Rather than quietly mix a 2022 series into current numbers, every industry title carries its own vintage. Knowing a source’s recency before you build on it matters more than any chart.' },
     {
@@ -160,8 +167,15 @@ export const labourMarket: CaseStudyProps = {
       t: 'fig',
       src: '/projects/labour-market/pbi-overview.png',
       page: 'Page 1, Overview',
-      alt: 'Power BI Overview page: national unemployment rate trend back to 1978, employed persons trend, and KPI cards for unemployment rate, employment, participation and employment-to-population ratio.',
-      caption: 'The national headline series, seasonally adjusted, back to February 1978. The report is four pages: national, states, industries, and the full-time to part-time split.',
+      alt: 'Power BI Overview page: national unemployment rate trend back to 1978, employed persons trend, and KPI cards showing 4.43% unemployment, 14,823.3 thousand employed, 67.01% participation and 64.04% employment-to-population.',
+      caption: 'The national headline series, seasonally adjusted, back to February 1978. Unemployment at 4.43%, employment at a record 14.8 million, up 1.73% year on year. Both recessions and the pandemic spike are visible in the one line.',
+    },
+    {
+      t: 'fig',
+      src: '/projects/labour-market/pbi-ftpt.png',
+      page: 'Page 4, Full-time vs Part-time',
+      alt: 'Power BI Full-time vs Part-time page: stacked area of full-time against part-time employment since 1978, full-time and part-time share cards, full-time share by sex over time, and an employment by sex donut.',
+      caption: 'Where the finding lives in the report. The by-sex lines are the same two series the analysis above decomposes: the male line falling steadily, the female line flattening and then turning up after 2017.',
     },
 
     { t: 'pull', text: 'The headline rate hides the composition. Who works full-time, and why that is changing, is the part that actually moved.' },

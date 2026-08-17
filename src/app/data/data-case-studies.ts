@@ -83,6 +83,11 @@ export const entries: DataEntry[] = [
         caption: 'Overview page. Headline measures across the national series.',
       },
       {
+        src: '/projects/labour-market/pbi-state.png',
+        alt: 'Power BI State Breakdown page: unemployment rate and employment ranked across all eight states and territories, plus a per-jurisdiction trend line.',
+        caption: 'All eight jurisdictions. The earlier version showed six, because the ABS returns only what exists and says nothing about the rest.',
+      },
+      {
         src: '/projects/labour-market/pbi-ftpt.png',
         alt: 'Power BI page comparing full-time and part-time employment by sex.',
         caption: 'Full-time against part-time, split by sex. This is where the gap sits in the report.',
