@@ -55,18 +55,28 @@ export const entries: DataEntry[] = [
     title: 'Australian Labour Market Dashboard',
     sub: 'End to end pipeline on live ABS data',
     provenance: { label: 'Live ABS API', real: true },
-    figure: '80%',
-    claim: 'of working men hold a full-time job. For women it is 57%.',
+    figure: '2017',
+    claim: 'the year the gender full-time gap started closing for a different reason.',
     blurb:
-      'Python ingests live ABS data, Azure SQL models it through a staging to mart layer, and a four-page Power BI report visualises it. The report is generated as code rather than clicked together.',
-    stack: ['ABS API', 'Azure SQL', 'Power BI', 'DAX', 'Python'],
+      'Python ingests live ABS data, dbt models it into a tested star schema on SQL Server, and Power BI and Excel read the mart on top. Built to answer a question, not just move rows: the gap between male and female full-time work is closing, but the obvious explanation for why is wrong.',
+    stack: ['ABS API', 'dbt', 'SQL Server', 'Power BI', 'Excel', 'Python'],
     href: '/projects/data/labour-market',
     method: {
       source: 'ABS API, refreshed on release',
-      transform: 'Azure SQL, staging to mart',
-      output: 'Power BI, generated as code',
+      transform: 'dbt star schema, 124 tests',
+      output: 'Power BI and Excel, generated as code',
     },
     shots: [
+      {
+        src: '/projects/labour-market/ft-gap-convergence.png',
+        alt: 'Line chart of full-time share of employment by sex from 1978 to 2026, showing the male rate falling and the female rate bottoming out in 2017 before rising.',
+        caption: 'The finding. Women’s full-time rate fell for 39 years, bottomed in 2017, and has risen since.',
+      },
+      {
+        src: '/projects/labour-market/ft-gap-decomposition.png',
+        alt: 'Bar chart of the change in full-time share for men and women across five eras, with the 2017 to 2026 female bar the only positive one.',
+        caption: 'Which side moved the gap, by era. The last bar is the only time women’s rate rose.',
+      },
       {
         src: '/projects/labour-market/pbi-overview.png',
         alt: 'Power BI overview page showing national labour force headline measures.',
@@ -75,17 +85,12 @@ export const entries: DataEntry[] = [
       {
         src: '/projects/labour-market/pbi-ftpt.png',
         alt: 'Power BI page comparing full-time and part-time employment by sex.',
-        caption: 'Full-time against part-time, split by sex. This is where the 80 against 57 sits.',
+        caption: 'Full-time against part-time, split by sex. This is where the gap sits in the report.',
       },
       {
         src: '/projects/labour-market/pbi-industry.png',
         alt: 'Power BI page breaking employment down by industry.',
-        caption: 'Industry breakdown.',
-      },
-      {
-        src: '/projects/labour-market/pbi-state.png',
-        alt: 'Power BI page breaking employment down by state and territory.',
-        caption: 'State and territory view.',
+        caption: 'Industry breakdown, annual to 2022, labelled with its vintage on purpose.',
       },
     ],
   },

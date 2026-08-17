@@ -41,12 +41,12 @@ export const dataProjects: IndexedProject[] = [
   {
     id: 'labour-market',
     title: 'Australian Labour Market Dashboard',
-    blurb: 'Live ABS data ingested in Python, modelled through a staging→mart layer in Azure SQL, and reported in Power BI generated as code.',
-    stack: ['ABS API', 'Azure SQL', 'Power BI', 'DAX', 'Python'],
+    blurb: 'Live ABS data ingested in Python, modelled into a tested dbt star schema on SQL Server, and reported in Power BI and Excel generated as code. Used to answer why the gender full-time gap is closing.',
+    stack: ['ABS API', 'dbt', 'SQL Server', 'Power BI', 'Excel', 'Python'],
     href: '/projects/data/labour-market',
     linkLabel: 'Case study',
     featured: true,
-    note: '80% of working men are full-time, 57% of women',
+    note: 'The gap is closing, but not for the reason the numbers first suggest',
   },
   {
     id: 'youtube',
