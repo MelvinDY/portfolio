@@ -30,9 +30,23 @@ export default function Reveal({
   useEffect(() => {
     const el = ref.current
     if (!el) return
+
+    // threshold 0, not a ratio.
+    //
+    // A ratio threshold is unreachable once the element is taller than the
+    // viewport divided by that ratio: asking for 12% of a 9,700px article to be
+    // visible needs ~1,170px on screen at once, which a ~840px viewport can
+    // never provide. The observer then never fires, `shown` stays false, and the
+    // element sits at opacity 0 forever. That is exactly what happened to the
+    // labour market case study when its content column grew past ~7,000px: the
+    // whole article was in the DOM and invisible.
+    //
+    // Firing as soon as any part of the element intersects cannot fail that way,
+    // and for anything shorter than the viewport it is a few pixels of scroll
+    // different from the old behaviour.
     const io = new IntersectionObserver(
       ([e]) => { if (e.isIntersecting) { setShown(true); io.disconnect() } },
-      { threshold: 0.12 },
+      { threshold: 0 },
     )
     io.observe(el)
     return () => io.disconnect()
