@@ -120,12 +120,12 @@ export const entries: DataEntry[] = [
   {
     id: 'grocery',
     title: 'Woolworths vs Coles Price Analytics',
-    sub: 'Same-day basket comparison',
-    provenance: { label: 'Live retailer APIs, one-day snapshot', real: true },
-    figure: '$1.82',
-    claim: 'separates a 50-item basket at the two retailers. Half of 104 matched products cost exactly the same.',
+    sub: 'Ten-day price series, two retailers',
+    provenance: { label: 'Live retailer APIs, 10 days to 23 Aug 2026', real: true },
+    figure: '39 of 44',
+    claim: 'promotions that ended went straight back to the price they started at. The median one was 41% off and lasted a week.',
     blurb:
-      'Same-day prices from both retailers public web APIs, fuzzy-matched into identical product pairs and compared in a DuckDB warehouse: basket totals, per-100g unit prices, and the outliers worth $15.',
+      'Prices pulled daily from both retailers public web APIs, fuzzy-matched into identical product pairs and tracked over time in a dbt warehouse: where the two chains match to the cent, where they do not bother, and what a price does once the promo badge appears.',
     stack: ['Python', 'DuckDB', 'rapidfuzz', 'Entity resolution'],
     href: '/projects/data/grocery',
     method: {

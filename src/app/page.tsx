@@ -116,7 +116,7 @@ export default function HomePage() {
 
                 Rows analysed is the figure this page can actually defend:
                 40,000 trending videos, 12,500 invoices, 1,147 subscriptions
-                and 104 matched pairs, all of them published on the case study
+                and 128 matched pairs, all of them published on the case study
                 pages. The number it replaced could not be pointed at. */}
             <div className="rdout" data-rise>
               <div className="rd">
