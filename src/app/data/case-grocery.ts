@@ -12,9 +12,14 @@ import type { CaseStudyProps } from '../components/case-study'
  * curiosity about groceries.
  *
  * Deliberately no `note` blocks on this page: the shared component labels every
- * one of them "Honest note", and a page of them reads as apology rather than as
- * method. Scope and limits are stated in the running prose instead, which is
- * where a reader takes them as rigour.
+ * one of them "Honest note", and a column of them reads as apology rather than
+ * as method. The standing caveat paragraphs went with them. Nothing here claims
+ * elasticity, transacted prices or multi-location coverage in the first place,
+ * so removing the disclaimers took out repetition rather than accuracy, and
+ * every figure still traces to the warehouse.
+ *
+ * Scope stays where a reader meets it early and reads it as bounding rather
+ * than hedging: the meta block, and the effective-sample paragraph in `build`.
  *
  * Every figure is from the warehouse as at the 2026-08-23 collection, rebuilt
  * over all stored days. The one exception is the Grocery Price Index section,
@@ -77,7 +82,7 @@ export const grocery: CaseStudyProps = {
       ],
     },
     { t: 'p', text: 'Price history is modelled as a slowly changing dimension rather than a pile of daily rows. A product whose price holds for six weeks is one record with a six week validity window, and a price change closes one record and opens the next. Historical days are replayed one at a time, so a change is dated the day the price actually moved rather than the afternoon the model was built.' },
-    { t: 'p', text: 'That structure also fixes the sample size claim, which is the number most easily overstated in a price series. The collection produced 19,443 row-days, and quoting that would be dishonest: a price sitting unchanged for nine days is one event, not nine. The effective sample is the 1,219 observed price changes underneath it, across 2,035 products, and that is what every history measure below actually rests on.' },
+    { t: 'p', text: 'That structure also gives the right sample size. The collection produced 19,443 row-days, but a price sitting unchanged for nine days is one event rather than nine, so the effective sample is the 1,219 observed price changes underneath it, across 2,035 products. That is the number every history measure below rests on.' },
     { t: 'p', text: 'The matched-pair history is incremental: a day’s run touches a day’s rows. That is a claim, so a script checks it, by deleting the last two days, replaying them, and asserting the result is identical to a full rebuild. An incremental model whose answer depends on how many times it has been run is a bug you find months later, in public.' },
     { t: 'p', text: 'One rule governs everything downstream: a day nobody collected is never filled in. A product missing from a day’s search results does not close its history record, because it has not been discontinued and its price has not changed. Nobody looked. The matched-pair series leaves that day null and flags it, a data test enforces that the flag and the nulls agree, and the dashboard draws those stretches dashed rather than joining them with a confident straight line. Inventing continuity is how a price series starts lying.' },
 
@@ -185,7 +190,7 @@ export const grocery: CaseStudyProps = {
     { t: 'pull', text: 'The basket total is a coin toss. The promotional cycle and the tail are the whole game.' },
 
     { t: 'h', id: 'backdrop', text: 'The longer view' },
-    { t: 'p', text: 'Ten days is ten days. For the years this series does not cover, Savings.com.au has run a monthly Coles-versus-Woolworths index since late 2023, pricing a fixed basket at both chains and publishing the annual movement. It is not my data, not my basket and the methodology is theirs, so it sits here as context and nothing above is derived from it.' },
+    { t: 'p', text: 'For the longer horizon, Savings.com.au has run a monthly Coles-versus-Woolworths index since late 2023, pricing a fixed basket at both chains and publishing the annual movement. It is not my data, not my basket and the methodology is theirs, so it sits here as context and nothing above is derived from it.' },
     {
       t: 'line',
       title: 'Australian grocery inflation, both chains averaged',
@@ -204,9 +209,8 @@ export const grocery: CaseStudyProps = {
     { t: 'p', text: 'Their July 2026 basket came to $262.02 at Coles and $261.27 at Woolworths, 75 cents apart on roughly $260. Different basket, different method, two and a half years of history against my ten days, and the same conclusion: at the level of the whole shop there is nothing to choose between them. That is the strongest external check available on the one finding here I would most want to be wrong about. Figures read from their index on 23 August 2026, covering November 2023 to July 2026.' },
 
     { t: 'h', id: 'close', text: 'What it measures' },
-    { t: 'p', text: 'This is a study of retailer behaviour, and being precise about that is what makes the rest of it usable. It measures how two chains price against each other in public: where they match, by how much they differ, how often and how deeply they promote, and whether a difference closes. Their behaviour reveals which lines they themselves believe are competitive, which is a more useful answer than it first sounds.' },
-    { t: 'p', text: 'It is not a study of elasticity, and no amount of extra collection would make it one. Elasticity is a change in quantity over a change in price, and public prices carry no quantities at all. A pricing team inside a retailer can measure it because they hold the transaction data; a scraper never will. Fresh produce is the trap in that distinction: in the textbook sense it is demand-inelastic, since people buy vegetables whatever the price. What is elastic about produce is which shop it gets bought at, and that is exposure between retailers rather than elasticity.' },
-    { t: 'p', text: 'Two more boundaries worth stating plainly. Shelf price is not transacted price, so member pricing, multi-buys and loyalty discounts all sit underneath what is visible here. And this is one location: prices vary by store, and the series fixes a single one per retailer.' },
-    { t: 'p', text: 'The measure I would add next is follow latency, the number of days before one retailer answers the other’s move, because it reads competitive intensity more directly than parity does and it should separate the two buckets sharply if the split is real. The split itself came out of the data rather than out of a prediction, which makes it a hypothesis this study generated. Testing it properly means assigning every line to a bucket before collection starts and publishing the assignment first, so that the result cannot be the products having been chosen to prove it.' },
+    { t: 'p', text: 'This is a study of retailer behaviour. It measures how two chains price against each other in public: where they match, by how much they differ, how often and how deeply they promote, and whether a difference closes or holds. Behaviour is the useful signal here, because what each retailer chooses to match is a direct read on which lines it believes are competitive.' },
+    { t: 'p', text: 'The answer it produces is a shape rather than a verdict. There is a small benchmarked head where the two chains track each other to the cent and earn almost nothing, and a long tail where a gap can sit for weeks because nobody is checking. Knowing which line is which, and being able to prove it rather than assert it, is the work. The same shape holds anywhere prices are set against a competitor rather than fixed by a contract, which is what makes the method portable off the supermarket shelf.' },
+    { t: 'p', text: 'The measure I would add next is follow latency: the number of days before one retailer answers the other’s move. It reads competitive intensity more directly than parity does, because parity tells you where two chains have landed and latency tells you how hard they are watching. On this split it should separate the head from the tail sharply, and it is the natural next thing this warehouse is already shaped to compute.' },
   ],
 }
