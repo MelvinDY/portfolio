@@ -61,12 +61,12 @@ export const dataProjects: IndexedProject[] = [
   {
     id: 'grocery',
     title: 'Woolworths vs Coles Price Analytics',
-    blurb: 'Prices pulled daily from both retailers’ public APIs, fuzzy-matched into identical product pairs and tracked over time in a dbt warehouse.',
-    stack: ['Python', 'DuckDB', 'rapidfuzz', 'Entity resolution'],
+    blurb: 'Competitor benchmarking on public data: two retailers’ prices matched into identical product pairs and tracked in a dbt warehouse, measured on parity rate, gap and promotion behaviour.',
+    stack: ['Python', 'dbt', 'DuckDB', 'rapidfuzz'],
     href: '/projects/data/grocery',
     linkLabel: 'Case study',
     featured: true,
-    note: '9 in 10 specials end back where they started',
+    note: '7.1% parity in household, 62.5% in pantry',
   },
   {
     id: 'saas',
