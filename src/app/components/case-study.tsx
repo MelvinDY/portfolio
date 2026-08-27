@@ -34,7 +34,7 @@ export type Block =
   | { t: 'lede'; text: string }
   | { t: 'stats'; items: { figure: string; caption: string }[] }
   | { t: 'bars'; title: string; unit: string; bars: Bar[]; read?: string }
-  | { t: 'line'; title: string; unit: string; pts: [number, number][]; pts2?: [number, number][]; legend?: [string, string]; xLabels: string[]; yTop?: string; read?: string }
+  | { t: 'line'; title: string; unit: string; pts: [number, number][]; pts2?: [number, number][]; legend?: [string, string]; xLabels: string[]; yTop?: string; yBottom?: string; baseline?: number; baselineLabel?: string; read?: string }
   | { t: 'fig'; src: string; alt: string; page?: string; caption: string }
   | { t: 'note'; text: string }
   | { t: 'flow'; items: { stage: string; tool: string; what: string }[] }
@@ -82,7 +82,11 @@ function LineChart({ b }: { b: Extract<Block, { t: 'line' }> }) {
   const x = (v: number) => P.l + v * (W - P.l - P.r)
   const y = (v: number) => P.t + (1 - v) * (H - P.t - P.b)
   const d = b.pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${x(p[0]).toFixed(1)},${y(p[1]).toFixed(1)}`).join(' ')
-  const area = `${d} L${x(b.pts[b.pts.length - 1][0]).toFixed(1)},${y(0)} L${x(b.pts[0][0]).toFixed(1)},${y(0)} Z`
+  // With a baseline the series is signed, so the fill closes on the zero line
+  // rather than on the floor. Filling to the floor under a negative value
+  // shades the wrong side and reads as if the quantity were still positive.
+  const foot = b.baseline ?? 0
+  const area = `${d} L${x(b.pts[b.pts.length - 1][0]).toFixed(1)},${y(foot)} L${x(b.pts[0][0]).toFixed(1)},${y(foot)} Z`
   const d2 = b.pts2
     ? b.pts2.map((p, i) => `${i === 0 ? 'M' : 'L'}${x(p[0]).toFixed(1)},${y(p[1]).toFixed(1)}`).join(' ')
     : null
@@ -113,12 +117,33 @@ function LineChart({ b }: { b: Extract<Block, { t: 'line' }> }) {
         {[0.25, 0.5, 0.75].map(g => (
           <line key={g} x1={P.l} x2={W - P.r} y1={y(g)} y2={y(g)} stroke="#14120F" strokeOpacity="0.1" strokeWidth="1" />
         ))}
-        <path d={area} fill={`url(#${gid})`} />
+        <path d={area} fill={b.baseline === undefined ? `url(#${gid})` : '#ff5e1f'} fillOpacity={b.baseline === undefined ? 1 : 0.12} />
+        {b.baseline !== undefined && (
+          <line x1={P.l} x2={W - P.r} y1={y(b.baseline)} y2={y(b.baseline)} stroke="#14120F" strokeOpacity="0.45" strokeWidth="1.5" />
+        )}
         <path d={d} fill="none" stroke="#ff5e1f" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
         {/* Optional second series. No area fill and no gradient: the fill reads
             as emphasis, and a comparison line is there to be compared against,
             not to compete. */}
         {d2 && <path d={d2} fill="none" stroke="#14120F" strokeOpacity="0.55" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />}
+        {/* yTop has been in the type since this chart was written and was never
+            drawn, so every line chart shipped without a vertical scale. A reader
+            could see a shape and not read a value off it. */}
+        {b.yTop && (
+          <text x={P.l} y={P.t + 9} fontSize="11" fill="#8A8378" fontFamily="var(--font-mono), monospace">
+            {b.yTop}
+          </text>
+        )}
+        {b.yBottom && (
+          <text x={P.l} y={H - P.b - 2} fontSize="11" fill="#8A8378" fontFamily="var(--font-mono), monospace">
+            {b.yBottom}
+          </text>
+        )}
+        {b.baseline !== undefined && b.baselineLabel && (
+          <text x={W - P.r} y={y(b.baseline) - 5} textAnchor="end" fontSize="11" fill="#8A8378" fontFamily="var(--font-mono), monospace">
+            {b.baselineLabel}
+          </text>
+        )}
         {b.xLabels.map((l, i) => (
           <text
             key={l}
