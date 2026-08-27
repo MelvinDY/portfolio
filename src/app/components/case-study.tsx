@@ -34,7 +34,7 @@ export type Block =
   | { t: 'lede'; text: string }
   | { t: 'stats'; items: { figure: string; caption: string }[] }
   | { t: 'bars'; title: string; unit: string; bars: Bar[]; read?: string }
-  | { t: 'line'; title: string; unit: string; pts: [number, number][]; pts2?: [number, number][]; legend?: [string, string]; xLabels: string[]; yTop?: string; yBottom?: string; baseline?: number; baselineLabel?: string; read?: string }
+  | { t: 'line'; title: string; unit: string; pts: [number, number][]; pts2?: [number, number][]; legend?: [string, string]; xLabels: string[]; yTop?: string; yBottom?: string; baseline?: number; baselineLabel?: string; dots?: boolean; read?: string }
   | { t: 'fig'; src: string; alt: string; page?: string; caption: string }
   | { t: 'note'; text: string }
   | { t: 'flow'; items: { stage: string; tool: string; what: string }[] }
@@ -144,6 +144,15 @@ function LineChart({ b }: { b: Extract<Block, { t: 'line' }> }) {
             {b.baselineLabel}
           </text>
         )}
+        {/* One marker per observation. Without them a reader cannot tell an
+            observed day from a day the line merely passes through, and this
+            project's whole rule is that a day nobody collected is never filled
+            in. On a sparse series the line is interpolation and the dots are
+            the data, so the dots have to be visible. */}
+        {b.dots &&
+          b.pts.map((pt, i) => (
+            <circle key={i} cx={x(pt[0])} cy={y(pt[1])} r="3.5" fill="#ff5e1f" stroke="#FDFCF9" strokeWidth="1.5" />
+          ))}
         {b.xLabels.map((l, i) => (
           <text
             key={l}

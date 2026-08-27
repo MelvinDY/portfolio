@@ -154,18 +154,19 @@ export const grocery: CaseStudyProps = {
     {
       t: 'line',
       title: 'Who is cheaper, day by day',
-      unit: 'basket total, Woolworths minus Coles, AUD. 12 collected days, 12 to 27 Aug 2026',
+      unit: 'basket total, Woolworths minus Coles, AUD. 12 collected days between 12 and 27 Aug 2026',
       yTop: 'Coles cheaper by $10',
       yBottom: 'Woolworths cheaper by $20',
       baseline: 0.6667,
       baselineLabel: 'level',
+      dots: true,
       pts: [
         [0.0, 0.1673], [0.0667, 0.1723], [0.1333, 0.1723], [0.2667, 0.1773],
         [0.4, 0.2023], [0.4667, 0.9077], [0.5333, 0.9077], [0.6, 0.7787],
         [0.7333, 0.692], [0.8, 0.6903], [0.8667, 0.8137], [1.0, 0.0233],
       ],
       xLabels: ['12 Aug', '19 Aug', '27 Aug'],
-      read: 'The line crosses zero twice in a fortnight. Woolworths holds a $15 lead for a week, Coles takes it by $7 overnight on 19 August, the two converge to within 71 cents by the 24th, and Woolworths reopens a $19 lead on the 27th. This is what the corrected basket looks like as a series rather than as a sentence, and it is the strongest argument against quoting any single day: pick your morning and this data will tell you either chain is cheaper by up to $19. Points are spaced by date, so the flat runs are days apart rather than consecutive. The 15 July snapshot is deliberately off this chart, because a four-week collection hole sits between it and 12 August and drawing a line across a gap nobody observed is the one thing this project refuses to do anywhere else. The last point prices 47 lines rather than 48, Woolworths having returned no qualifying carton of eggs that morning; on the 47 lines common to both days the swing is the same, from plus $2.51 to minus $19.30.',
+      read: 'The line crosses zero twice in a fortnight. Woolworths holds a $15 lead for a week, Coles takes it by $7 overnight on 19 August, the two converge to within 71 cents by the 24th, and Woolworths reopens a $19 lead on the 27th. This is what the corrected basket looks like as a series rather than as a sentence, and it is the strongest argument against quoting any single day: pick your morning and this data will tell you either chain is cheaper by up to $19. Each dot is a collected day and the line between them is interpolation, not observation. Four days inside this window carry no dot: the 15th, 17th and 26th were not collected, and the 22nd was collected so badly that Coles answered seven basket lines out of fifty, so it is excluded everywhere. The 15 July snapshot is off the chart entirely, because a four-week collection hole sits between it and 12 August and drawing a line across a gap that size claims far more than a two-day hop does. The last point prices 47 lines rather than 48, Woolworths having returned no qualifying carton of eggs that morning; on the 47 lines common to both days the swing is the same, from plus $2.51 to minus $19.30.',
     },
 
     { t: 'lede', text: 'That headline rate hides the finding. Split the same pairs by aisle and they come apart.' },
