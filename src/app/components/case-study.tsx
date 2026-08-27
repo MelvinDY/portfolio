@@ -34,7 +34,7 @@ export type Block =
   | { t: 'lede'; text: string }
   | { t: 'stats'; items: { figure: string; caption: string }[] }
   | { t: 'bars'; title: string; unit: string; bars: Bar[]; read?: string }
-  | { t: 'line'; title: string; unit: string; pts: [number, number][]; xLabels: string[]; yTop?: string; read?: string }
+  | { t: 'line'; title: string; unit: string; pts: [number, number][]; pts2?: [number, number][]; legend?: [string, string]; xLabels: string[]; yTop?: string; read?: string }
   | { t: 'fig'; src: string; alt: string; page?: string; caption: string }
   | { t: 'note'; text: string }
   | { t: 'flow'; items: { stage: string; tool: string; what: string }[] }
@@ -83,11 +83,26 @@ function LineChart({ b }: { b: Extract<Block, { t: 'line' }> }) {
   const y = (v: number) => P.t + (1 - v) * (H - P.t - P.b)
   const d = b.pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${x(p[0]).toFixed(1)},${y(p[1]).toFixed(1)}`).join(' ')
   const area = `${d} L${x(b.pts[b.pts.length - 1][0]).toFixed(1)},${y(0)} L${x(b.pts[0][0]).toFixed(1)},${y(0)} Z`
+  const d2 = b.pts2
+    ? b.pts2.map((p, i) => `${i === 0 ? 'M' : 'L'}${x(p[0]).toFixed(1)},${y(p[1]).toFixed(1)}`).join(' ')
+    : null
   const gid = `g-${b.title.replace(/\W+/g, '')}`
 
   return (
     <div className="mt-10">
       <FigHead title={b.title} unit={b.unit} />
+      {b.legend && (
+        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 text-[12px] text-[#5A544C]">
+          <span className="flex items-center gap-2">
+            <span className="inline-block h-[3px] w-5 bg-[#ff5e1f]" />
+            {b.legend[0]}
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="inline-block h-[3px] w-5 bg-[#14120F]/55" />
+            {b.legend[1]}
+          </span>
+        </div>
+      )}
       <svg viewBox={`0 0 ${W} ${H}`} className="mt-5 w-full" role="img" aria-label={`${b.title}. ${b.read ?? ''}`}>
         <defs>
           <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
@@ -100,6 +115,10 @@ function LineChart({ b }: { b: Extract<Block, { t: 'line' }> }) {
         ))}
         <path d={area} fill={`url(#${gid})`} />
         <path d={d} fill="none" stroke="#ff5e1f" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
+        {/* Optional second series. No area fill and no gradient: the fill reads
+            as emphasis, and a comparison line is there to be compared against,
+            not to compete. */}
+        {d2 && <path d={d2} fill="none" stroke="#14120F" strokeOpacity="0.55" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />}
         {b.xLabels.map((l, i) => (
           <text
             key={l}
