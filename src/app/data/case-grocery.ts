@@ -13,9 +13,12 @@ import type { CaseStudyProps } from '../components/case-study'
  * because how it was found is worth more than the number. No matched-pair
  * figure moved: the matcher always enforced pack size within 2%.
  *
- * Added: the `panel` section. Three years of history backfilled from an open
- * price tracker keyed on the same retailer product ids, verified against this
- * project's own days at 99.97%, plus the store-brand against name-brand split
+ * Added: the `panel` section. A YEAR of history backfilled from an open price
+ * tracker keyed on the same retailer product ids, verified against this
+ * project's own days at 99.97%. The source reaches back to Sep 2023; the
+ * analysis window is the most recent 12 months and every figure in the section
+ * is that window. Do not describe it as three years: that is what is on disk,
+ * not what was measured. plus the store-brand against name-brand split
  * and a pre-registered test scored against predictions committed before any
  * bucket-level figure existed. Full write-ups live in the repo, in
  * docs/data_quality.md, docs/preregistration.md and docs/results_bucket_test.md.
@@ -55,7 +58,7 @@ export const grocery: CaseStudyProps = {
        collected days bound the promotion and reference-price measures, and the
        backfilled years bound the rest, so a reader should meet both before the
        findings rather than after them. */
-    ['Scope', '13 collected days to 27 Aug 2026, plus 3 years backfilled'],
+    ['Scope', '13 collected days, plus a backfilled year to 27 Aug 2026'],
     ['Built', 'Collector, entity resolution, dbt warehouse with SCD2 history'],
   ],
   contents: [
@@ -63,7 +66,7 @@ export const grocery: CaseStudyProps = {
     ['build', 'Building the series'],
     ['matching', 'The matching layer'],
     ['findings', 'The measures'],
-    ['panel', 'Three years, and a test'],
+    ['panel', 'A year of prices, and a test'],
     ['backdrop', 'The longer view'],
     ['close', 'What it measures'],
   ],
@@ -190,7 +193,7 @@ export const grocery: CaseStudyProps = {
       ],
       read: 'A promotion on these shelves is deep and brief and then it is over: median 41% off, median run of 7 days, ending where it started. Nine in ten are a promotional cycle rather than a price change, which is the difference between timing your shop and switching your shop.',
     },
-    { t: 'p', text: 'Run the same question at the pair level and it answers differently. Of the pairs observed on at least five days, 63 opened with a gap wider than 5%, and 51 of them, 81%, were still wider than 5% on the last day observed. Over this window gaps mostly do not close, though that turns out to be a fact about the window rather than about the gaps, and the three-year series below settles it. That persistence barely moves between the buckets, 82% in the price-opaque aisles against 80% in the price-visible ones, so the split governs whether the two chains match at all rather than how quickly they correct once they differ.' },
+    { t: 'p', text: 'Run the same question at the pair level and it answers differently. Of the pairs observed on at least five days, 63 opened with a gap wider than 5%, and 51 of them, 81%, were still wider than 5% on the last day observed. Over this window gaps mostly do not close, though that turns out to be a fact about the window rather than about the gaps, and the year-long series below settles it. That persistence barely moves between the buckets, 82% in the price-opaque aisles against 80% in the price-visible ones, so the split governs whether the two chains match at all rather than how quickly they correct once they differ.' },
     {
       t: 'bars',
       title: 'Largest same-product gaps',
@@ -209,19 +212,19 @@ export const grocery: CaseStudyProps = {
 
     { t: 'pull', text: 'The basket total is a coin toss. The promotional cycle and the tail are the whole game.' },
 
-    { t: 'h', id: 'panel', text: 'Three years, and a test I could fail' },
-    { t: 'p', text: 'Ten days answers which chain was cheaper. It cannot answer whether a gap is a promotion or a position, because on any single morning those look identical and only the following weeks separate them. An open price tracker has been scraping both chains daily since September 2023 and publishes the result, and it keys products by the retailers’ own product ids, which are the same ids this collector already stores. So the pairs matched here extend backwards three years on an equality join, with no re-matching at all.' },
+    { t: 'h', id: 'panel', text: 'A year of prices, and a test I could fail' },
+    { t: 'p', text: 'Ten days answers which chain was cheaper. It cannot answer whether a gap is a promotion or a position, because on any single morning those look identical and only the following weeks separate them. An open price tracker has been scraping both chains daily since September 2023 and publishes the result, and it keys products by the retailers’ own product ids, which are the same ids this collector already stores. So the pairs matched here extend backwards on an equality join, with no re-matching at all. The source reaches back three years. Every figure in this section is the most recent twelve months of it, 27 Aug 2025 to 27 Aug 2026, and the remaining two years sit on disk unanalysed behind a one-line change.' },
     { t: 'p', text: 'Borrowed data is worth what it can be checked against. For every day this project priced a product itself, the backfill is asked what price it implies for that day and the two are compared: 22,616 overlapping observations, 99.97% agreeing to the cent, from two scrapers built independently by two people who have never spoken. That check is a gate rather than a report. It runs before anything is built, and below 99% the whole arm refuses to build.' },
     {
       t: 'stats',
       items: [
-        { figure: '783,141', caption: 'Observed price changes across 44,648 products, back to September 2023.' },
+        { figure: '783,141', caption: 'Observed price changes across 44,648 products in the source, back to September 2023. The study reads the most recent year of it.' },
         { figure: '99.97%', caption: 'Agreement between the backfill and this project’s own collected days, over 22,616 observations.' },
         { figure: '7 days', caption: 'Median life of a price gap wider than 5%. Identical in every cell tested.' },
       ],
     },
 
-    { t: 'lede', text: 'The first thing three years buys is a correction to the ten-day answer.' },
+    { t: 'lede', text: 'The first thing a year buys is a correction to the ten-day answer.' },
     { t: 'p', text: 'Over ten days, gaps looked permanent: four in five that opened wider than 5% were still open on the last day observed. Over a year they are not. Of 30,398 gap episodes on name brands, 97.7% close, and the median one lasts seven days. The short window was not measuring how long gaps persist. It was measuring the length of its own window, which is the failure mode of every study that reports persistence over a period shorter than the thing being measured.' },
 
     { t: 'lede', text: 'The second is a split the aisle chart could not separate: store brand against name brand.' },
