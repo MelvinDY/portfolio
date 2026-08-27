@@ -4,6 +4,22 @@ import type { CaseStudyProps } from '../components/case-study'
  * Woolworths vs Coles case study. Copy kept in the author's voice per 11.C,
  * with the em-dashes rewritten out.
  *
+ * v6, 2026-08-27. Two changes. The basket figure is CORRECTED: it read $13.92
+ * in Coles' favour on 9 of 10 days, and the basket had been taking the cheapest
+ * hit per line without checking its pack size, which hit 35.9% of sized Coles
+ * lines against 3.1% at Woolworths and almost always toward smaller, cheaper
+ * packs. Corrected, the two chains are level and Woolworths averages $6.47
+ * cheaper. The correction is stated on the page rather than quietly applied,
+ * because how it was found is worth more than the number. No matched-pair
+ * figure moved: the matcher always enforced pack size within 2%.
+ *
+ * Added: the `panel` section. Three years of history backfilled from an open
+ * price tracker keyed on the same retailer product ids, verified against this
+ * project's own days at 99.97%, plus the store-brand against name-brand split
+ * and a pre-registered test scored against predictions committed before any
+ * bucket-level figure existed. Full write-ups live in the repo, in
+ * docs/data_quality.md, docs/preregistration.md and docs/results_bucket_test.md.
+ *
  * v5, 2026-08-23. Rewritten in the vocabulary a pricing team actually uses:
  * parity rate, mean absolute gap, promotion frequency and depth, gap
  * persistence, reference-price integrity, and the price-visible / price-opaque
@@ -34,11 +50,12 @@ export const grocery: CaseStudyProps = {
     ['Role', 'Solo build and analysis'],
     ['Stack', 'Python, dbt, DuckDB, rapidfuzz'],
     ['Source', 'Retailer web APIs, collected daily'],
-    ['Sample', '50-line basket, 128 matched pairs'],
-    /* The scope belongs beside the sample size, not four sections down. Ten
-       days bounds every history measure further down, so a reader should meet
-       it before the findings rather than after them. */
-    ['Scope', '10 collected days, 15 Jul to 23 Aug 2026'],
+    ['Sample', '48-line basket, 128 matched pairs, 1,523 backfilled pairs'],
+    /* The scope belongs beside the sample size, not four sections down. The
+       collected days bound the promotion and reference-price measures, and the
+       backfilled years bound the rest, so a reader should meet both before the
+       findings rather than after them. */
+    ['Scope', '13 collected days to 27 Aug 2026, plus 3 years backfilled'],
     ['Built', 'Collector, entity resolution, dbt warehouse with SCD2 history'],
   ],
   contents: [
@@ -46,6 +63,7 @@ export const grocery: CaseStudyProps = {
     ['build', 'Building the series'],
     ['matching', 'The matching layer'],
     ['findings', 'The measures'],
+    ['panel', 'Three years, and a test'],
     ['backdrop', 'The longer view'],
     ['close', 'What it measures'],
   ],
@@ -103,9 +121,11 @@ export const grocery: CaseStudyProps = {
         { label: 'Coles cheaper', value: '37', pct: 67 },
         { label: 'Woolworths cheaper', value: '36', pct: 65 },
       ],
-      read: 'The parity rate is stable, holding between 39.5% and 43.0% on every August day in the series. The basket total disagrees with the pair count and neither is wrong: the basket takes the cheapest available item per line, the pairs count only products both chains stock in the same size. Coles took the basket on 9 of the 10 days, by $13.92 on the most recent.',
+      read: 'The parity rate is stable, holding between 39.5% and 43.0% on every August day in the series. The basket total disagrees with the pair count and neither is wrong: the basket takes the cheapest available item per line, the pairs count only products both chains stock in the same size. On the basket the two chains are level, 48 comparable lines coming to $190.71 at Coles against $191.47 at Woolworths.',
     },
 
+    { t: 'p', text: 'That basket figure is a correction. It previously read $13.92 in Coles’ favour, with Coles taking 9 of the 10 days, and the reason it was wrong is worth more than the number. The basket took the cheapest hit per line without ever checking that the hit was the size the line asked for, so a 2L milk line could be priced on a 1L bottle and a 1kg carrot line on a 170g pack.' },
+    { t: 'p', text: 'The error was not symmetric, which is what made it dangerous rather than merely noisy. It hit 35.9% of sized Coles lines against 3.1% at Woolworths, almost always toward smaller and therefore cheaper packs, applying a systematic discount to exactly the side the finding named as cheaper. Corrected, Coles takes 4 of the 10 days and Woolworths averages $6.47 cheaper. Not one matched-pair figure on this page moved, because the matcher has always enforced pack size within 2%: the careful component was right and the crude one was on the front page.' },
     { t: 'lede', text: 'That headline rate hides the finding. Split the same pairs by aisle and they come apart.' },
     {
       t: 'bars',
@@ -170,7 +190,7 @@ export const grocery: CaseStudyProps = {
       ],
       read: 'A promotion on these shelves is deep and brief and then it is over: median 41% off, median run of 7 days, ending where it started. Nine in ten are a promotional cycle rather than a price change, which is the difference between timing your shop and switching your shop.',
     },
-    { t: 'p', text: 'Run the same question at the pair level and it answers differently. Of the pairs observed on at least five days, 63 opened with a gap wider than 5%, and 51 of them, 81%, were still wider than 5% on the last day observed. Gaps between the two retailers mostly do not close. That persistence barely moves between the buckets, 82% in the price-opaque aisles against 80% in the price-visible ones, so the split governs whether the two chains match at all rather than how quickly they correct once they differ.' },
+    { t: 'p', text: 'Run the same question at the pair level and it answers differently. Of the pairs observed on at least five days, 63 opened with a gap wider than 5%, and 51 of them, 81%, were still wider than 5% on the last day observed. Over this window gaps mostly do not close, though that turns out to be a fact about the window rather than about the gaps, and the three-year series below settles it. That persistence barely moves between the buckets, 82% in the price-opaque aisles against 80% in the price-visible ones, so the split governs whether the two chains match at all rather than how quickly they correct once they differ.' },
     {
       t: 'bars',
       title: 'Largest same-product gaps',
@@ -188,6 +208,52 @@ export const grocery: CaseStudyProps = {
     },
 
     { t: 'pull', text: 'The basket total is a coin toss. The promotional cycle and the tail are the whole game.' },
+
+    { t: 'h', id: 'panel', text: 'Three years, and a test I could fail' },
+    { t: 'p', text: 'Ten days answers which chain was cheaper. It cannot answer whether a gap is a promotion or a position, because on any single morning those look identical and only the following weeks separate them. An open price tracker has been scraping both chains daily since September 2023 and publishes the result, and it keys products by the retailers’ own product ids, which are the same ids this collector already stores. So the pairs matched here extend backwards three years on an equality join, with no re-matching at all.' },
+    { t: 'p', text: 'Borrowed data is worth what it can be checked against. For every day this project priced a product itself, the backfill is asked what price it implies for that day and the two are compared: 22,616 overlapping observations, 99.97% agreeing to the cent, from two scrapers built independently by two people who have never spoken. That check is a gate rather than a report. It runs before anything is built, and below 99% the whole arm refuses to build.' },
+    {
+      t: 'stats',
+      items: [
+        { figure: '783,141', caption: 'Observed price changes across 44,648 products, back to September 2023.' },
+        { figure: '99.97%', caption: 'Agreement between the backfill and this project’s own collected days, over 22,616 observations.' },
+        { figure: '7 days', caption: 'Median life of a price gap wider than 5%. Identical in every cell tested.' },
+      ],
+    },
+
+    { t: 'lede', text: 'The first thing three years buys is a correction to the ten-day answer.' },
+    { t: 'p', text: 'Over ten days, gaps looked permanent: four in five that opened wider than 5% were still open on the last day observed. Over a year they are not. Of 30,398 gap episodes on name brands, 97.7% close, and the median one lasts seven days. The short window was not measuring how long gaps persist. It was measuring the length of its own window, which is the failure mode of every study that reports persistence over a period shorter than the thing being measured.' },
+
+    { t: 'lede', text: 'The second is a split the aisle chart could not separate: store brand against name brand.' },
+    {
+      t: 'bars',
+      title: 'How often a price moves',
+      unit: 'share of days either chain repriced, 12 months to 27 Aug 2026',
+      bars: [
+        { label: 'Name brand, fresh produce', value: '10.2%', pct: 100, lead: true },
+        { label: 'Name brand, packaged staples', value: '8.9%', pct: 87 },
+        { label: 'Store brand, fresh produce', value: '7.4%', pct: 73 },
+        { label: 'Store brand, packaged staples', value: '1.1%', pct: 11 },
+      ],
+      read: 'A name brand is the same physical good on both shelves, so a gap between the chains is a pricing decision. A store brand is a substitute from a different supplier, so a gap is partly a product difference. Pooled, store brands reprice about three and a half times less often than name brands. Split by aisle that single number turns out to be an average of two regimes: eight times less often on packaged staples, and only 1.4 times on produce. Crop and weather move a price whoever owns the label, and private-label pricing discipline is something you can only exercise over a manufactured good.',
+    },
+
+    { t: 'lede', text: 'Writing the prediction down first is what makes it a test rather than a story.' },
+    { t: 'p', text: 'The aisle split earlier on this page was found in the data rather than predicted before it, which makes it a hypothesis this study generated rather than one it tested. So for the longer series the item list, the bucket assignment and the expected numbers were committed to version control before a single bucket-level figure was computed, and the commit hash is published beside the results. Seven of twelve predictions landed inside the registered range. Packaged staples went five of six and fresh produce two of six, which is at least the right cell to be wrong about.' },
+    { t: 'p', text: 'The claim that mattered was whether the store-brand effect survived holding aisle constant, with a commitment made in advance to retract it publicly if it did not. It survived. The prediction that failed hardest is the more useful result.' },
+    {
+      t: 'bars',
+      title: 'Do the two chains’ prices move together?',
+      unit: 'median per-pair correlation of monthly mean price, 12 months to 27 Aug 2026',
+      bars: [
+        { label: 'Store brand, packaged staples', value: '0.72', pct: 100, lead: true },
+        { label: 'Store brand, produce', value: '0.42', pct: 58 },
+        { label: 'Name brand, produce', value: '0.28', pct: 39 },
+        { label: 'Name brand, packaged staples', value: '0.24', pct: 33 },
+      ],
+      read: 'Those are monthly means. Day to day the two name-brand figures are zero and faintly negative, against a registered prediction of 0.80 to 0.95. Two chains buying the same crop in the same weather ought to move together, and on national brands they do not, because national brands are the promotional vehicles and the two chains run their cycles out of phase. The prices take turns rather than moving together. Store brands are lightly promoted, so what remains is shared cost arriving at both chains at once, and they track each other most closely of all. The axis separating correlated from uncorrelated prices is not fresh against packaged. It is promoted against not.',
+    },
+    { t: 'p', text: 'That is the sort of result worth wanting. The prediction was wrong in a direction that named its own cause, and the cause is visible in the other measures on this page rather than invented to cover the miss.' },
 
     { t: 'h', id: 'backdrop', text: 'The longer view' },
     { t: 'p', text: 'For the longer horizon, Savings.com.au has run a monthly Coles-versus-Woolworths index since late 2023, pricing a fixed basket at both chains and publishing the annual movement. It is not my data, not my basket and the methodology is theirs, so it sits here as context and nothing above is derived from it.' },
