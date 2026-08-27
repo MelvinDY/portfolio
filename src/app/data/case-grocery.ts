@@ -4,14 +4,13 @@ import type { CaseStudyProps } from '../components/case-study'
  * Woolworths vs Coles case study. Copy kept in the author's voice per 11.C,
  * with the em-dashes rewritten out.
  *
- * v6, 2026-08-27. Two changes. The basket figure is CORRECTED: it read $13.92
- * in Coles' favour on 9 of 10 days, and the basket had been taking the cheapest
- * hit per line without checking its pack size, which hit 35.9% of sized Coles
- * lines against 3.1% at Woolworths and almost always toward smaller, cheaper
- * packs. Corrected, the two chains are level and Woolworths averages $6.07
- * cheaper. The correction is stated on the page rather than quietly applied,
- * because how it was found is worth more than the number. No matched-pair
- * figure moved: the matcher always enforced pack size within 2%.
+ * v8, 2026-08-28. The basket is removed from the page. It was the thinnest
+ * thing here -- one total per collected day, thirteen days, and the measure that
+ * had already been corrected twice -- and it invited a reader to weigh a coin
+ * toss against three years of matched-pair history. The matching layer, the
+ * aisle split, the promotion behaviour and the backfill all stand without it.
+ * The pack-size bug that forced the last correction lives on in the repo, in
+ * docs/data_quality.md, where it is a data-quality record rather than a finding.
  *
  * v7, 2026-08-27. The panel now runs over the FULL source history, Sep 2023 to
  * Aug 2026, not the twelve months it launched with. Eligibility and window had
@@ -61,7 +60,7 @@ export const grocery: CaseStudyProps = {
     ['Role', 'Solo build and analysis'],
     ['Stack', 'Python, dbt, DuckDB, rapidfuzz'],
     ['Source', 'Retailer web APIs, collected daily'],
-    ['Sample', '48-line basket, 128 matched pairs, 1,523 backfilled pairs, 775k pair-days'],
+    ['Sample', '128 matched pairs on the day, 1,523 backfilled pairs, 775k pair-days'],
     /* The scope belongs beside the sample size, not four sections down. The
        collected days bound the promotion and reference-price measures, and the
        backfilled years bound the rest, so a reader should meet both before the
@@ -129,7 +128,6 @@ export const grocery: CaseStudyProps = {
         'Matched pair. The same product at both chains: equal brand, pack size within 2%, and a fuzzy name score of 80 or better. Home brands are matched only against each other, as substitutes rather than as the same product. Every accepted pair keeps its score, so any pair can be pulled up and shown why it was accepted.',
         'Parity rate. The share of matched pairs priced identically to the cent at both chains on the same day. Not within a tolerance: equal.',
         'Mean absolute gap. The mean of the absolute dollar difference across matched pairs in an aisle. It weights every pair equally, so it describes the shelf rather than the till, and a dear line nobody buys counts as much as milk.',
-        'Basket total. The cheapest hit per basket line, restricted to lines where both chains stock the size the line asks for, summed across 48 comparable lines. Lines with no size match at one chain leave the basket rather than being compared across different sizes.',
         'Promotion episode. A run of consecutive collected days on which the retailer’s own promotion flag is set for a product. Depth is measured against the price this collector observed before the run began, not against the advertised was-price.',
         'Reference-price integrity. The share of advertised was-prices that match a price this collector actually observed on an earlier day. Only episodes with an earlier observation of my own can be tested, so the denominator is 100, not 203.',
         'Repricing rate. Over the backfilled year, the share of pair-days on which either chain moved its price by at least half a cent. This is the effective sample size for the brand-tier comparison: a price sitting still for nine days is one event, not nine.',
@@ -146,27 +144,7 @@ export const grocery: CaseStudyProps = {
         { label: 'Coles cheaper', value: '37', pct: 67 },
         { label: 'Woolworths cheaper', value: '36', pct: 65 },
       ],
-      read: 'The parity rate is stable, holding between 39.5% and 43.0% on every August day in the series. The basket total disagrees with the pair count and neither is wrong: the basket takes the cheapest available item per line, the pairs count only products both chains stock in the same size. On the basket the two chains are level, 48 comparable lines coming to $190.71 at Coles against $191.47 at Woolworths.',
-    },
-
-    { t: 'p', text: 'That basket figure is a correction. It previously read $13.92 in Coles’ favour, with Coles taking 9 of the 10 days, and the reason it was wrong is worth more than the number. The basket took the cheapest hit per line without ever checking that the hit was the size the line asked for, so a 2L milk line could be priced on a 1L bottle and a 1kg carrot line on a 170g pack.' },
-    { t: 'p', text: 'The error was not symmetric, which is what made it dangerous rather than merely noisy. It hit 35.9% of sized Coles lines against 3.1% at Woolworths, almost always toward smaller and therefore cheaper packs, applying a systematic discount to exactly the side the finding named as cheaper. Corrected, Coles takes 6 of the 13 days and Woolworths averages $6.07 cheaper. Not one matched-pair figure on this page moved, because the matcher has always enforced pack size within 2%: the careful component was right and the crude one was on the front page.' },
-    {
-      t: 'line',
-      title: 'Who is cheaper, day by day',
-      unit: 'basket total, Woolworths minus Coles, AUD. 12 collected days between 12 and 27 Aug 2026',
-      yTop: 'Coles cheaper by $10',
-      yBottom: 'Woolworths cheaper by $20',
-      baseline: 0.6667,
-      baselineLabel: 'level',
-      dots: true,
-      pts: [
-        [0.0, 0.1673], [0.0667, 0.1723], [0.1333, 0.1723], [0.2667, 0.1773],
-        [0.4, 0.2023], [0.4667, 0.9077], [0.5333, 0.9077], [0.6, 0.7787],
-        [0.7333, 0.692], [0.8, 0.6903], [0.8667, 0.8137], [1.0, 0.0233],
-      ],
-      xLabels: ['12 Aug', '19 Aug', '27 Aug'],
-      read: 'The line crosses zero twice in a fortnight. Woolworths holds a $15 lead for a week, Coles takes it by $7 overnight on 19 August, the two converge to within 71 cents by the 24th, and Woolworths reopens a $19 lead on the 27th. This is what the corrected basket looks like as a series rather than as a sentence, and it is the strongest argument against quoting any single day: depending on the morning selected, the same data will support a claim of either chain being cheaper by as much as $19. Each dot is a collected day and the line between them is interpolation, not observation. Four days inside this window carry no dot: the 15th, 17th and 26th were not collected, and the 22nd was collected so badly that Coles answered seven basket lines out of fifty, so it is excluded everywhere. The 15 July snapshot is off the chart entirely, because a four-week collection hole sits between it and 12 August and drawing a line across a gap that size claims far more than a two-day hop does. The last point prices 47 lines rather than 48, Woolworths having returned no qualifying carton of eggs that morning; on the 47 lines common to both days the swing is the same, from plus $2.51 to minus $19.30.',
+      read: 'The parity rate is stable, holding between 39.5% and 43.0% on every August day in the series. Parity is equality, not a tolerance: these are pairs where both chains show the same price to the cent on the same morning. The count runs only over products both chains stock in the same size, which is the population the matching layer is built to identify and the only population on which the word identical means anything.',
     },
 
     { t: 'lede', text: 'That headline rate hides the finding. Split the same pairs by aisle and they come apart.' },
@@ -250,7 +228,7 @@ export const grocery: CaseStudyProps = {
       read: 'The same OMO bottle was $30 at Woolworths and $15 at Coles on the same day. Every line here is laundry, coffee, toothpaste or dish soap, and not one is a known value item. A bare label is one product. A label reading (5 variants) is five products of the same line carrying the same gap to the cent, grouped into one bar rather than repeated five times. They are grouped because a whole range goes on promotion at once, which is the actual unit of decision: the choice times a range rather than a product.',
     },
 
-    { t: 'pull', text: 'The basket total is close to a tie. The promotional cycle and the long tail carry the finding.' },
+    { t: 'pull', text: 'Where the two chains compete, they compete to the cent. Where they do not, a gap can sit for a month.' },
 
     { t: 'h', id: 'panel', text: 'Three years, and a test I could fail' },
     { t: 'p', text: 'Thirteen days answers which chain was cheaper. It cannot answer whether a gap is a promotion or a position, because on any single morning those look identical and only the following months separate them. An open price tracker has been scraping both chains daily since September 2023 and publishes the result, and it keys products by the retailers’ own product ids, which are the same ids this collector already stores. So the pairs matched here extend backwards on an equality join, with no re-matching at all.' },
@@ -432,16 +410,15 @@ export const grocery: CaseStudyProps = {
       ],
       xLabels: ['Nov ’24', 'Sep ’25', 'Jul ’26'],
       yTop: '10%',
-      read: 'Grocery inflation peaked above 9% in February 2025 and had cooled to 1.38% by July 2026. That frames everything above: the basket gap measured here moves around inside a market that is close to flat, so it is competitive noise rather than a cost-of-living signal.',
+      read: 'Grocery inflation peaked above 9% in February 2025 and had cooled to 1.38% by July 2026. That frames everything above. The gaps measured here open and close inside a market whose overall level is close to flat, so they are competitive behaviour between two chains rather than a cost-of-living signal, and a gap that swings 67% on a chocolate block says nothing about what groceries cost in aggregate.',
     },
-    { t: 'p', text: 'Their July 2026 basket came to $262.02 at Coles and $261.27 at Woolworths, 75 cents apart on roughly $260. A different basket, a different method, and nearly three years of history against thirteen collected days, reaching the same conclusion: at the level of the whole shop there is nothing to choose between them. That is the strongest external check available on the one finding here I would most want to be wrong about. Figures read from their index on 23 August 2026, covering November 2023 to July 2026.' },
+    { t: 'p', text: 'Their July 2026 basket came to $262.02 at Coles and $261.27 at Woolworths, 75 cents apart on roughly $260. A different basket and a different method, reaching the conclusion this study reaches from the other direction: at the level of the whole shop there is nothing to choose between the two chains, and the interesting variation is underneath that, in which lines each is willing to compete on. Figures read from their index on 23 August 2026, covering November 2023 to July 2026.' },
 
     { t: 'h', id: 'close', text: 'Conclusion' },
     { t: 'p', text: 'Five things the series supports, in the order I would defend them.' },
     {
       t: 'list',
       items: [
-        'Neither chain wins the basket. Across 48 comparable lines the two totals sit within a dollar on the most recent day, the winner flips repeatedly across the collected days, and Woolworths averages $6.07 cheaper across the thirteen collected. Any claim of a stable lead for either chain is a claim about noise, a point made here with some authority: this study published one before the pack-size screen was added.',
         'The average hides the finding. Parity runs from 62.5% in pantry to 7.1% in household on the same morning, and the mean household gap is six times pantry’s. The two chains compete hard where a shopper can price from memory and barely at all where they cannot.',
         'A promotion flag is not a price cut. Of 121 promotion starts with an observable baseline, 17 moved the price the wrong way or not at all, including four mineral waters going from $3.00 to $3.30 while flagged. All 17 were at one chain. The advertised was-prices themselves check out, 100 of 100, so this is the badge and the shelf price being managed apart rather than fake discounting.',
         'Nine in ten promotions are a cycle, not a price change. Of 44 promotions observed on both sides, 39 returned to exactly the price they started at, median 41% off over a 7-day run. That is the difference between timing your shop and switching your shop.',
