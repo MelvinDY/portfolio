@@ -68,7 +68,7 @@ export const grocery: CaseStudyProps = {
     ['findings', 'The measures'],
     ['panel', 'A year of prices, and a test'],
     ['backdrop', 'The longer view'],
-    ['close', 'What it measures'],
+    ['close', 'Conclusion'],
   ],
   links: [
     { label: 'Source and pipeline', href: 'https://github.com/MelvinDY/woolworths-vs-coles-analytics', primary: true },
@@ -114,6 +114,20 @@ export const grocery: CaseStudyProps = {
     { t: 'p', text: 'Porting the original SQL into dbt came with one hard rule: it could change how the marts are built and not what they contain. Every mart was reconciled row for row against the pre-port output before the old models were deleted. Nothing moved.' },
 
     { t: 'h', id: 'findings', text: 'The measures' },
+    { t: 'p', text: 'Every figure below is computed in the warehouse from the collected days, and rebuilt from the raw CSVs on every run. The definitions matter more than the numbers, because a reader who cannot tell what a measure counts cannot tell whether it is being counted honestly, so they are stated here rather than left implied.' },
+    {
+      t: 'list',
+      items: [
+        'Matched pair. The same product at both chains: equal brand, pack size within 2%, and a fuzzy name score of 80 or better. Home brands are matched only against each other, as substitutes rather than as the same product. Every accepted pair keeps its score, so any pair can be pulled up and shown why it was accepted.',
+        'Parity rate. The share of matched pairs priced identically to the cent at both chains on the same day. Not within a tolerance: equal.',
+        'Mean absolute gap. The mean of the absolute dollar difference across matched pairs in an aisle. It weights every pair equally, so it describes the shelf rather than the till, and a dear line nobody buys counts as much as milk.',
+        'Basket total. The cheapest hit per basket line, restricted to lines where both chains stock the size the line asks for, summed across 48 comparable lines. Lines with no size match at one chain leave the basket rather than being compared across different sizes.',
+        'Promotion episode. A run of consecutive collected days on which the retailer’s own promotion flag is set for a product. Depth is measured against the price this collector observed before the run began, not against the advertised was-price.',
+        'Reference-price integrity. The share of advertised was-prices that match a price this collector actually observed on an earlier day. Only episodes with an earlier observation of my own can be tested, so the denominator is 100, not 203.',
+        'Repricing rate. Over the backfilled year, the share of pair-days on which either chain moved its price by at least half a cent. This is the effective sample size for the brand-tier comparison: a price sitting still for nine days is one event, not nine.',
+        'Gap episode. A run of consecutive days on which the two prices differ by more than 5% of their mean, in the same direction. It closes when the gap narrows to 5% or less while both prices are still being observed; a run reaching the last observed day is open, and its length is a lower bound rather than a measurement.',
+      ],
+    },
     { t: 'lede', text: 'Parity rate first. On identical national-brand products the two chains mostly refuse to be beaten, and 43% of pairs match to the cent.' },
     {
       t: 'bars',
@@ -277,7 +291,19 @@ export const grocery: CaseStudyProps = {
     },
     { t: 'p', text: 'Their July 2026 basket came to $262.02 at Coles and $261.27 at Woolworths, 75 cents apart on roughly $260. Different basket, different method, two and a half years of history against my ten days, and the same conclusion: at the level of the whole shop there is nothing to choose between them. That is the strongest external check available on the one finding here I would most want to be wrong about. Figures read from their index on 23 August 2026, covering November 2023 to July 2026.' },
 
-    { t: 'h', id: 'close', text: 'What it measures' },
+    { t: 'h', id: 'close', text: 'Conclusion' },
+    { t: 'p', text: 'Five things the series supports, in the order I would defend them.' },
+    {
+      t: 'list',
+      items: [
+        'Neither chain wins the basket. Across 48 comparable lines the two totals sit within a dollar on the most recent day, the winner flips repeatedly across the collected days, and Woolworths averages $6.47 cheaper over the ten published ones. Anyone quoting a stable lead for either chain is quoting noise, and I know because I quoted one myself before the pack-size screen was added.',
+        'The average hides the finding. Parity runs from 62.5% in pantry to 7.1% in household on the same morning, and the mean household gap is six times pantry’s. The two chains compete hard where a shopper can price from memory and barely at all where they cannot.',
+        'A promotion flag is not a price cut. Of 121 promotion starts with an observable baseline, 17 moved the price the wrong way or not at all, including four mineral waters going from $3.00 to $3.30 while flagged. All 17 were at one chain. The advertised was-prices themselves check out, 100 of 100, so this is the badge and the shelf price being managed apart rather than fake discounting.',
+        'Nine in ten promotions are a cycle, not a price change. Of 44 promotions observed on both sides, 39 returned to exactly the price they started at, median 41% off over a 7-day run. That is the difference between timing your shop and switching your shop.',
+        'Store brands are priced to hold still and name brands are the promotional vehicle. Over the backfilled year a store-brand packaged staple reprices eight times less often than its name-brand equivalent, and the two chains’ name-brand prices barely correlate day to day because their promotional cycles run out of phase.',
+      ],
+    },
+    { t: 'p', text: 'What the study cannot tell you is worth stating as plainly. These are shelf prices, not transacted prices: member pricing, multi-buys and loyalty offers sit underneath them. There are no quantities anywhere in public price data, so nothing here is elasticity and the word does not appear. It is online national pricing from one collection point, and the promotion and reference-price measures rest on 13 collected days rather than on the backfilled year, because the backfill carries prices and no promotion metadata at all.' },
     { t: 'p', text: 'This is a study of retailer behaviour. It measures how two chains price against each other in public: where they match, by how much they differ, how often and how deeply they promote, and whether a difference closes or holds. Behaviour is the useful signal here, because what each retailer chooses to match is a direct read on which lines it believes are competitive.' },
     { t: 'p', text: 'The answer it produces is a shape rather than a verdict. There is a small benchmarked head where the two chains track each other to the cent and earn almost nothing, and a long tail where a gap can sit for weeks because nobody is checking. Knowing which line is which, and being able to prove it rather than assert it, is the work. The same shape holds anywhere prices are set against a competitor rather than fixed by a contract, which is what makes the method portable off the supermarket shelf.' },
     { t: 'p', text: 'The measure I would add next is follow latency: the number of days before one retailer answers the other’s move. It reads competitive intensity more directly than parity does, because parity tells you where two chains have landed and latency tells you how hard they are watching. On this split it should separate the head from the tail sharply, and it is the natural next thing this warehouse is already shaped to compute.' },

@@ -157,8 +157,14 @@ function Blocks({ blocks }: { blocks: Block[] }) {
                 <FigHead title={b.title} unit={b.unit} />
                 <div className="mt-5 flex flex-col gap-3">
                   {b.bars.map(bar => (
-                    <div key={bar.label} className="grid grid-cols-[minmax(0,8.5rem)_1fr_auto] items-center gap-3">
-                      <span className="truncate text-[12.5px] text-[#5A544C]">{bar.label}</span>
+                    <div key={bar.label} className="grid grid-cols-[minmax(0,10rem)_1fr_auto] items-center gap-3 sm:grid-cols-[minmax(0,13.5rem)_1fr_auto]">
+                      {/* Wraps rather than truncates. At 8.5rem with `truncate`,
+                          18 of the 67 bar labels across these case studies were
+                          silently cut to an ellipsis: "OMO Sensitive La...",
+                          "Store brand, packaged st...". A chart that hides which
+                          product it is measuring is not a chart. A long label
+                          costs a second line, which is the cheaper failure. */}
+                      <span className="text-[12.5px] leading-snug text-[#5A544C]">{bar.label}</span>
                       {/* No filled background track: 9.F calls those dashboard
                           clutter. The bar is the value, the gap is just space. */}
                       <span className="h-2">
