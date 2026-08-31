@@ -69,7 +69,7 @@ const SPEC: [string, string][] = [
 ]
 
 export default function SoftwareProjects() {
-  const [open, setOpen] = useState<string | null>(null)
+  const [open, setOpen] = useState<{ id: string; shot: number } | null>(null)
 
   const featured = featuredProjects
   const rest = restProjects
@@ -181,6 +181,37 @@ export default function SoftwareProjects() {
                         <figcaption className="mt-3 text-[11.5px] leading-relaxed text-[#8A8378]" style={mono}>
                           {shot.caption}
                         </figcaption>
+
+                        {/* The rest of the contact sheet. A build with six
+                            screenshots was showing one and hiding five behind a
+                            click, which read as a project with one screenshot.
+                            Nothing here is decorative: every thumbnail is a real
+                            screen, and opens the record on that screen. */}
+                        {d && d.shots.length > 1 && (
+                          <ul className="mt-3 flex flex-wrap gap-2">
+                            {d.shots.slice(1).map((s, si) => (
+                              <li key={s.src}>
+                                <button
+                                  type="button"
+                                  onClick={() => setOpen({ id: p.id, shot: si + 1 })}
+                                  data-cursor="open"
+                                  aria-label={`Open ${p.title}: ${s.caption}`}
+                                  className={`group relative block overflow-hidden border border-[#14120F]/12 transition-colors hover:border-[#C13E00] focus-visible:border-[#C13E00] focus-visible:outline-none ${
+                                    d.shape === 'phone' ? 'h-[76px] w-[42px] bg-[#EFEEEA]' : 'h-[54px] w-[96px] bg-[#EAEAE6]'
+                                  }`}
+                                >
+                                  <Image
+                                    src={s.src}
+                                    alt={s.alt}
+                                    fill
+                                    sizes="96px"
+                                    className="object-cover object-top transition-opacity group-hover:opacity-85"
+                                  />
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
                       </>
                     ) : (
                       d?.pull && (
@@ -225,7 +256,7 @@ export default function SoftwareProjects() {
                     <div className="mt-6 flex flex-wrap items-center gap-4" style={mono}>
                       {d && (
                         <button
-                          onClick={() => setOpen(p.id)}
+                          onClick={() => setOpen({ id: p.id, shot: 0 })}
                           data-cursor="details"
                           className="border border-[#14120F]/25 px-[18px] py-2.5 text-[12.5px] transition-colors hover:border-[#C13E00] hover:text-[#C13E00]"
                         >
@@ -319,8 +350,12 @@ export default function SoftwareProjects() {
         </div>
       </footer>
 
-      {open && projectDetails[open] && (
-        <SoftwareDetail detail={projectDetails[open]} onClose={() => setOpen(null)} />
+      {open && projectDetails[open.id] && (
+        <SoftwareDetail
+          detail={projectDetails[open.id]}
+          initialShot={open.shot}
+          onClose={() => setOpen(null)}
+        />
       )}
     </div>
   )

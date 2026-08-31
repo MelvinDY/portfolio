@@ -90,7 +90,7 @@ export const softwareProjects: IndexedProject[] = [
   {
     id: 'research-dashboard',
     title: 'Research Dashboard',
-    blurb: 'Fund manager research dashboard for an investment research house, built to run embedded in another product’s iframe. No application database — each manager’s document-library folder is the record, read live through Microsoft Graph.',
+    blurb: 'Fund manager research dashboard for an investment research house, built to run embedded in another product’s iframe. The document library the team already maintains is the record itself, read live through Microsoft Graph.',
     stack: ['Next.js', 'TypeScript', 'Microsoft Graph', 'SharePoint', 'Vercel Edge Config'],
     href: 'https://research-dashboard-demo.vercel.app/demo',
     linkLabel: 'Live demo',
@@ -114,7 +114,7 @@ export const softwareProjects: IndexedProject[] = [
   {
     id: 'haven',
     title: 'Haven',
-    blurb: 'Consent-first Android app for couples where the sharing rules are enforced by the schema: symmetric grants, and no location history to leak.',
+    blurb: 'Consent-first Android app for couples where the sharing rules are enforced by the schema: symmetric grants, and one current location in place of a history.',
     stack: ['Kotlin', 'Jetpack Compose', 'Ktor', 'PostgreSQL', 'WebSockets'],
     href: 'https://github.com/MelvinDY/Haven',
     linkLabel: 'Source',

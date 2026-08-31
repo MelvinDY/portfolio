@@ -48,12 +48,16 @@ const PHONE_RATIO = 9 / 20
 const WIDE_RATIO = 16 / 9
 
 export default function SoftwareDetail({
-  detail, onClose,
+  detail, onClose, initialShot = 0,
 }: {
   detail: ProjectDetail
   onClose: () => void
+  /** Which shot to land on. The index page shows the whole contact sheet on
+   *  the card, so clicking the fourth thumbnail should open the fourth shot
+   *  rather than dropping you at the first and making you find it again. */
+  initialShot?: number
 }) {
-  const [shot, setShot] = useState(0)
+  const [shot, setShot] = useState(initialShot)
   const [box, setBox] = useState({ w: 0, h: 0 })
   const [view, setView] = useState({ w: 1440, h: 900 })
   const observer = useRef<ResizeObserver | null>(null)
@@ -267,16 +271,52 @@ export default function SoftwareDetail({
               </p>
             )}
 
+            {/* The decisions, not a feature list. The reasoning sits in its own
+                column rather than welded onto the claim: read down the first
+                column alone and you have the build in five lines; the other two
+                are there for whoever wants them. Three columns only where the
+                record column is actually wide enough for them — below lg it
+                stacks, each part keeping a label so nothing loses its slot. */}
             <div className="flex shrink-0 flex-col">
-              <h2 className="text-[11px] uppercase tracking-[0.16em] text-[#8A8378]" style={mono}>Worth knowing</h2>
-              <ul className="mt-[clamp(8px,1.4vh,12px)] flex flex-col gap-[clamp(6px,1.2vh,9px)]">
-                {detail.highlights.map(h => (
-                  <li
-                    key={h}
-                    className="relative shrink-0 pl-5 text-[clamp(11.5px,1.65vh,13.5px)] leading-snug text-[#5A544C]"
-                  >
-                    <span aria-hidden="true" className="absolute left-0 top-[9px] h-px w-2.5 bg-[#ff5e1f]" />
+              <h2 className="text-[11px] uppercase tracking-[0.16em] text-[#8A8378]" style={mono}>Decisions</h2>
+
+              <div
+                aria-hidden="true"
+                style={mono}
+                className="mt-[clamp(8px,1.4vh,12px)] hidden border-b border-[#14120F]/15 pb-1.5 lg:grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)_minmax(0,1fr)] lg:gap-x-4"
+              >
+                {['Decision', 'Why', 'What it bought'].map(h => (
+                  <span key={h} className="text-[9.5px] uppercase tracking-[0.16em] text-[#8A8378]">
                     {h}
+                  </span>
+                ))}
+              </div>
+
+              <ul className="flex flex-col lg:mt-0">
+                {detail.decisions.map(d => (
+                  <li
+                    key={d.decision}
+                    className="grid shrink-0 grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1 border-b border-[#14120F]/12 py-[clamp(7px,1.3vh,11px)] text-[clamp(11.5px,1.6vh,13px)] leading-snug last:border-b-0 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)_minmax(0,1fr)] lg:gap-x-4 lg:gap-y-0"
+                  >
+                    <span className="col-span-2 font-medium text-[#14120F] lg:col-span-1">
+                      {d.decision}
+                    </span>
+
+                    <span
+                      style={mono}
+                      className="pt-px text-[9.5px] uppercase tracking-[0.16em] text-[#8A8378] lg:hidden"
+                    >
+                      Why
+                    </span>
+                    <span className="text-[#5A544C]">{d.why}</span>
+
+                    <span
+                      style={mono}
+                      className="pt-px text-[9.5px] uppercase tracking-[0.16em] text-[#8A8378] lg:hidden"
+                    >
+                      Bought
+                    </span>
+                    <span className="text-[#5A544C]">{d.bought}</span>
                   </li>
                 ))}
               </ul>
