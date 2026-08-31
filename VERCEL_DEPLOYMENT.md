@@ -46,7 +46,7 @@ After deployment, add these environment variables in the Vercel Dashboard:
 | `RESEND_API_KEY` | `<your-resend-api-key>` | Production, Preview, Development |
 | `FROM_EMAIL` | `onboarding@resend.dev` | Production, Preview, Development |
 | `TO_EMAIL` | `melvindarialyogiana@gmail.com` | Production, Preview, Development |
-| `OPENAI_API_KEY` | `<your-openai-api-key>` (your full key) | Production, Preview, Development |
+| `OPENAI_API_KEY` | `<your-openai-api-key>` | Production, Preview, Development |
 
 **Important:** Select all three environments (Production, Preview, Development) for each variable.
 
