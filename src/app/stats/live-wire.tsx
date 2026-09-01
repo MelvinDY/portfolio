@@ -5,13 +5,14 @@ import { ago, countryName, type SqlMeta } from './theme'
 import { SqlButton } from './sql-panel'
 
 export interface WireRow {
+  /** Sydney time to the minute. Deliberately not to the second -- see FEED_QUERY. */
   at: string
+  /** Seconds, rounded to the nearest minute. Coarse on purpose, for the same reason. */
   age: number
   path: string
   country: string | null
   device: string | null
   browser: string | null
-  referrer_host: string | null
   you: boolean
   /** Opaque group number, valid only within this payload. Equality is the only
    *  meaningful operation on it — see FEED_QUERY. */
@@ -264,7 +265,6 @@ export default function LiveWire({
                       <span className="wire-meta">
                         {r.country && <span>{countryName(r.country)}</span>}
                         {ua && <span>{ua}</span>}
-                        {r.referrer_host && <span className="wire-ref">from {r.referrer_host}</span>}
                       </span>
                       {r.you && <span className="wire-you">that&apos;s you</span>}
                       <span className="wire-age">{ago(r.age)}</span>

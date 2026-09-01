@@ -304,23 +304,32 @@ export const FEED_QUERY = sql`
   -- numbered 1..n within the payload, so it cannot leak how many people were
   -- on the site in the last 24 hours.
   WITH recent AS (
-    SELECT ts, path, country, device, browser, referrer_host, visitor_id
+    SELECT ts, path, country, device, browser, visitor_id
     FROM events
     WHERE ts > now() - interval '24 hours'
       AND event IS NULL
     ORDER BY ts DESC
     LIMIT $2::int
   )
+  -- Minute resolution, not second, and no per-row referrer. This feed lists
+  -- people individually on a public page, and on a site this quiet a row is
+  -- recognisable to anyone who already knew the visit was coming. The panel
+  -- reads the same at a minute; what it loses is the ability to be watched.
+  -- age is rounded with it, or the exact second is simply recoverable from
+  -- the next field along. Every consumer of it is minute-scale or coarser:
+  -- railGap is log-scaled, tier steps at 1h/6h, QUIET_S is 12m, SESSION_S 30m.
+  -- The aggregate referrers panel is untouched -- hosts stay pooled into counts.
+  --
   -- The live count rides along as an uncorrelated scalar subquery: Postgres
   -- evaluates it once for the whole statement, so the wire and the header badge
   -- cost one round trip between them rather than two on every poll.
-  SELECT to_char(ts AT TIME ZONE '${TZ}', 'HH24:MI:SS')  AS at,
-         extract(epoch FROM now() - ts)::int             AS age,
+  SELECT to_char(ts AT TIME ZONE '${TZ}', 'HH24:MI')     AS at,
+         (round(extract(epoch FROM now() - ts) / 60)
+           * 60)::int                                    AS age,
          path,
          country,
          device,
          browser,
-         referrer_host,
          visitor_id = $1::text                           AS you,
          (dense_rank() OVER (ORDER BY visitor_id))::int  AS who,
          (SELECT count(DISTINCT visitor_id)::int

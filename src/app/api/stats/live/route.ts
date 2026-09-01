@@ -14,7 +14,6 @@ interface FeedRow {
   country: string | null
   device: string | null
   browser: string | null
-  referrer_host: string | null
   you: boolean
   who: number
   live: number

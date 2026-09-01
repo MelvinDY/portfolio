@@ -38,6 +38,7 @@ const display = { fontFamily: 'var(--font-space-grotesk), system-ui, sans-serif'
 /** Question wording per section, keyed by id. Kept beside the layout because
  *  it is phrasing rather than content, and it only makes sense here. */
 const QUESTION: Record<string, string> = {
+  'live-feed': 'Can other people see my visit?',
   'contact-form': 'What happens if I message you?',
   chat: 'What happens if I use the chat box?',
   storage: 'Are you storing anything on my device?',
@@ -66,7 +67,10 @@ const QA: Item[] = [
   },
   {
     q: 'Who else gets to see it?',
-    a: ['Four companies, because the site has to run somewhere and email has to be delivered by someone.'],
+    a: [
+      'Four companies, because the site has to run somewhere and email has to be delivered by someone.',
+      'And everyone. The dashboard at /stats is public, on purpose — it is the honest version of showing my work. The next question covers what that actually puts on screen.',
+    ],
     processors: true,
   },
   ...sections.map(s => ({ q: QUESTION[s.id] ?? s.title, a: s.body })),

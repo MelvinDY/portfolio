@@ -777,7 +777,6 @@ export const css = `
 .wire-meta > span:not(:first-child)::before {
   content: '·'; margin: 0 7px; color: rgba(20,18,15,0.22);
 }
-.wire-ref { color: ${MUTED}; }
 .wire-you {
   flex-shrink: 0;
   font-family: var(--font-newsreader, Georgia, serif); font-style: italic;

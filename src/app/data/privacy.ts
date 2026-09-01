@@ -56,6 +56,17 @@ export const processors = [
 ]
 
 export const sections = [
+  // First in the list because it follows straight on from "who else gets to
+  // see it", and because it is the one answer here a visitor might actually
+  // object to. Burying it further down would be the dishonest arrangement.
+  {
+    id: 'live-feed',
+    title: 'Whether other people can see your visit',
+    body: [
+      'Yes, and this is the part worth reading twice. One panel on the public dashboard lists recent pageviews individually rather than as totals: the page, the country, the device, and the time to the minute, refreshed every ten seconds.',
+      'It never shows your IP or your city, and the identifier behind it is the same salted hash that resets at midnight. But this is a quiet site. On a slow day a single row can still be recognisable to someone who already knew you were about to visit. If that bothers you, that is a reasonable thing to be bothered by, and the address at the bottom of this page reaches me.',
+    ],
+  },
   {
     id: 'contact-form',
     title: 'If you use the contact form',
