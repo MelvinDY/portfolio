@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getPostById, getAllPosts } from '../../lib/blog'
-import { FULL_NAME, SITE_URL } from '../../lib/site'
+import { FULL_NAME, SITE_URL, jsonLd } from '../../lib/site'
 import BlogPostTE from './blog-post-te'
 
 interface BlogPostPageProps {
@@ -42,7 +42,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(articleLd) }}
       />
       <BlogPostTE post={post} next={next} />
     </>

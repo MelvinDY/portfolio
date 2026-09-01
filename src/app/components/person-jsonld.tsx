@@ -1,4 +1,4 @@
-import { FULL_NAME, JOB_TITLE, SAME_AS, SHORT_NAME, SITE_URL, TAGLINE } from "../lib/site"
+import { FULL_NAME, JOB_TITLE, SAME_AS, SHORT_NAME, SITE_URL, TAGLINE, jsonLd } from "../lib/site"
 
 /**
  * Structured data for the homepage.
@@ -72,7 +72,7 @@ export default function PersonJsonLd() {
     <script
       type="application/ld+json"
       // Values are our own constants, not user input — no injection surface.
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }}
+      dangerouslySetInnerHTML={{ __html: jsonLd(graph) }}
     />
   )
 }

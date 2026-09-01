@@ -33,7 +33,12 @@ export async function GET(req: NextRequest) {
   }
 
   const requested = req.nextUrl.searchParams.get('range') ?? '30d'
-  const range = requested in RANGES ? requested : '30d'
+  // Object.hasOwn, not `in`: `in` walks the prototype chain, so ?range=constructor
+  // (or toString, or __proto__) passed the check and handed buildQueries the
+  // Object constructor instead of a RangeSpec. Every field came back undefined
+  // and the interval arithmetic became NaN, so the graceful fall-back to 30d
+  // turned into a 502.
+  const range = Object.hasOwn(RANGES, requested) ? requested : '30d'
   const spec = RANGES[range]
 
   try {

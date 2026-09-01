@@ -11,7 +11,12 @@ const HOUR_MS = 60 * 60 * 1000
 
 // Contact form validation schema
 const contactFormSchema = z.object({
-  name: z.string().min(1, "Name is required").max(100, "Name is too long"),
+  name: z.string()
+    .min(1, "Name is required")
+    .max(100, "Name is too long")
+    // Same guard the email field gets. `name` is interpolated into the Subject,
+    // and a header is a header even when a JSON API is the one assembling it.
+    .refine((name) => !name.includes('\n') && !name.includes('\r'), "Invalid name format"),
   email: z.string()
     .email("Please provide a valid email address")
     .max(254, "Email is too long") // RFC 5321
@@ -95,7 +100,9 @@ export async function POST(request: NextRequest) {
     const { data, error } = await new Resend(RESEND_API_KEY).emails.send({
       from: FROM_EMAIL,
       to: [TO_EMAIL],
-      subject: `Portfolio Contact: Message from ${escapeHtml(name)}`,
+      // Not escapeHtml: a subject line is not HTML, and escaping it only meant
+      // a name containing & or ' arrived mangled. CRLF is handled by the schema.
+      subject: `Portfolio Contact: Message from ${name}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px;">

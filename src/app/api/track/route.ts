@@ -11,8 +11,24 @@ const bodySchema = z.object({
   path: z.string().min(1).max(200),
   referrer: z.string().max(500).optional(),
   utm_source: z.string().max(80).optional(),
-  event: z.string().max(60).optional(),
+  // Named events are emitted by our own code, so they can be held to a slug.
+  event: z.string().max(60).regex(/^[a-z0-9_-]+$/i).optional(),
 })
+
+/**
+ * What a path is allowed to look like once the query string is off it.
+ *
+ * This endpoint is open by necessity -- it is called from the browser on every
+ * pageview, so it cannot be authenticated -- and whatever it stores is rendered
+ * on the public /stats dashboard. React escapes it, so this was never an XSS
+ * hole, but without a shape check anyone could POST 200 characters of prose and
+ * watch it appear in the "top pages" panel. A route is a leading slash and
+ * URL-safe segments; nothing else gets written.
+ */
+const PATH_RE = /^\/[A-Za-z0-9\-._~/%]*$/
+
+/** Hostnames only: labels joined by dots, as `new URL().hostname` yields. */
+const HOST_RE = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i
 
 export async function POST(req: NextRequest) {
   const ok = new NextResponse(null, { status: 204 })
@@ -31,6 +47,12 @@ export async function POST(req: NextRequest) {
 
     // Normalise: strip trailing slash (except root), drop query strings
     const cleanPath = (path.split('?')[0].replace(/\/+$/, '') || '/').slice(0, 200)
+    if (!PATH_RE.test(cleanPath)) return ok
+
+    // Same treatment for the referrer: referrerHost() already reduces it to a
+    // hostname, but `new URL()` accepts plenty that no real referrer produces.
+    const rHost = referrerHost(referrer, req.nextUrl.hostname)
+    const cleanReferrer = rHost && HOST_RE.test(rHost) ? rHost : null
 
     const vid = visitorId(ip, ua!)
 
@@ -52,7 +74,7 @@ export async function POST(req: NextRequest) {
       INSERT INTO events (visitor_id, path, referrer_host, country, device, browser, os, utm_source, event)
       SELECT
         ${vid}::text, ${cleanPath}::text,
-        ${referrerHost(referrer, req.nextUrl.hostname)}::text,
+        ${cleanReferrer}::text,
         ${country}::text, ${device}::text, ${browser}::text, ${os}::text,
         ${utm_source?.slice(0, 80) ?? null}::text, ${event ?? null}::text
       WHERE (

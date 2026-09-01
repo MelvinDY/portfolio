@@ -33,3 +33,22 @@ export const PROFILES = {
 } as const
 
 export const SAME_AS = Object.values(PROFILES)
+
+/**
+ * Serialise a JSON-LD graph for injection into a
+ * `<script type="application/ld+json">` block.
+ *
+ * JSON.stringify does not escape `<`, so a value containing `</script>` would
+ * close the block early and the rest would be parsed as HTML. Emitting it as
+ * the `<` escape is ordinary JSON -- every parser reads it back as `<` --
+ * and the two Unicode separators get the same treatment because they are legal
+ * in JSON but illegal raw inside a JavaScript string literal.
+ *
+ * Today the input is our own content, so this is defence for the day it isn't.
+ */
+export function jsonLd(graph: unknown): string {
+  return JSON.stringify(graph)
+    .replace(/</g, "\\u003c")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029")
+}
